@@ -52,7 +52,7 @@ const Confirmation = () => {
               Booking Confirmed!
             </h1>
             <p className="text-muted-foreground">
-              Thank you for choosing TidyWise. We'll contact you shortly.
+              Thank you for choosing TIDYWISE. We'll contact you shortly.
             </p>
           </div>
 

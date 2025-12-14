@@ -19,7 +19,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
-            <img src={logo} alt="TidyWise Logo" className="h-10 w-auto" />
+            <img src={logo} alt="TIDYWISE Logo" className="h-10 w-auto" />
             <span className="font-display text-xl font-bold text-foreground">TIDYWISE</span>
           </a>
 

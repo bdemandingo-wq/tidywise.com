@@ -45,7 +45,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "TidyWise Cleaning <support@tidywisecleaning.com>",
+        from: "TIDYWISE Cleaning <support@tidywisecleaning.com>",
         to: ["support@tidywisecleaning.com"],
         subject: `New Booking Request from ${booking.customerName} - ${booking.preferredDate}`,
         html: `
@@ -95,9 +95,9 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "TidyWise Cleaning <support@tidywisecleaning.com>",
+        from: "TIDYWISE Cleaning <support@tidywisecleaning.com>",
         to: [booking.customerEmail],
-        subject: "Your TidyWise Cleaning Booking Confirmation ✅",
+        subject: "Your TIDYWISE Cleaning Booking Confirmation ✅",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
             <h1 style="color: #2563eb;">Hi ${booking.customerName},</h1>

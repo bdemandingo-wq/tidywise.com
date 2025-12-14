@@ -24,7 +24,7 @@ const WhyChooseUs = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Why Choose TidyWise?
+            Why Choose TIDYWISE?
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             We're not just another cleaning service. We're your partners in creating a healthier, happier home environment.
