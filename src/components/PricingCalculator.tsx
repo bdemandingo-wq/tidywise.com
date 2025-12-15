@@ -184,11 +184,23 @@ const PricingCalculator = () => {
             {/* Book Button */}
             <Button
               size="lg"
-              className="w-full text-lg font-semibold"
+              className="w-full text-lg font-semibold bg-success text-success-foreground hover:bg-success/90"
               onClick={handleBooking}
             >
-              Book This Service
+              Book This Service - Get Confirmed in Minutes
             </Button>
+            
+            {/* Trust indicator */}
+            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-success" />
+                No hidden fees
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-success" />
+                Cancel anytime
+              </span>
+            </div>
           </CardContent>
         </Card>
       </div>

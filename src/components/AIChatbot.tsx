@@ -1,15 +1,34 @@
-import { useState } from "react";
-import { MessageCircle, X, Send, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MessageCircle, X, Send, Trash2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChat } from "@/hooks/useChat";
 import { cn } from "@/lib/utils";
 
+const suggestedQuestions = [
+  "What services do you offer?",
+  "How much does cleaning cost?",
+  "Do you use eco-friendly products?",
+  "How do I book a cleaning?",
+];
+
 const AIChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [showProactiveBubble, setShowProactiveBubble] = useState(false);
   const { messages, isLoading, sendMessage, clearMessages } = useChat();
+
+  // Show proactive bubble after 8 seconds if chat hasn't been opened
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isOpen && messages.length === 0) {
+        setShowProactiveBubble(true);
+      }
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, messages.length]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,15 +38,57 @@ const AIChatbot = () => {
     }
   };
 
+  const handleSuggestedQuestion = (question: string) => {
+    sendMessage(question);
+  };
+
+  const handleOpen = () => {
+    setIsOpen(true);
+    setShowProactiveBubble(false);
+  };
+
   return (
     <>
+      {/* Proactive Bubble */}
+      {showProactiveBubble && !isOpen && (
+        <div 
+          className="fixed bottom-24 right-6 z-50 max-w-[280px] animate-fade-in cursor-pointer"
+          onClick={handleOpen}
+        >
+          <div className="bg-card border border-border rounded-xl p-4 shadow-elevated relative">
+            <button 
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowProactiveBubble(false);
+              }}
+            >
+              <X className="w-3 h-3" />
+            </button>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Need help?</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Ask me about pricing, services, or get a quick quote!
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="absolute -bottom-2 right-8 w-4 h-4 bg-card border-r border-b border-border rotate-45" />
+        </div>
+      )}
+
       {/* Chat Toggle Button */}
       <Button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => isOpen ? setIsOpen(false) : handleOpen()}
         className={cn(
           "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg",
           "bg-primary hover:bg-primary/90 text-primary-foreground",
-          "transition-transform hover:scale-105"
+          "transition-all hover:scale-105",
+          !isOpen && "animate-pulse"
         )}
         size="icon"
       >
@@ -36,28 +97,66 @@ const AIChatbot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[calc(100vw-3rem)] rounded-xl border bg-background shadow-2xl">
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] rounded-xl border bg-background shadow-2xl animate-scale-in">
           {/* Header */}
-          <div className="flex items-center justify-between border-b px-4 py-3">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              <span className="font-semibold text-foreground">TIDYWISE Assistant</span>
+          <div className="flex items-center justify-between border-b px-4 py-3 bg-primary/5 rounded-t-xl">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-success border-2 border-background" />
+              </div>
+              <div>
+                <span className="font-semibold text-foreground">TIDYWISE Assistant</span>
+                <p className="text-xs text-muted-foreground">Typically replies instantly</p>
+              </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={clearMessages}
               className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title="Clear chat"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Messages */}
-          <ScrollArea className="h-[400px] p-4">
+          <ScrollArea className="h-[350px] p-4">
             {messages.length === 0 ? (
-              <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                <p>Hi! How can I help you today?<br />Ask me about our cleaning services.</p>
+              <div className="space-y-4">
+                {/* Welcome Message */}
+                <div className="flex justify-start">
+                  <div className="max-w-[85%] rounded-lg px-4 py-3 bg-muted text-foreground">
+                    <p className="text-sm">
+                      👋 Hi there! I'm your TIDYWISE assistant. I can help you with:
+                    </p>
+                    <ul className="text-sm mt-2 space-y-1 text-muted-foreground">
+                      <li>• Pricing & service info</li>
+                      <li>• Booking questions</li>
+                      <li>• Service area coverage</li>
+                    </ul>
+                    <p className="text-sm mt-2">How can I help you today?</p>
+                  </div>
+                </div>
+                
+                {/* Suggested Questions */}
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground text-center">Quick questions:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestedQuestions.map((question, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSuggestedQuestion(question)}
+                        className="text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        {question}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -71,7 +170,7 @@ const AIChatbot = () => {
                   >
                     <div
                       className={cn(
-                        "max-w-[85%] rounded-lg px-3 py-2 text-sm",
+                        "max-w-[85%] rounded-lg px-4 py-2.5 text-sm",
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted text-foreground"
@@ -83,7 +182,7 @@ const AIChatbot = () => {
                 ))}
                 {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-3 py-2">
+                    <div className="bg-muted rounded-lg px-4 py-3">
                       <div className="flex gap-1">
                         <span className="h-2 w-2 rounded-full bg-foreground/40 animate-bounce" />
                         <span className="h-2 w-2 rounded-full bg-foreground/40 animate-bounce [animation-delay:0.1s]" />
@@ -97,16 +196,21 @@ const AIChatbot = () => {
           </ScrollArea>
 
           {/* Input */}
-          <form onSubmit={handleSubmit} className="border-t p-3">
+          <form onSubmit={handleSubmit} className="border-t p-3 bg-muted/30">
             <div className="flex gap-2">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 bg-background"
               />
-              <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+              <Button 
+                type="submit" 
+                size="icon" 
+                disabled={isLoading || !input.trim()}
+                className="bg-primary hover:bg-primary/90"
+              >
                 <Send className="h-4 w-4" />
               </Button>
             </div>

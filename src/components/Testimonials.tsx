@@ -25,6 +25,17 @@ const Testimonials = () => {
   return (
     <section className="py-16 bg-muted">
       <div className="container mx-auto px-4">
+        {/* Rating summary */}
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex gap-0.5">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-6 h-6 fill-secondary text-secondary" />
+            ))}
+          </div>
+          <span className="text-lg font-semibold text-foreground">5.0</span>
+          <span className="text-muted-foreground">from 100+ reviews</span>
+        </div>
+        
         <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
           What Our Clients Say
         </h2>
@@ -50,6 +61,17 @@ const Testimonials = () => {
               </div>
             </div>
           ))}
+        </div>
+        
+        {/* CTA */}
+        <div className="text-center mt-10">
+          <a 
+            href="#booking" 
+            className="inline-flex items-center gap-2 text-primary font-semibold hover:underline"
+          >
+            Join our happy customers - Get your quote now
+            <span className="text-lg">→</span>
+          </a>
         </div>
       </div>
     </section>
