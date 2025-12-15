@@ -43,6 +43,10 @@
     --navy: 221 83% 25%;
     --navy-light: 221 83% 53%;
     --cream: 40 33% 97%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
     
     /* Typography */
     --font-display: 'Playfair Display', serif;

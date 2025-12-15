@@ -25,13 +25,13 @@ const Hero = () => {
           Into a Sanctuary
         </h1>
         <p className="text-background/90 text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          South Florida's most trusted cleaning service. Professional, reliable, and thorough cleaning solutions.
+          South Florida's most trusted cleaning service. For Every Budget, For Every Space, For You.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
           <Button
             variant="outline"
             size="lg"
-            className="bg-secondary text-secondary-foreground border-secondary hover:bg-secondary/90 font-semibold"
+            className="bg-info text-info-foreground border-info hover:bg-info/90 font-semibold"
             asChild
           >
             <a href="tel:+15615718725" className="flex items-center gap-2">
@@ -41,7 +41,7 @@ const Hero = () => {
           </Button>
           <Button
             size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
+            className="bg-success text-success-foreground hover:bg-success/90 font-semibold"
             asChild
           >
             <a href="#booking">Get Instant Quote</a>
