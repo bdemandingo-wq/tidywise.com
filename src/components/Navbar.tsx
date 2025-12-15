@@ -34,8 +34,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="TIDYWISE Logo" className="h-12 w-auto" />
+          <Link to="/" className="flex items-center">
             <span className="font-display text-xl font-bold text-foreground">TIDYWISE</span>
           </Link>
 
