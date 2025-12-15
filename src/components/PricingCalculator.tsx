@@ -184,19 +184,20 @@ const PricingCalculator = () => {
             {/* Book Button */}
             <Button
               size="lg"
-              className="w-full text-lg font-semibold bg-success text-success-foreground hover:bg-success/90"
+              className="w-full text-base md:text-lg font-semibold bg-success text-success-foreground hover:bg-success/90 py-6"
               onClick={handleBooking}
             >
-              Book This Service - Get Confirmed in Minutes
+              <span className="hidden sm:inline">Book This Service - Get Confirmed in Minutes</span>
+              <span className="sm:hidden">Book Now - Instant Confirmation</span>
             </Button>
             
             {/* Trust indicator */}
-            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-success" />
                 No hidden fees
               </span>
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-success" />
                 Cancel anytime
               </span>
