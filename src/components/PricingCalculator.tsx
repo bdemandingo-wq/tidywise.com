@@ -7,10 +7,50 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
+// Pricing tiers based on square footage
+const pricingTiers = [
+  { maxSqft: 750, label: "Up to 750 sf" },
+  { maxSqft: 1000, label: "Up to 1000 sf" },
+  { maxSqft: 1250, label: "Up to 1250 sf" },
+  { maxSqft: 1500, label: "Up to 1500 sf" },
+  { maxSqft: 1800, label: "Up to 1800 sf" },
+  { maxSqft: 2100, label: "Up to 2100 sf" },
+  { maxSqft: 2400, label: "Up to 2400 sf" },
+  { maxSqft: 2700, label: "Up to 2700 sf" },
+  { maxSqft: 3000, label: "Up to 3000 sf" },
+  { maxSqft: 3300, label: "Up to 3300 sf" },
+  { maxSqft: 3600, label: "Up to 3600 sf" },
+  { maxSqft: 4000, label: "Up to 4000 sf" },
+  { maxSqft: 4400, label: "Up to 4400 sf" },
+];
+
+// Service types with pricing per tier (matching the reference table)
 const serviceTypes = [
-  { value: "standard", label: "Standard Cleaning", basePrice: 142 },
-  { value: "deep", label: "Deep Cleaning", basePrice: 209 },
-  { value: "moveinout", label: "Move In/Out Cleaning", basePrice: 259 },
+  { 
+    value: "deep", 
+    label: "Deep Clean (First Cleaning)", 
+    prices: [208, 243, 278, 313, 348, 383, 438, 493, 548, 603, 658, 713, 768]
+  },
+  { 
+    value: "standard", 
+    label: "Standard Clean", 
+    prices: [108, 143, 178, 213, 248, 283, 313, 368, 423, 478, 533, 588, 643]
+  },
+  { 
+    value: "moveinout", 
+    label: "Move In/Move Out Clean", 
+    prices: [283, 318, 353, 388, 423, 458, 513, 568, 623, 678, 733, 788, 843]
+  },
+  { 
+    value: "construction", 
+    label: "Construction Clean Up", 
+    prices: [450, 502, 555, 607, 660, 712, 795, 877, 960, 1042, 1125, 1207, 1290]
+  },
+  { 
+    value: "airbnb", 
+    label: "Airbnb/Short-Term Rental", 
+    prices: [140, 160, 180, 200, 220, 240, 265, 295, 330, 365, 400, 435, 470]
+  },
 ];
 
 const frequencies = [
@@ -30,6 +70,17 @@ const addOns = [
   { id: "dishes", label: "Dishes", price: 15 },
 ];
 
+// Helper function to get price based on sqft tier
+const getPriceForSqft = (sqft: number, prices: number[]): number => {
+  for (let i = 0; i < pricingTiers.length; i++) {
+    if (sqft <= pricingTiers[i].maxSqft) {
+      return prices[i];
+    }
+  }
+  // If over max tier, use highest price
+  return prices[prices.length - 1];
+};
+
 const PricingCalculator = () => {
   const navigate = useNavigate();
   const [sqft, setSqft] = useState([1500]);
@@ -41,8 +92,8 @@ const PricingCalculator = () => {
   const selectedFrequency = frequencies.find((f) => f.value === frequency)!;
 
   const totalPrice = useMemo(() => {
-    const sqftMultiplier = sqft[0] / 1000;
-    let price = selectedService.basePrice * sqftMultiplier;
+    // Get base price from tier
+    let price = getPriceForSqft(sqft[0], selectedService.prices);
 
     // Add add-ons
     const addOnTotal = selectedAddOns.reduce((sum, id) => {
