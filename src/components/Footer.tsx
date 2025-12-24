@@ -6,9 +6,9 @@ const Footer = () => {
   return (
     <footer className="bg-foreground text-background py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Brand */}
-          <div>
+          <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <img src={logo} alt="TIDYWISE Logo" className="h-10 w-auto invert" />
               <span className="font-display text-xl font-bold">TIDYWISE</span>
@@ -27,14 +27,14 @@ const Footer = () => {
               </a>
               <p className="flex items-center gap-2 text-background/70">
                 <MapPin className="w-4 h-4" />
-                South Florida
+                Deerfield Beach, FL
               </p>
             </div>
           </div>
 
           {/* Services */}
           <div>
-            <h3 className="font-display font-semibold mb-4">Services</h3>
+            <h3 className="font-display font-semibold mb-4">Our Services</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/standard-cleaning" className="text-background/70 hover:text-background transition-colors">
@@ -52,6 +52,16 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/carpet-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Carpet Cleaning
+                </Link>
+              </li>
+              <li>
+                <Link to="/upholstery-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Upholstery Cleaning
+                </Link>
+              </li>
+              <li>
                 <Link to="/#booking" className="text-background/70 hover:text-background transition-colors">
                   Get a Quote
                 </Link>
@@ -59,7 +69,81 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Broward County Cities */}
+          <div>
+            <h3 className="font-display font-semibold mb-4">Broward County</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/fort-lauderdale-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Fort Lauderdale
+                </Link>
+              </li>
+              <li>
+                <Link to="/hollywood-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Hollywood
+                </Link>
+              </li>
+              <li>
+                <Link to="/pompano-beach-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Pompano Beach
+                </Link>
+              </li>
+              <li>
+                <Link to="/coral-springs-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Coral Springs
+                </Link>
+              </li>
+              <li>
+                <Link to="/pembroke-pines-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Pembroke Pines
+                </Link>
+              </li>
+              <li>
+                <Link to="/broward-county-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  View All Broward →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Palm Beach & Miami-Dade Cities */}
+          <div>
+            <h3 className="font-display font-semibold mb-4">More Cities</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/boca-raton-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Boca Raton
+                </Link>
+              </li>
+              <li>
+                <Link to="/west-palm-beach-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  West Palm Beach
+                </Link>
+              </li>
+              <li>
+                <Link to="/miami-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Miami
+                </Link>
+              </li>
+              <li>
+                <Link to="/miami-beach-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Miami Beach
+                </Link>
+              </li>
+              <li>
+                <Link to="/delray-beach-cleaning" className="text-background/70 hover:text-background transition-colors">
+                  Delray Beach
+                </Link>
+              </li>
+              <li>
+                <Link to="/service-areas" className="text-background/70 hover:text-background transition-colors">
+                  View All Cities →
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company & Resources */}
           <div>
             <h3 className="font-display font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm">
@@ -75,7 +159,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/blog" className="text-background/70 hover:text-background transition-colors">
-                  Blog
+                  Blog & Tips
                 </Link>
               </li>
               <li>
@@ -88,43 +172,41 @@ const Footer = () => {
                   Join Our Team
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Service Areas */}
-          <div>
-            <h3 className="font-display font-semibold mb-4">Service Areas</h3>
-            <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/broward-county-cleaning" className="text-background/70 hover:text-background transition-colors">
-                  Broward County
-                </Link>
-              </li>
-              <li>
-                <Link to="/palm-beach-county-cleaning" className="text-background/70 hover:text-background transition-colors">
-                  Palm Beach County
-                </Link>
-              </li>
-              <li>
-                <Link to="/miami-dade-cleaning" className="text-background/70 hover:text-background transition-colors">
-                  Miami-Dade County
-                </Link>
-              </li>
-              <li>
-                <Link to="/service-areas" className="text-background/70 hover:text-background transition-colors">
-                  View All Cities →
+                <Link to="/sitemap" className="text-background/70 hover:text-background transition-colors">
+                  Sitemap
                 </Link>
               </li>
             </ul>
           </div>
         </div>
 
+        {/* County Links Row */}
+        <div className="border-t border-background/20 py-6 mb-6">
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <Link to="/broward-county-cleaning" className="text-background/70 hover:text-background transition-colors">
+              Broward County Cleaning
+            </Link>
+            <span className="text-background/30">|</span>
+            <Link to="/palm-beach-county-cleaning" className="text-background/70 hover:text-background transition-colors">
+              Palm Beach County Cleaning
+            </Link>
+            <span className="text-background/30">|</span>
+            <Link to="/miami-dade-cleaning" className="text-background/70 hover:text-background transition-colors">
+              Miami-Dade County Cleaning
+            </Link>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
-        <div className="border-t border-background/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-background/20 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-background/70 text-sm">
             © {new Date().getFullYear()} TIDYWISE Cleaning Services. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm">
+            <Link to="/sitemap" className="text-background/70 hover:text-background transition-colors">
+              Sitemap
+            </Link>
             <Link to="/auth" className="text-background/70 hover:text-background transition-colors">
               Admin
             </Link>

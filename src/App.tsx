@@ -101,6 +101,7 @@ const CarpetCleaning = lazy(() => import("./pages/CarpetCleaning"));
 const UpholsteryCleaning = lazy(() => import("./pages/UpholsteryCleaning"));
 const ReferralProgram = lazy(() => import("./pages/ReferralProgram"));
 const ContractorRateSheet = lazy(() => import("./pages/ContractorRateSheet"));
+const Sitemap = lazy(() => import("./pages/Sitemap"));
 
 const queryClient = new QueryClient();
 
@@ -130,6 +131,7 @@ const AppRoutes = () => {
         <Route path="/upholstery-cleaning" element={<UpholsteryCleaning />} />
         <Route path="/referral-program" element={<ReferralProgram />} />
         <Route path="/contractor-rate-sheet" element={<ContractorRateSheet />} />
+        <Route path="/sitemap" element={<Sitemap />} />
         
         {/* County Landing Pages */}
         <Route path="/broward-county-cleaning" element={<BrowardCountyCleaning />} />
