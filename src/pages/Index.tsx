@@ -17,8 +17,8 @@ const Index = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Cleaners Near Me | South Florida Cleaning Services | TIDYWISE"
-        pageDescription="Looking for cleaners near me? TIDYWISE serves Broward, Miami-Dade & Palm Beach County. Licensed & insured professional cleaners. Same-day quotes. Call (561) 571-8725!"
+        pageTitle="South Florida Cleaning Services | TIDYWISE"
+        pageDescription="South Florida's best cleaning service. Broward, Miami-Dade & Palm Beach County. Licensed & insured. Same-day quotes. Call (561) 571-8725!"
         canonicalUrl="https://tidywisecleaning.com"
         pageType="home"
       />
