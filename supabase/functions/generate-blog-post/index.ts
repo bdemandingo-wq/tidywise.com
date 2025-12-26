@@ -1,10 +1,31 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Restricted CORS - only allow specific origins
+const ALLOWED_ORIGINS = [
+  'https://tidywisecleaning.com',
+  'https://www.tidywisecleaning.com',
+  'https://ekseakjxarhjujngoklz.supabase.co',
+];
+
+const DEV_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:8080',
+  'http://localhost:3000',
+];
+
+function getCorsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('Origin') || '';
+  const isAllowed = ALLOWED_ORIGINS.includes(origin) || 
+    DEV_ORIGINS.includes(origin) ||
+    origin.includes('.lovable.app') ||
+    origin.includes('.lovableproject.com');
+  
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
 
 const CLEANING_TOPICS = [
   "Quick cleaning hacks for busy Florida professionals",
@@ -42,6 +63,8 @@ const CLEANING_TOPICS = [
 const CATEGORIES = ["Tips", "Guides", "Seasonal", "Health", "Home Care"];
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -50,19 +73,76 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
 
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !SUPABASE_ANON_KEY) {
       throw new Error('Supabase credentials not configured');
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // ============ AUTHENTICATION CHECK ============
+    // Verify the request has a valid authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      console.log('Missing or invalid Authorization header');
+      return new Response(JSON.stringify({ error: 'Unauthorized: Missing authentication' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
+    // Create a client with the user's token to verify their identity
+    const userSupabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Verify the user is authenticated
+    const { data: { user }, error: authError } = await userSupabase.auth.getUser();
+    if (authError || !user) {
+      console.log('Auth verification failed:', authError?.message);
+      return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('User authenticated:', user.id);
+
+    // ============ ADMIN ROLE CHECK ============
+    // Use service role client to check admin status (bypasses RLS)
+    const serviceSupabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    
+    const { data: roleData, error: roleError } = await serviceSupabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError) {
+      console.error('Role check failed:', roleError.message);
+      return new Response(JSON.stringify({ error: 'Failed to verify permissions' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!roleData) {
+      console.log('User is not an admin:', user.id);
+      return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log('Admin access verified for user:', user.id);
+
+    // ============ BLOG GENERATION LOGIC ============
     // Get existing blog post slugs to avoid duplicates
-    const { data: existingPosts } = await supabase
+    const { data: existingPosts } = await serviceSupabase
       .from('blog_posts')
       .select('slug, title');
 
@@ -173,7 +253,7 @@ The content should include:
       .substring(0, 100);
 
     // Check if slug already exists
-    const { data: existingSlug } = await supabase
+    const { data: existingSlug } = await serviceSupabase
       .from('blog_posts')
       .select('slug')
       .eq('slug', slug)
@@ -190,7 +270,7 @@ The content should include:
     }
 
     // Insert the new blog post
-    const { data: newPost, error: insertError } = await supabase
+    const { data: newPost, error: insertError } = await serviceSupabase
       .from('blog_posts')
       .insert({
         title: blogData.title,
