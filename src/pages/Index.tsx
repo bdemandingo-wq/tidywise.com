@@ -26,8 +26,8 @@ const Index = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="South Florida Cleaning Services | TIDYWISE"
-        pageDescription="South Florida's best cleaning service. Broward, Miami-Dade & Palm Beach County. Licensed & insured. Same-day quotes. Call (561) 571-8725!"
+        pageTitle="TIDYWISE House Cleaning Fort Lauderdale, Boca Raton & West Palm Beach"
+        pageDescription="TIDYWISE professional house cleaning in Fort Lauderdale, Boca Raton & West Palm Beach. Serving 40+ cities in Broward, Palm Beach & Miami-Dade. Call (561) 571-8725!"
         canonicalUrl="https://tidywisecleaning.com"
         pageType="home"
       />
