@@ -120,6 +120,7 @@ const BookingForm = () => {
             total_amount: parseFloat(booking.totalPrice),
             bedrooms: formData.beds,
             bathrooms: formData.baths,
+            frequency: booking.frequency,
             notes: `${formData.accessInstructions}\n\nFocus Areas: ${formData.focusAreas}\n\nPet Info: ${formData.hasPets !== "no" ? `${formData.hasPets} - ${formData.petDetails}` : "No pets"}`
           })
         });
