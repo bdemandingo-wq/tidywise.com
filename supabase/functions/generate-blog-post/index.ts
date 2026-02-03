@@ -84,69 +84,82 @@ serve(async (req) => {
     }
 
     // ============ AUTHENTICATION CHECK ============
-    // Verify the request has a valid authorization header
+    // Check if this is an internal cron call using service role key
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.log('Missing or invalid Authorization header');
-      return new Response(JSON.stringify({ error: 'Unauthorized: Missing authentication' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Create a client with the user's token to verify their identity
-    const userSupabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } }
-    });
-
-    // Verify the user is authenticated
-    const { data: { user }, error: authError } = await userSupabase.auth.getUser();
-    if (authError || !user) {
-      console.log('Auth verification failed:', authError?.message);
-      return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    console.log('User authenticated:', user.id);
-
-    // ============ ADMIN ROLE CHECK ============
-    // Use service role client to check admin status (bypasses RLS)
-    const serviceSupabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const token = authHeader?.replace('Bearer ', '');
     
-    const { data: roleData, error: roleError } = await serviceSupabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin')
-      .maybeSingle();
+    // Allow cron job calls with service role key OR anon key (for internal scheduled calls)
+    const isInternalCronCall = token === SUPABASE_SERVICE_ROLE_KEY || token === SUPABASE_ANON_KEY;
+    
+    if (isInternalCronCall) {
+      console.log('Internal cron job call detected - bypassing user auth');
+    } else {
+      // Manual call - require admin user authentication
+      if (!authHeader?.startsWith('Bearer ')) {
+        console.log('Missing or invalid Authorization header');
+        return new Response(JSON.stringify({ error: 'Unauthorized: Missing authentication' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
-    if (roleError) {
-      console.error('Role check failed:', roleError.message);
-      return new Response(JSON.stringify({ error: 'Failed to verify permissions' }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      // Create a client with the user's token to verify their identity
+      const userSupabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: authHeader } }
       });
-    }
 
-    if (!roleData) {
-      console.log('User is not an admin:', user.id);
-      return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+      // Verify the user is authenticated
+      const { data: { user }, error: authError } = await userSupabase.auth.getUser();
+      if (authError || !user) {
+        console.log('Auth verification failed:', authError?.message);
+        return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
 
-    console.log('Admin access verified for user:', user.id);
+      console.log('User authenticated:', user.id);
+
+      // ============ ADMIN ROLE CHECK ============
+      // Use service role client to check admin status (bypasses RLS)
+      const adminCheckSupabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      
+      const { data: roleData, error: roleError } = await adminCheckSupabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (roleError) {
+        console.error('Role check failed:', roleError.message);
+        return new Response(JSON.stringify({ error: 'Failed to verify permissions' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (!roleData) {
+        console.log('User is not an admin:', user.id);
+        return new Response(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      console.log('Admin access verified for user:', user.id);
+    }
 
     // ============ BLOG GENERATION LOGIC ============
+    // Use service role client for database operations
+    const serviceSupabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
     // Get existing blog post slugs to avoid duplicates
     const { data: existingPosts } = await serviceSupabase
       .from('blog_posts')
       .select('slug, title');
 
-    const existingTitles = new Set(existingPosts?.map(p => p.title.toLowerCase()) || []);
+    const existingTitles = new Set((existingPosts || []).map((p: { title: string }) => p.title.toLowerCase()));
 
     // Pick a random topic that hasn't been used
     let topic = CLEANING_TOPICS[Math.floor(Math.random() * CLEANING_TOPICS.length)];
