@@ -129,30 +129,6 @@ const BookingForm = () => {
         // Continue even if webhook fails - booking is saved locally
       }
 
-      // Send confirmation emails
-      const { error } = await supabase.functions.invoke("send-booking-confirmation", {
-        body: {
-          customerName: formData.name,
-          customerEmail: formData.email,
-          customerPhone: formData.phone,
-          address: formData.address,
-          beds: formData.beds,
-          baths: formData.baths,
-          specialInstructions: `${formData.accessInstructions}\n\nFocus Areas: ${formData.focusAreas}`,
-          petInfo: formData.hasPets !== "no" ? `${formData.hasPets} - ${formData.petDetails}` : "No pets",
-          serviceType: booking.serviceType,
-          sqft: booking.sqft,
-          frequency: booking.frequency,
-          addOns: booking.addOns,
-          totalPrice: booking.totalPrice,
-          preferredDate: preferredDate ? format(preferredDate, "EEEE, MMMM d, yyyy") : "Not specified",
-        },
-      });
-
-      if (error) {
-        console.error("Error sending email:", error);
-      }
-
       // Send SMS notification via OpenPhone
       try {
         await supabase.functions.invoke("send-sms-notification", {

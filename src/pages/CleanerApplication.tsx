@@ -133,26 +133,6 @@ const CleanerApplication = () => {
       
       if (error) throw error;
 
-      // Send confirmation email to admin
-      try {
-        await supabase.functions.invoke("send-cleaner-application-notification", {
-          body: {
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            hasTransportation: data.hasTransportation,
-            hasSupplies: data.hasSupplies,
-            yearsExperience: data.yearsExperience,
-            hasInsurance: data.hasInsurance,
-            canProvideReferences: data.canProvideReferences,
-            workAreas: data.workAreas,
-            supplyPictures: pictureUrls,
-          },
-        });
-      } catch (emailError) {
-        console.error("Failed to send notification email:", emailError);
-      }
-
       // Send SMS notification via OpenPhone
       try {
         await supabase.functions.invoke("send-sms-notification", {
