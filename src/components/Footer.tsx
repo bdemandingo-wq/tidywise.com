@@ -202,7 +202,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-background/20 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="border-t border-background/20 pt-6 pb-20 md:pb-0 flex flex-col md:flex-row justify-center md:justify-between items-center gap-4">
           <p className="text-background/70 text-sm">
             © {new Date().getFullYear()} TIDYWISE Cleaning Services. All rights reserved.
           </p>
