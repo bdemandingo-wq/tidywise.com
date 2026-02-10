@@ -16,35 +16,38 @@ interface SmsNotificationRequest {
 }
 
 function formatBookingSms(data: Record<string, unknown>): string {
-  return `📋 NEW BOOKING
-👤 ${data.customerName}
-📞 ${data.customerPhone}
-📧 ${data.customerEmail}
-📍 ${data.address}
-🧽 ${data.serviceType} (${data.frequency})
-🏠 ${data.beds}bd/${data.baths}ba • ${data.sqft} sqft
-📅 ${data.preferredDate}
-💰 $${data.totalPrice}`;
+  return `🆕 NEW BOOKING!
+
+Customer: ${data.customerName}
+Service: ${data.serviceType} (${data.frequency})
+Date: ${data.preferredDate}
+Address: ${data.address}
+Total: $${data.totalPrice}
+
+Log in to your dashboard to view details.`;
 }
 
 function formatApplicationSms(data: Record<string, unknown>): string {
   const workAreas = (data.workAreas as string[])?.join(", ") || "N/A";
-  return `🧹 NEW CLEANER APPLICATION
-👤 ${data.name}
-📞 ${data.phone}
-📧 ${data.email}
-📅 ${data.yearsExperience}yr exp
-🚗 Transport: ${data.hasTransportation ? "✅" : "❌"}
-🧴 Supplies: ${data.hasSupplies ? "✅" : "❌"}
-🛡️ Insurance: ${data.hasInsurance ? "✅" : "❌"}
-📍 Areas: ${workAreas}`;
+  return `🆕 NEW CLEANER APPLICATION!
+
+Name: ${data.name}
+Phone: ${data.phone}
+Email: ${data.email}
+Experience: ${data.yearsExperience} years
+Areas: ${workAreas}
+
+Log in to your dashboard to review.`;
 }
 
 function formatContactSms(data: Record<string, unknown>): string {
-  return `💼 COMMERCIAL INQUIRY
-👤 ${data.name}
-📧 ${data.email}
-💬 ${data.message}`;
+  return `🆕 NEW COMMERCIAL INQUIRY!
+
+Name: ${data.name}
+Email: ${data.email}
+Message: ${data.message}
+
+Log in to your dashboard to respond.`;
 }
 
 const handler = async (req: Request): Promise<Response> => {
