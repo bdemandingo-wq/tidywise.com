@@ -239,7 +239,7 @@ const SEOSchema = ({
     ]
   } : null;
 
-
+  return (
     <Helmet>
       <title>{pageTitle}</title>
       <meta name="description" content={pageDescription} />
@@ -249,7 +249,7 @@ const SEOSchema = ({
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
       <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:type" content="website" />
+      <meta property="og:type" content={pageType === 'blog' ? 'article' : 'website'} />
       <meta property="og:image" content={`${website}/og-image.webp`} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
@@ -278,6 +278,16 @@ const SEOSchema = ({
       {breadcrumbSchema && (
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}
+        </script>
+      )}
+      {blogPostingSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(blogPostingSchema)}
+        </script>
+      )}
+      {serviceSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(serviceSchema)}
         </script>
       )}
     </Helmet>
