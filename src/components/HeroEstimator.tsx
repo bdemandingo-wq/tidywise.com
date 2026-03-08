@@ -74,7 +74,7 @@ const HeroEstimator = () => {
 
         <Button
           size="lg"
-          className="w-full bg-success text-success-foreground hover:bg-success/90 font-semibold group"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold group"
           asChild
         >
           <a href="#booking" className="flex items-center justify-center gap-2">

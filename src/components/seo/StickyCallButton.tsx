@@ -29,7 +29,7 @@ const StickyCallButton = () => {
       <div className="md:hidden bg-background/95 backdrop-blur-sm border-t border-border p-3 flex gap-2">
         <Button
           size="lg"
-          className="flex-1 bg-info text-info-foreground font-semibold"
+          className="flex-1 bg-primary text-primary-foreground font-semibold"
           asChild
         >
           <a href={telLink} className="flex items-center justify-center gap-2">
@@ -39,7 +39,7 @@ const StickyCallButton = () => {
         </Button>
         <Button
           size="lg"
-          className="flex-1 bg-success text-success-foreground font-semibold"
+          className="flex-1 bg-primary text-primary-foreground font-semibold"
           asChild
         >
           <a href="#booking" className="flex items-center justify-center gap-2">
@@ -53,7 +53,7 @@ const StickyCallButton = () => {
       <div className="hidden md:block">
         <Button
           size="lg"
-          className="bg-info text-info-foreground shadow-elevated font-semibold text-lg py-6 px-8 hover:scale-105 transition-transform"
+          className="bg-primary text-primary-foreground shadow-elevated font-semibold text-lg py-6 px-8 hover:scale-105 transition-transform"
           asChild
         >
           <a 

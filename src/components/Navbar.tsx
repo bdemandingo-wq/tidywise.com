@@ -138,7 +138,7 @@ const Navbar = () => {
                 Call Now
               </a>
             </Button>
-            <Button size="sm" className="bg-success text-success-foreground hover:bg-success/90" onClick={handleBookNowClick}>
+            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleBookNowClick}>
               Book Now
             </Button>
           </div>
@@ -227,7 +227,7 @@ const Navbar = () => {
                     Call
                   </a>
                 </Button>
-                <Button className="flex-1 bg-success text-success-foreground" onClick={() => { setIsOpen(false); handleBookNowClick(); }}>
+                <Button className="flex-1 bg-primary text-primary-foreground" onClick={() => { setIsOpen(false); handleBookNowClick(); }}>
                   Book Now
                 </Button>
               </div>

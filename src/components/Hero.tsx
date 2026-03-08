@@ -15,18 +15,18 @@ const Hero = () => {
       id="home"
       className="relative min-h-screen flex items-center pt-16 noise-texture"
       style={{
-        background: "linear-gradient(135deg, hsl(40 33% 98%) 0%, hsl(175 30% 95%) 50%, hsl(40 33% 98%) 100%)",
+        background: "linear-gradient(135deg, hsl(40 33% 98%) 0%, hsl(224 30% 95%) 50%, hsl(40 33% 98%) 100%)",
       }}
     >
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Copy + CTAs */}
           <div className="space-y-6 opacity-0 animate-fade-in">
-            {/* Trust indicator */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success border border-success/20">
+            {/* Trust indicator - green */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
               </span>
               <span className="text-sm font-medium">Booking Available Today</span>
             </div>
@@ -39,14 +39,14 @@ const Hero = () => {
               TIDYWISE delivers professional home cleaning across Fort Lauderdale, Boca Raton, West Palm Beach, Miami & 30+ South Florida cities — with transparent pricing, vetted cleaners, and a satisfaction guarantee.
             </p>
 
-            {/* Trust pills */}
+            {/* Trust pills - blue */}
             <div className="flex flex-wrap gap-2">
               {trustPills.map((pill) => (
                 <div
                   key={pill.label}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card border border-border text-sm font-medium text-foreground shadow-soft"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary shadow-soft"
                 >
-                  <pill.icon className="w-4 h-4 text-primary" aria-hidden="true" />
+                  <pill.icon className="w-4 h-4" aria-hidden="true" />
                   <span>{pill.label}</span>
                 </div>
               ))}
@@ -59,7 +59,7 @@ const Hero = () => {
             >
               <Button
                 size="lg"
-                className="bg-success text-success-foreground hover:bg-success/90 font-semibold text-base md:text-lg px-8 py-6 group will-change-transform hover:scale-[1.02] transition-all"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-base md:text-lg px-8 py-6 group will-change-transform hover:scale-[1.02] transition-all"
                 asChild
               >
                 <a href="#booking" className="flex items-center gap-2">

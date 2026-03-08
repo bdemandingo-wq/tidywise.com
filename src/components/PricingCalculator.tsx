@@ -269,7 +269,7 @@ const PricingCalculator = () => {
             {/* Book Button */}
             <Button
               size="lg"
-              className="w-full text-lg font-semibold bg-success text-success-foreground hover:bg-success/90"
+              className="w-full text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
               onClick={handleBooking}
             >
               {isCustomService ? "Request Quote" : "Book This Service"}

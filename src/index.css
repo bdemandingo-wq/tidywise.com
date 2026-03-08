@@ -13,16 +13,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 20 14% 10%;
 
-    --primary: 175 85% 32%;
+    --primary: 224 76% 48%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 38 92% 50%;
-    --secondary-foreground: 20 14% 10%;
+    --secondary: 142 71% 45%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 40 20% 95%;
     --muted-foreground: 20 10% 40%;
 
-    --accent: 175 85% 32%;
+    --accent: 224 76% 48%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -30,22 +30,22 @@
 
     --border: 40 10% 90%;
     --input: 40 10% 90%;
-    --ring: 175 85% 32%;
+    --ring: 224 76% 48%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
     --hero-overlay: 20 14% 10%;
-    --gold: 38 92% 50%;
-    --gold-hover: 38 92% 42%;
-    --teal: 175 85% 32%;
-    --teal-light: 175 60% 45%;
+    --gold: 224 76% 48%;
+    --gold-hover: 224 76% 40%;
+    --teal: 224 76% 48%;
+    --teal-light: 224 60% 58%;
     --cream: 40 33% 98%;
-    --success: 160 84% 39%;
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
-    --info: 175 85% 32%;
+    --info: 224 76% 48%;
     --info-foreground: 0 0% 100%;
-    --amber: 38 92% 50%;
+    --amber: 142 71% 45%;
     
     /* Typography */
     --font-display: 'Playfair Display', serif;
@@ -68,16 +68,16 @@
     --popover: 20 14% 11%;
     --popover-foreground: 40 20% 95%;
 
-    --primary: 175 60% 45%;
+    --primary: 224 70% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 38 92% 50%;
-    --secondary-foreground: 20 14% 8%;
+    --secondary: 142 71% 45%;
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 20 10% 18%;
     --muted-foreground: 20 8% 55%;
 
-    --accent: 175 60% 45%;
+    --accent: 224 70% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 45%;
@@ -85,7 +85,7 @@
 
     --border: 20 10% 22%;
     --input: 20 10% 22%;
-    --ring: 175 60% 45%;
+    --ring: 224 70% 55%;
   }
 }
 
@@ -103,7 +103,6 @@
     font-family: var(--font-display);
   }
 
-  /* Reduce motion for accessibility */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -127,7 +126,6 @@
     will-change: transform;
   }
 
-  /* Noise texture overlay */
   .noise-texture::before {
     content: '';
     position: absolute;
@@ -156,32 +154,19 @@
     box-shadow: var(--shadow-card);
   }
 
-  /* Optimized fade-in animation using transform and opacity only */
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
     will-change: opacity, transform;
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes fadeInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 
   .animate-fade-in-left {
@@ -189,50 +174,35 @@
     will-change: opacity, transform;
   }
 
-  /* Optimized bounce animation using transform only */
   .animate-bounce {
     animation: bounce 2s infinite;
     will-change: transform;
   }
 
   @keyframes bounce {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-25%);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-25%); }
   }
 
-  /* Optimized pulse animation using opacity only */
   .animate-pulse {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     will-change: opacity;
   }
 
   @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.5;
-    }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
   }
 
-  /* Optimized ping animation using transform and opacity */
   .animate-ping {
     animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
     will-change: transform, opacity;
   }
 
   @keyframes ping {
-    75%, 100% {
-      transform: scale(2);
-      opacity: 0;
-    }
+    75%, 100% { transform: scale(2); opacity: 0; }
   }
 
-  /* Scroll snap for carousel */
   .scroll-snap-x {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
