@@ -17,8 +17,8 @@ const ContactOptions = () => {
             href="#booking"
             className="bg-card rounded-xl p-6 text-center border border-border hover:shadow-lg hover:-translate-y-1 transition-all group"
           >
-            <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
-              <CalendarDays className="w-6 h-6 text-success" />
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <CalendarDays className="w-6 h-6 text-primary" />
             </div>
             <h3 className="font-display text-lg font-semibold text-foreground mb-2">Book Online</h3>
             <p className="text-sm text-muted-foreground">Get an instant quote and pick your date.</p>
