@@ -258,7 +258,7 @@ const PricingCalculator = () => {
                         onCheckedChange={() => toggleAddOn(addOn.id)}
                       />
                       <label htmlFor={addOn.id} className="text-sm cursor-pointer">
-                        {addOn.label} (${addOn.price})
+                        {addOn.label} {addOn.isCustom ? "(Custom Quote)" : `($${addOn.price})`}
                       </label>
                     </div>
                   ))}
