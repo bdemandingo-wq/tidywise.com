@@ -227,7 +227,7 @@ const Navbar = () => {
                     Call
                   </a>
                 </Button>
-                <Button className="flex-1 bg-success text-success-foreground" onClick={() => { setIsOpen(false); handleBookNowClick(); }}>
+                <Button className="flex-1 bg-primary text-primary-foreground" onClick={() => { setIsOpen(false); handleBookNowClick(); }}>
                   Book Now
                 </Button>
               </div>
