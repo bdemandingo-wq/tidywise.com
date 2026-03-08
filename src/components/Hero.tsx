@@ -13,11 +13,15 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center pt-16 noise-texture"
+      className="relative min-h-screen flex items-center pt-16"
       style={{
-        background: "linear-gradient(135deg, hsl(40 33% 98%) 0%, hsl(224 30% 95%) 50%, hsl(40 33% 98%) 100%)",
+        backgroundImage: "url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=75')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/55" />
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Copy + CTAs */}
