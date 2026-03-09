@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const BocaRatonCleaning = () => {
   return (
@@ -116,7 +117,7 @@ const BocaRatonCleaning = () => {
           </div>
         </section>
 
-        <CityPageNavigation currentCity="Boca Raton" county="palm-beach" />
+        <RelatedLinks currentPage="/boca-raton-cleaning" pageType="city" cityName="Boca Raton" />
         <Footer />
       </main>
     </>

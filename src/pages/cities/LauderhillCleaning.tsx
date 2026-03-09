@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const LauderhillCleaning = () => {
   return (
@@ -77,6 +78,7 @@ const LauderhillCleaning = () => {
           </div>
         </section>
 
+        <RelatedLinks currentPage="/lauderhill-cleaning" pageType="city" cityName="Lauderhill" />
         <Footer />
       </main>
     </>

@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const WestPalmBeachCleaning = () => {
   return (
@@ -136,11 +137,7 @@ const WestPalmBeachCleaning = () => {
           </div>
         </section>
 
-        <CityPageNavigation 
-          currentCity="West Palm Beach"
-          county="palm-beach"
-        />
-
+        <RelatedLinks currentPage="/west-palm-beach-cleaning" pageType="city" cityName="West Palm Beach" />
         <Footer />
       </main>
     </>

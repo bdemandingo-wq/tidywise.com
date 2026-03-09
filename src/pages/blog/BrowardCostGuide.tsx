@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import StickyCallButton from "@/components/seo/StickyCallButton";
+import RelatedLinks from "@/components/seo/RelatedLinks";
+import AuthorBio from "@/components/seo/AuthorBio";
 
 const BrowardCostGuide = () => {
   return (
@@ -113,6 +115,8 @@ const BrowardCostGuide = () => {
           </div>
         </article>
 
+        <AuthorBio />
+        <RelatedLinks currentPage="/blog/broward-cost-guide" pageType="blog" />
         <Footer />
         <StickyCallButton />
       </main>

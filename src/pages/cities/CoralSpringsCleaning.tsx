@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const CoralSpringsCleaning = () => {
   return (
@@ -136,11 +137,7 @@ const CoralSpringsCleaning = () => {
           </div>
         </section>
 
-        <CityPageNavigation 
-          currentCity="Coral Springs"
-          county="broward"
-        />
-
+        <RelatedLinks currentPage="/coral-springs-cleaning" pageType="city" cityName="Coral Springs" />
         <Footer />
       </main>
     </>

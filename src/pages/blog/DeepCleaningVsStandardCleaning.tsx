@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import StickyCallButton from "@/components/seo/StickyCallButton";
+import RelatedLinks from "@/components/seo/RelatedLinks";
+import AuthorBio from "@/components/seo/AuthorBio";
 
 const DeepCleaningVsStandardCleaning = () => {
   return (
@@ -152,6 +154,8 @@ const DeepCleaningVsStandardCleaning = () => {
           </div>
         </article>
 
+        <AuthorBio />
+        <RelatedLinks currentPage="/blog/deep-cleaning-vs-standard-cleaning" pageType="blog" />
         <Footer />
         <StickyCallButton />
       </main>

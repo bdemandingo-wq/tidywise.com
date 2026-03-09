@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const MiamiCleaning = () => {
   return (
@@ -116,7 +117,7 @@ const MiamiCleaning = () => {
           </div>
         </section>
 
-        <CityPageNavigation currentCity="Miami" county="miami-dade" />
+        <RelatedLinks currentPage="/miami-cleaning" pageType="city" cityName="Miami" />
         <Footer />
       </main>
     </>

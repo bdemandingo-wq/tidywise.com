@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const FortLauderdaleCleaning = () => {
   return (
@@ -116,7 +117,7 @@ const FortLauderdaleCleaning = () => {
           </div>
         </section>
 
-        <CityPageNavigation currentCity="Fort Lauderdale" county="broward" />
+        <RelatedLinks currentPage="/fort-lauderdale-cleaning" pageType="city" cityName="Fort Lauderdale" />
         <Footer />
       </main>
     </>

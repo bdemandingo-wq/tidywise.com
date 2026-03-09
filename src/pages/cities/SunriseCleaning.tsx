@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const SunriseCleaning = () => {
   return (
@@ -77,6 +78,7 @@ const SunriseCleaning = () => {
           </div>
         </section>
 
+        <RelatedLinks currentPage="/sunrise-cleaning" pageType="city" cityName="Sunrise" />
         <Footer />
       </main>
     </>

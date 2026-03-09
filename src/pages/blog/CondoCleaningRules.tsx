@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import StickyCallButton from "@/components/seo/StickyCallButton";
+import RelatedLinks from "@/components/seo/RelatedLinks";
+import AuthorBio from "@/components/seo/AuthorBio";
 
 const CondoCleaningRules = () => {
   return (
@@ -136,6 +138,8 @@ const CondoCleaningRules = () => {
           </div>
         </article>
 
+        <AuthorBio />
+        <RelatedLinks currentPage="/blog/condo-cleaning-rules-south-florida" pageType="blog" />
         <Footer />
         <StickyCallButton />
       </main>
