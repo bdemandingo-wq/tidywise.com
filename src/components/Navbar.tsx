@@ -155,7 +155,7 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in">
+          <div className="md:hidden py-4 border-t border-border animate-fade-in relative z-[60] bg-background">
             <div className="flex flex-col gap-2">
               <Link
                 to="/"
