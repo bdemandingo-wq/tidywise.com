@@ -167,6 +167,13 @@ const Auth = () => {
   }
 
   return (
+    <>
+      <SEOHead
+        title="Sign In | TIDYWISE Cleaning Services"
+        description="Sign in or create an account to manage your TIDYWISE cleaning bookings. Track appointments and manage your profile."
+        canonical="https://tidywisecleaning.com/auth"
+        noIndex={true}
+      />
     <div className="min-h-screen bg-muted py-12 px-4">
       <div className="max-w-md mx-auto">
         <button
