@@ -10,7 +10,7 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import StickyCallButton from "@/components/seo/StickyCallButton";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/seo/SEOHead";
 
 const faqs = [
   {
