@@ -41,6 +41,13 @@ const Confirmation = () => {
   }
 
   return (
+    <>
+      <SEOHead
+        title="Booking Confirmed | TIDYWISE"
+        description="Your cleaning service booking has been confirmed. TIDYWISE will contact you within 15 minutes."
+        canonical="https://tidywisecleaning.com/confirmation"
+        noIndex={true}
+      />
     <div className="min-h-screen bg-muted flex items-center justify-center py-12 px-4">
       <Card className="max-w-lg w-full shadow-elevated animate-scale-in">
         <CardContent className="p-8">
