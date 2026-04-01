@@ -93,6 +93,13 @@ const CustomerPortal = () => {
   }
 
   return (
+    <>
+      <SEOHead
+        title="My Bookings | TIDYWISE"
+        description="View and manage your TIDYWISE cleaning service bookings. Track upcoming and past appointments."
+        canonical="https://tidywisecleaning.com/my-bookings"
+        noIndex={true}
+      />
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-background border-b border-border sticky top-0 z-50">
