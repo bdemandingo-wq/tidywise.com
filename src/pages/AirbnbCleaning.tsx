@@ -29,7 +29,7 @@ const AirbnbCleaning = () => {
       <SEOSchema
         pageTitle="Airbnb & Vacation Rental Cleaning | South Florida | TIDYWISE"
         pageDescription="Professional Airbnb and vacation rental turnover cleaning in South Florida. Fast same-day turnovers, linen service, and checklist-based cleaning for 5-star reviews."
-        pageUrl="https://tidywisecleaning.com/airbnb-cleaning"
+        canonicalUrl="https://tidywisecleaning.com/airbnb-cleaning"
       />
       <Navbar />
       <main id="main-content" className="pt-16">
@@ -102,7 +102,7 @@ const AirbnbCleaning = () => {
           </div>
         </section>
 
-        <RelatedLinks currentPath="/airbnb-cleaning" />
+        <RelatedLinks pageType="service" currentPage="/airbnb-cleaning" />
       </main>
       <Footer />
       <StickyCallButton />

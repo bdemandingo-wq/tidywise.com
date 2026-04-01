@@ -29,7 +29,7 @@ const PostConstructionCleaning = () => {
       <SEOSchema
         pageTitle="Post-Construction Cleaning | South Florida | TIDYWISE"
         pageDescription="Professional post-construction and renovation cleanup in South Florida. Dust removal, window cleaning, paint splatter cleanup, and move-in ready detail cleaning."
-        pageUrl="https://tidywisecleaning.com/post-construction-cleaning"
+        canonicalUrl="https://tidywisecleaning.com/post-construction-cleaning"
       />
       <Navbar />
       <main id="main-content" className="pt-16">
@@ -98,7 +98,7 @@ const PostConstructionCleaning = () => {
           </div>
         </section>
 
-        <RelatedLinks currentPath="/post-construction-cleaning" />
+        <RelatedLinks pageType="service" currentPage="/post-construction-cleaning" />
       </main>
       <Footer />
       <StickyCallButton />
