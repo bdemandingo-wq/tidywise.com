@@ -244,6 +244,7 @@ const ContractorRateSheet = () => {
         }
       `}</style>
     </div>
+    </>
   );
 };
 
