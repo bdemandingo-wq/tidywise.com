@@ -2,7 +2,7 @@ import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { Phone, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Helmet } from "react-helmet-async";
+import SEOHead from "@/components/seo/SEOHead";
 
 const NotFound = () => {
   const location = useLocation();
@@ -13,11 +13,12 @@ const NotFound = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Page Not Found | TIDYWISE Cleaning Services</title>
-        <meta name="robots" content="noindex, nofollow" />
-        <meta name="description" content="The page you're looking for doesn't exist. TIDYWISE offers professional house cleaning in Fort Lauderdale, Boca Raton & West Palm Beach." />
-      </Helmet>
+      <SEOHead
+        title="Page Not Found | TIDYWISE Cleaning Services"
+        description="The page you're looking for doesn't exist. TIDYWISE offers professional house cleaning in Fort Lauderdale, Boca Raton & West Palm Beach."
+        canonical="https://tidywisecleaning.com/404"
+        noIndex={true}
+      />
       
       <div className="flex min-h-screen items-center justify-center bg-muted px-4">
         <div className="text-center max-w-lg">

@@ -183,18 +183,12 @@ const Sitemap = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Sitemap | TIDYWISE Cleaning Services</title>
-        <meta name="description" content="Complete sitemap for TIDYWISE Cleaning Services. Find all our service pages, city locations, and helpful blog articles." />
-        <link rel="canonical" href={`${baseUrl}/sitemap`} />
-        <meta name="robots" content="index, follow" />
-        <script type="application/ld+json">
-          {JSON.stringify(sitemapSchema)}
-        </script>
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbSchema)}
-        </script>
-      </Helmet>
+      <SEOHead
+        title="Sitemap | TIDYWISE Cleaning Services"
+        description="Complete sitemap for TIDYWISE Cleaning Services. Find all our service pages, city locations, and helpful blog articles."
+        canonical={`${baseUrl}/sitemap`}
+        schemaJson={[sitemapSchema, breadcrumbSchema]}
+      />
       <main className="min-h-screen">
         <Navbar />
         
