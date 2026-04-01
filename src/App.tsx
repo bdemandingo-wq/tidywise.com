@@ -137,6 +137,9 @@ const AppRoutes = () => {
         <Route path="/upholstery-cleaning" element={<UpholsteryCleaning />} />
         <Route path="/referral-program" element={<ReferralProgram />} />
         <Route path="/contractor-rate-sheet" element={<ContractorRateSheet />} />
+        <Route path="/airbnb-cleaning" element={<AirbnbCleaning />} />
+        <Route path="/office-cleaning" element={<OfficeCleaning />} />
+        <Route path="/post-construction-cleaning" element={<PostConstructionCleaning />} />
         <Route path="/sitemap" element={<Sitemap />} />
         
         {/* County Landing Pages */}
