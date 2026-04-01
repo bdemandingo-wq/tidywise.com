@@ -276,6 +276,7 @@ const CustomerPortal = () => {
         </Card>
       </main>
     </div>
+    </>
   );
 };
 
