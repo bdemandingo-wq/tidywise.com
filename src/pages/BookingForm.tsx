@@ -456,6 +456,7 @@ const BookingForm = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 

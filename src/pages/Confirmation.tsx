@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Home, Phone } from "lucide-react";
