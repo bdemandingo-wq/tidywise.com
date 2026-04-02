@@ -158,6 +158,7 @@ const Confirmation = () => {
         </CardContent>
       </Card>
     </div>
+      )}
     </>
   );
 };
