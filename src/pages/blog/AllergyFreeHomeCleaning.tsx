@@ -11,7 +11,7 @@ const AllergyFreeHomeCleaning = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Allergy-Free Home Cleaning Tips for Florida Residents | TIDYWISE"
+        pageTitle="Allergy-Free Home Cleaning Tips | TIDYWISE"
         pageDescription="Combat Florida's year-round allergens with proper cleaning techniques. Expert tips for allergy sufferers."
         canonicalUrl="https://tidywisecleaning.com/blog/allergy-free-home-cleaning"
         pageType="blog"

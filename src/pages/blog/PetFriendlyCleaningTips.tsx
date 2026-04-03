@@ -11,8 +11,8 @@ const PetFriendlyCleaningTips = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Pet-Friendly Home Cleaning Tips for Florida Pet Owners | TIDYWISE"
-        pageDescription="Keep your Florida home fresh with pets! Expert tips for removing pet hair, odors, and stains. Pet-safe cleaning products. Professional pet-friendly cleaning services."
+        pageTitle="Pet-Friendly Cleaning Tips for Florida Homes | TIDYWISE"
+        pageDescription="Keep your Florida home fresh with pets. Tips for pet hair, odors & stains. Pet-safe products & pro cleaning."
         canonicalUrl="https://tidywisecleaning.com/blog/pet-friendly-cleaning-tips"
         pageType="blog"
         county="South Florida"

@@ -11,7 +11,7 @@ const EcoFriendlyCleaningProducts = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Best Eco-Friendly Cleaning Products for Florida Homes | TIDYWISE"
+        pageTitle="Eco-Friendly Cleaning Products for Homes | TIDYWISE"
         pageDescription="Discover sustainable cleaning products perfect for South Florida's climate. Protect your family and the environment."
         canonicalUrl="https://tidywisecleaning.com/blog/eco-friendly-cleaning-products"
         pageType="blog"

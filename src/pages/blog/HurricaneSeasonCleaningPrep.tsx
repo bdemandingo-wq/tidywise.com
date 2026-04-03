@@ -11,7 +11,7 @@ const HurricaneSeasonCleaningPrep = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Hurricane Season Home Cleaning & Prep Guide | South Florida | TIDYWISE"
+        pageTitle="Hurricane Season Cleaning & Prep Guide | TIDYWISE"
         pageDescription="Prepare your South Florida home for hurricane season. Pre-storm cleaning checklist, post-storm cleanup tips, and professional cleaning services. Be ready!"
         canonicalUrl="https://tidywisecleaning.com/blog/hurricane-season-cleaning-prep"
         pageType="blog"
