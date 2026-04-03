@@ -44,8 +44,8 @@ const Index = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="House Cleaning Fort Lauderdale, Boca Raton & West Palm Beach | TIDYWISE"
-        pageDescription="Top-rated house cleaning in Fort Lauderdale, Boca Raton & West Palm Beach. TIDYWISE serves 40+ South Florida cities. Instant online quotes. Licensed & insured. Call (561) 571-8725."
+        pageTitle="South Florida House Cleaning | Licensed | TIDYWISE"
+        pageDescription="Top-rated house cleaning in Fort Lauderdale, Boca Raton & West Palm Beach. 40+ cities. Instant online quotes. Licensed & insured."
         canonicalUrl="https://tidywisecleaning.com"
         pageType="home"
         faqItems={homepageFaqs}
