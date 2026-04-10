@@ -11,8 +11,8 @@ const DeepCleaningVsStandardCleaning = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Deep Cleaning vs Standard Cleaning: What's the Difference? | TIDYWISE"
-        pageDescription="Learn the difference between deep cleaning and standard cleaning services. Find out which cleaning type is right for your South Florida home. Free quotes available!"
+        pageTitle="Deep vs Standard Cleaning Differences | TIDYWISE"
+        pageDescription="Learn the difference between deep cleaning and standard cleaning. Find which type is right for your South Florida home. Free quotes available!"
         canonicalUrl="https://tidywisecleaning.com/blog/deep-cleaning-vs-standard-cleaning"
         pageType="blog"
         county="South Florida"

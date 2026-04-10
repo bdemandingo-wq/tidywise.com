@@ -52,7 +52,7 @@ const StandardCleaning = () => {
     <>
       <SEOSchema
         pageTitle="Standard House Cleaning South Florida | From $150 | TIDYWISE"
-        pageDescription="Affordable standard house cleaning in Fort Lauderdale, Boca Raton & Miami. Starting at $150. Vacuuming, mopping, kitchen & bathroom cleaning. Book online or call (561) 571-8725."
+        pageDescription="Affordable house cleaning in Fort Lauderdale, Boca Raton & Miami from $150. Vacuuming, mopping, kitchen & bath cleaning. Book online today!"
         canonicalUrl="https://tidywisecleaning.com/standard-cleaning"
         pageType="service"
         county="South Florida"
