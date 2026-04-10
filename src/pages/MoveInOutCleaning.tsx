@@ -41,7 +41,7 @@ const MoveInOutCleaning = () => {
     <>
       <SEOSchema
         pageTitle="Move In Move Out Cleaning South Florida | TIDYWISE"
-        pageDescription="Move-out cleaning to get your full deposit back. Move-in cleaning for a fresh start. Serving Fort Lauderdale, Miami & 40+ South Florida cities. Book TIDYWISE today."
+        pageDescription="Move-out cleaning for full deposit back. Move-in cleaning for a fresh start. Fort Lauderdale, Miami & 40+ South Florida cities."
         canonicalUrl="https://tidywisecleaning.com/move-in-out-cleaning"
         pageType="service"
         county="South Florida"

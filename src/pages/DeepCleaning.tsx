@@ -36,8 +36,8 @@ const DeepCleaning = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Deep Cleaning Service Fort Lauderdale & South Florida | TIDYWISE"
-        pageDescription="Professional deep cleaning in South Florida starting at $250. Baseboards, inside cabinets, appliances & more. Highly-rated, eco-friendly cleaners. Instant quote online."
+        pageTitle="Deep Cleaning South Florida | From $250 | TIDYWISE"
+        pageDescription="Professional deep cleaning in South Florida from $250. Baseboards, cabinets, appliances & more. Eco-friendly cleaners. Instant quote online."
         canonicalUrl="https://tidywisecleaning.com/deep-cleaning"
         pageType="service"
         county="South Florida"

@@ -93,7 +93,7 @@ const ServiceAreas = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Near Me South Florida | 40+ Cities | TIDYWISE"
-        pageDescription="Looking for house cleaning near me? TIDYWISE serves 40+ cities across Broward, Palm Beach & Miami-Dade counties. Find your city for local pricing. Call (561) 571-8725."
+        pageDescription="House cleaning near me? TIDYWISE serves 40+ cities across Broward, Palm Beach & Miami-Dade counties. Find your city for local pricing."
         canonicalUrl="https://tidywisecleaning.com/service-areas"
         pageType="service"
         breadcrumbs={[
