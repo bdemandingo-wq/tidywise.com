@@ -3,8 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { execSync } from "child_process";
-import prerender from "vite-plugin-prerender";
-import JSDOMRenderer from "@prerenderer/renderer-jsdom";
 
 function sitemapPlugin(): Plugin {
   return {
@@ -137,14 +135,6 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     sitemapPlugin(),
-    mode === "production" &&
-      prerender({
-        staticDir: path.join(__dirname, "dist"),
-        routes: PRERENDER_ROUTES,
-        renderer: new JSDOMRenderer({
-          renderAfterTime: 1000,
-        }),
-      }),
   ].filter(Boolean),
   resolve: {
     alias: {
