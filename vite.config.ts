@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { execSync } from "child_process";
-import prerender, { PuppeteerRenderer } from "vite-plugin-prerender";
 
 function sitemapPlugin(): Plugin {
   return {
@@ -136,24 +135,6 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     sitemapPlugin(),
-    mode === "production" &&
-      prerender({
-        staticDir: path.join(__dirname, "dist"),
-        routes: PRERENDER_ROUTES,
-        renderer: new PuppeteerRenderer({
-          // Wait for network to be idle and React to finish rendering
-          renderAfterTime: 3000,
-          headless: true,
-          args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        }),
-        postProcess(renderedRoute) {
-          // Fix absolute paths for assets so prerendered pages load correctly
-          renderedRoute.html = renderedRoute.html
-            .replace(/href="\//g, 'href="/')
-            .replace(/src="\//g, 'src="/');
-          return renderedRoute;
-        },
-      }),
   ].filter(Boolean),
   resolve: {
     alias: {
