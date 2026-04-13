@@ -21,6 +21,46 @@ interface BlogPost {
 const staticBlogPosts: BlogPost[] = [
   // Targeted local SEO posts — newest, highest priority
   {
+    slug: "house-cleaning-boca-raton",
+    title: "House Cleaning in Boca Raton, FL — Country Clubs, Estates & From $108",
+    excerpt: "From Boca West Country Club to East Boca condos — snowbird seasonal scheduling, country club access, and luxury home expertise. Everything Boca Raton homeowners need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-jupiter",
+    title: "House Cleaning in Jupiter, FL — Waterfront Homes, Golf Communities & From $108",
+    excerpt: "Jupiter's Intracoastal estates and golf communities need specific expertise — salt air, waterfront challenges, and gated access. Here's what Jupiter homeowners need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-palm-beach-gardens",
+    title: "House Cleaning in Palm Beach Gardens, FL — Golf Communities, Gated Neighborhoods & From $108",
+    excerpt: "PGA National, Mirasol, Ballenisles — Palm Beach Gardens' golf communities have specific access and cleaning requirements. Here's what homeowners need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-miramar",
+    title: "House Cleaning in Miramar, FL — Pricing, Services & What to Expect",
+    excerpt: "Miramar is Broward's largest planned community — large pool homes, gated neighborhoods, and family-friendly service. Everything you need to know about professional cleaning in Miramar.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-hialeah",
+    title: "House Cleaning in Hialeah, FL — Servicio en Español · From $108",
+    excerpt: "TIDYWISE serves Hialeah in English and Spanish. Transparent pricing, background-checked cleaners, and eco-friendly products for Miami-Dade's second-largest city.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
     slug: "house-cleaning-deerfield-beach",
     title: "House Cleaning in Deerfield Beach, FL — Your Local Service, From $108",
     excerpt: "TIDYWISE is headquartered in Deerfield Beach — not a franchise from another city. Faster response times, genuine local knowledge, and a commitment to getting it right in our own community.",
