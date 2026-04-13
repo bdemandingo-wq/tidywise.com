@@ -21,6 +21,54 @@ interface BlogPost {
 const staticBlogPosts: BlogPost[] = [
   // Targeted local SEO posts — newest, highest priority
   {
+    slug: "house-cleaning-doral",
+    title: "House Cleaning in Doral, FL — Servicio en Español · From $108",
+    excerpt: "TIDYWISE serves Doral's Latin American community in English and Spanish. Newer luxury planned communities, corporate apartments, and STR cleaning near Miami International Airport.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-north-miami",
+    title: "House Cleaning in North Miami, FL — Pricing, Services & What to Expect",
+    excerpt: "Keystone Islands, Biscayne Park, Sans Souci — North Miami's diverse neighborhoods and waterfront properties need a reliable, licensed service. Here's what you need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-north-miami-beach",
+    title: "House Cleaning in North Miami Beach, FL — Pricing, Services & What to Expect",
+    excerpt: "Point East, Ojus, Ives Estates — North Miami Beach's mix of condos and single-family homes near Sunny Isles Beach. Everything you need to know about professional cleaning here.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-plantation",
+    title: "House Cleaning in Plantation, FL — Established Homes, Country Clubs & From $108",
+    excerpt: "Plantation Golf & Country Club, Jacaranda, Westport — Broward County's most established planned city. Here's what Plantation homeowners need to know about professional cleaning.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-sunrise",
+    title: "House Cleaning in Sunrise, FL — Pricing, Services & What to Expect",
+    excerpt: "Sunrise Lakes, Welleby, Inverrary — western Broward's diverse mix of active adult communities and family homes. Here's what Sunrise homeowners need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-lake-worth",
+    title: "House Cleaning in Lake Worth, FL — Pricing, Services & What to Expect",
+    excerpt: "Historic bungalows, a thriving arts district, and waterfront lagoon properties — Lake Worth is one of Palm Beach County's most eclectic cities. Here's what homeowners need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
     slug: "house-cleaning-wellington",
     title: "House Cleaning in Wellington, FL — Equestrian Estates, Polo Season & From $108",
     excerpt: "The equestrian capital of the world has unique cleaning needs — polo season scheduling, horse property tracking, and luxury estates at Palm Beach Polo and Country Club.",

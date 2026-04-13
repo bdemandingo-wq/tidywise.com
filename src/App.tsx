@@ -132,6 +132,12 @@ const HouseCleaningHallandaleBeach = lazy(() => import("./pages/blog/HouseCleani
 const HouseCleaningSunnyIslesBeach = lazy(() => import("./pages/blog/HouseCleaningSunnyIslesBeach"));
 const HouseCleaningBoyntonBeach = lazy(() => import("./pages/blog/HouseCleaningBoyntonBeach"));
 const HouseCleaningWellington = lazy(() => import("./pages/blog/HouseCleaningWellington"));
+const HouseCleaningDoral = lazy(() => import("./pages/blog/HouseCleaningDoral"));
+const HouseCleaningNorthMiami = lazy(() => import("./pages/blog/HouseCleaningNorthMiami"));
+const HouseCleaningNorthMiamiBeach = lazy(() => import("./pages/blog/HouseCleaningNorthMiamiBeach"));
+const HouseCleaningPlantation = lazy(() => import("./pages/blog/HouseCleaningPlantation"));
+const HouseCleaningSunrise = lazy(() => import("./pages/blog/HouseCleaningSunrise"));
+const HouseCleaningLakeWorth = lazy(() => import("./pages/blog/HouseCleaningLakeWorth"));
 
 // Redirect component for old /blog/ai/:slug URLs
 const AiBlogPostRedirect = () => {
@@ -304,6 +310,12 @@ const AppRoutes = () => {
         <Route path="/blog/house-cleaning-sunny-isles-beach" element={<HouseCleaningSunnyIslesBeach />} />
         <Route path="/blog/house-cleaning-boynton-beach" element={<HouseCleaningBoyntonBeach />} />
         <Route path="/blog/house-cleaning-wellington" element={<HouseCleaningWellington />} />
+        <Route path="/blog/house-cleaning-doral" element={<HouseCleaningDoral />} />
+        <Route path="/blog/house-cleaning-north-miami" element={<HouseCleaningNorthMiami />} />
+        <Route path="/blog/house-cleaning-north-miami-beach" element={<HouseCleaningNorthMiamiBeach />} />
+        <Route path="/blog/house-cleaning-plantation" element={<HouseCleaningPlantation />} />
+        <Route path="/blog/house-cleaning-sunrise" element={<HouseCleaningSunrise />} />
+        <Route path="/blog/house-cleaning-lake-worth" element={<HouseCleaningLakeWorth />} />
 
         {/* Redirect old /blog/ai/ URLs to /blog/ */}
         <Route path="/blog/ai/:slug" element={<AiBlogPostRedirect />} />
