@@ -4,7 +4,7 @@ import HeroEstimator from "./HeroEstimator";
 
 const trustPills = [
   { icon: Shield, label: "Licensed & Insured" },
-  { icon: Star, label: "5.0 Stars · 100+ Reviews" },
+  { icon: Star, label: "4.9 Stars · 127+ Reviews" },
   { icon: Leaf, label: "Eco-Friendly Products" },
   { icon: Lock, label: "Satisfaction Guaranteed" },
 ];
@@ -40,7 +40,7 @@ const Hero = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-white/80 max-w-xl leading-relaxed">
-              TIDYWISE delivers professional home cleaning across Fort Lauderdale, Boca Raton, West Palm Beach, Miami & 30+ South Florida cities — with transparent pricing, vetted cleaners, and a satisfaction guarantee.
+              TIDYWISE delivers professional home cleaning across Fort Lauderdale, Boca Raton, West Palm Beach, Miami & 40+ South Florida cities — with transparent pricing, vetted cleaners, and a satisfaction guarantee.
             </p>
 
             {/* Trust pills */}

@@ -30,8 +30,8 @@ const SocialProofBar = () => {
                 <Star key={i} className="w-5 h-5 fill-secondary text-secondary" />
               ))}
             </div>
-            <span className="font-semibold">Rated 5.0 on Google</span>
-            <span className="opacity-80">· 100+ Verified Reviews</span>
+            <span className="font-semibold">Rated 4.9 on Google</span>
+            <span className="opacity-80">· 127+ Verified Reviews</span>
           </div>
 
           {/* Rotating testimonial */}

@@ -95,6 +95,11 @@ const AiBlogPost = lazy(() => import("./pages/blog/AiBlogPost"));
 const MollyMaidAlternative = lazy(() => import("./pages/vs/MollyMaidAlternative"));
 const MerryMaidsAlternative = lazy(() => import("./pages/vs/MerryMaidsAlternative"));
 const HandyAlternative = lazy(() => import("./pages/vs/HandyAlternative"));
+const TheMaidsAlternative = lazy(() => import("./pages/vs/TheMaidsAlternative"));
+const CleaningServiceAlternatives = lazy(() => import("./pages/vs/CleaningServiceAlternatives"));
+
+// Programmatic SEO pages
+const HouseCleaningCostGuide = lazy(() => import("./pages/HouseCleaningCostGuide"));
 
 // Redirect component for old /blog/ai/:slug URLs
 const AiBlogPostRedirect = () => {
@@ -230,6 +235,11 @@ const AppRoutes = () => {
         <Route path="/molly-maid-alternative" element={<MollyMaidAlternative />} />
         <Route path="/merry-maids-alternative" element={<MerryMaidsAlternative />} />
         <Route path="/handy-alternative" element={<HandyAlternative />} />
+        <Route path="/the-maids-alternative" element={<TheMaidsAlternative />} />
+        <Route path="/cleaning-service-alternatives" element={<CleaningServiceAlternatives />} />
+
+        {/* Programmatic SEO pages */}
+        <Route path="/house-cleaning-cost-south-florida" element={<HouseCleaningCostGuide />} />
 
         {/* Redirect old /blog/ai/ URLs to /blog/ */}
         <Route path="/blog/ai/:slug" element={<AiBlogPostRedirect />} />
