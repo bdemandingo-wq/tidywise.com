@@ -98,6 +98,15 @@ const NorthMiamiCleaning = () => {
           </div>
         </section>
 
+        <section className="py-10 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Want to learn more before booking?</p>
+            <Link to="/blog/house-cleaning-north-miami" className="text-primary font-semibold hover:underline">
+              Read our North Miami cleaning guide — pricing, neighborhoods, what's included →
+            </Link>
+          </div>
+        </section>
+
         <RelatedLinks currentPage="/north-miami-cleaning" pageType="city" cityName="North Miami" />
         <Footer />
       </main>

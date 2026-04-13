@@ -98,6 +98,15 @@ const DeerfieldBeachCleaning = () => {
           </div>
         </section>
 
+        <section className="py-10 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Want to learn more before booking?</p>
+            <Link to="/blog/house-cleaning-deerfield-beach" className="text-primary font-semibold hover:underline">
+              Read our Deerfield Beach cleaning guide — pricing, neighborhoods, what's included →
+            </Link>
+          </div>
+        </section>
+
         <RelatedLinks currentPage="/deerfield-beach-cleaning" pageType="city" cityName="Deerfield Beach" />
         <Footer />
       </main>

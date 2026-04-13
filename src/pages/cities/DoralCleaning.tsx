@@ -98,6 +98,15 @@ const DoralCleaning = () => {
           </div>
         </section>
 
+        <section className="py-10 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Want to learn more before booking?</p>
+            <Link to="/blog/house-cleaning-doral" className="text-primary font-semibold hover:underline">
+              Read our Doral cleaning guide — pricing, neighborhoods, what's included →
+            </Link>
+          </div>
+        </section>
+
         <RelatedLinks currentPage="/doral-cleaning" pageType="city" cityName="Doral" />
         <Footer />
       </main>

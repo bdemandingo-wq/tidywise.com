@@ -166,6 +166,15 @@ const WestPalmBeachCleaning = () => {
           </div>
         </section>
 
+        <section className="py-10 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Want to learn more before booking?</p>
+            <Link to="/blog/house-cleaning-west-palm-beach" className="text-primary font-semibold hover:underline">
+              Read our West Palm Beach cleaning guide — pricing, neighborhoods, what's included →
+            </Link>
+          </div>
+        </section>
+
         <RelatedLinks currentPage="/west-palm-beach-cleaning" pageType="city" cityName="West Palm Beach" />
         <Footer />
       </main>

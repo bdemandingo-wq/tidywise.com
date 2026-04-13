@@ -98,6 +98,15 @@ const WellingtonCleaning = () => {
           </div>
         </section>
 
+        <section className="py-10 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Want to learn more before booking?</p>
+            <Link to="/blog/house-cleaning-wellington" className="text-primary font-semibold hover:underline">
+              Read our Wellington cleaning guide — pricing, neighborhoods, what's included →
+            </Link>
+          </div>
+        </section>
+
         <RelatedLinks currentPage="/wellington-cleaning" pageType="city" cityName="Wellington" />
         <Footer />
       </main>

@@ -138,6 +138,12 @@ const HouseCleaningNorthMiamiBeach = lazy(() => import("./pages/blog/HouseCleani
 const HouseCleaningPlantation = lazy(() => import("./pages/blog/HouseCleaningPlantation"));
 const HouseCleaningSunrise = lazy(() => import("./pages/blog/HouseCleaningSunrise"));
 const HouseCleaningLakeWorth = lazy(() => import("./pages/blog/HouseCleaningLakeWorth"));
+const HouseCleaningMiami = lazy(() => import("./pages/blog/HouseCleaningMiami"));
+const HouseCleaningParkland = lazy(() => import("./pages/blog/HouseCleaningParkland"));
+const HouseCleaningTamarac = lazy(() => import("./pages/blog/HouseCleaningTamarac"));
+const HouseCleaningCoconutCreek = lazy(() => import("./pages/blog/HouseCleaningCoconutCreek"));
+const HouseCleaningMiamiGardens = lazy(() => import("./pages/blog/HouseCleaningMiamiGardens"));
+const HouseCleaningRoyalPalmBeach = lazy(() => import("./pages/blog/HouseCleaningRoyalPalmBeach"));
 
 // Redirect component for old /blog/ai/:slug URLs
 const AiBlogPostRedirect = () => {
@@ -316,6 +322,12 @@ const AppRoutes = () => {
         <Route path="/blog/house-cleaning-plantation" element={<HouseCleaningPlantation />} />
         <Route path="/blog/house-cleaning-sunrise" element={<HouseCleaningSunrise />} />
         <Route path="/blog/house-cleaning-lake-worth" element={<HouseCleaningLakeWorth />} />
+        <Route path="/blog/house-cleaning-miami" element={<HouseCleaningMiami />} />
+        <Route path="/blog/house-cleaning-parkland" element={<HouseCleaningParkland />} />
+        <Route path="/blog/house-cleaning-tamarac" element={<HouseCleaningTamarac />} />
+        <Route path="/blog/house-cleaning-coconut-creek" element={<HouseCleaningCoconutCreek />} />
+        <Route path="/blog/house-cleaning-miami-gardens" element={<HouseCleaningMiamiGardens />} />
+        <Route path="/blog/house-cleaning-royal-palm-beach" element={<HouseCleaningRoyalPalmBeach />} />
 
         {/* Redirect old /blog/ai/ URLs to /blog/ */}
         <Route path="/blog/ai/:slug" element={<AiBlogPostRedirect />} />

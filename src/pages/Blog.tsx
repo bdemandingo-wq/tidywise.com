@@ -21,6 +21,54 @@ interface BlogPost {
 const staticBlogPosts: BlogPost[] = [
   // Targeted local SEO posts — newest, highest priority
   {
+    slug: "house-cleaning-miami",
+    title: "House Cleaning in Miami, FL — Brickell, Wynwood, Coconut Grove & From $108",
+    excerpt: "From high-rise condos in Brickell to historic homes in Coconut Grove — Miami's diverse housing stock requires specific expertise. Bilingual service, STR specialists, licensed & insured.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-royal-palm-beach",
+    title: "House Cleaning in Royal Palm Beach, FL — Pricing, Services & What to Expect",
+    excerpt: "Royal Palm Beach's suburban family homes and proximity to The Acreage mean larger lots, more outdoor tracking, and homes that need consistent professional care. From $108.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-miami-gardens",
+    title: "House Cleaning in Miami Gardens, FL — Bilingual Team, From $108",
+    excerpt: "Miami-Dade's third-largest city — transparent pricing, background-checked cleaners, and bilingual English/Spanish service for the Hard Rock Stadium area and surrounding neighborhoods.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-coconut-creek",
+    title: "House Cleaning in Coconut Creek, FL — Wynmoor Village & Family Homes",
+    excerpt: "Wynmoor Village specialists. Coconut Creek's mix of active adult and family communities need a consistent, trusted service. Same team every visit, eco-friendly products, from $108.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-tamarac",
+    title: "House Cleaning in Tamarac, FL — Active Adult Communities & From $108",
+    excerpt: "Kings Point, Heathgate, Mainlands — Tamarac has Broward's largest concentration of 55+ communities. Same team every visit, eco-certified products, snowbird scheduling available.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-parkland",
+    title: "House Cleaning in Parkland, FL — Luxury Homes, Gated Communities & From $108",
+    excerpt: "Heron Bay, Woodlands, Watercrest — Parkland's gated communities require advance visitor registration and premium surface expertise. Background-checked cleaners, licensed & insured.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
     slug: "house-cleaning-doral",
     title: "House Cleaning in Doral, FL — Servicio en Español · From $108",
     excerpt: "TIDYWISE serves Doral's Latin American community in English and Spanish. Newer luxury planned communities, corporate apartments, and STR cleaning near Miami International Airport.",
