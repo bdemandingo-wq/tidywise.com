@@ -264,4 +264,37 @@
       <news:title>Move-In Cleaning in Miami FL — Start Fresh in Your New Home</news:title>
     </news:news>
   </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/house-cleaning-hollywood-florida</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>House Cleaning in Hollywood FL — Pricing, Services and What to Expect</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/deep-cleaning-service-boca-raton</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>Deep Cleaning Service in Boca Raton FL — What's Included and What It Costs</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/move-out-cleaning-west-palm-beach</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>Move-Out Cleaning in West Palm Beach FL — Get Your Security Deposit Back</news:title>
+    </news:news>
+  </url>
 </urlset>

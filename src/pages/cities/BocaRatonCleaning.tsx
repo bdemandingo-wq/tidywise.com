@@ -118,11 +118,19 @@ const BocaRatonCleaning = () => {
         </section>
 
         <section className="py-10 bg-muted/30">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-sm text-muted-foreground mb-2">Moving out of your Boca Raton home?</p>
-            <Link to="/blog/move-out-cleaning-boca-raton" className="text-primary font-semibold hover:underline">
-              Read our Boca Raton move-out cleaning guide — get your deposit back →
-            </Link>
+          <div className="container mx-auto px-4 text-center space-y-3">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">First time booking a cleaner?</p>
+              <Link to="/blog/deep-cleaning-service-boca-raton" className="text-primary font-semibold hover:underline">
+                Read our Boca Raton deep cleaning guide — what's included, pricing &amp; when to book →
+              </Link>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Moving out of your Boca Raton home?</p>
+              <Link to="/blog/move-out-cleaning-boca-raton" className="text-primary font-semibold hover:underline">
+                Read our move-out cleaning guide — get your deposit back →
+              </Link>
+            </div>
           </div>
         </section>
 
