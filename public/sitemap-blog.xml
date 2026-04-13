@@ -352,4 +352,48 @@
       <news:title>House Cleaning in Delray Beach FL — Pricing, Services and How to Book</news:title>
     </news:news>
   </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/house-cleaning-weston</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>House Cleaning in Weston FL — Pricing, Services and What to Expect</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/house-cleaning-aventura</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>House Cleaning in Aventura FL — Condos, High-Rises and Luxury Homes</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/house-cleaning-coral-gables</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>House Cleaning in Coral Gables FL — Mediterranean Homes, Estates and What It Costs</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://www.tidywisecleaning.com/blog/house-cleaning-deerfield-beach</loc>
+    <lastmod>2026-04-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <news:news>
+      <news:publication><news:name>TIDYWISE Cleaning Blog</news:name><news:language>en</news:language></news:publication>
+      <news:publication_date>2026-04-13</news:publication_date>
+      <news:title>House Cleaning in Deerfield Beach FL — Your Local Service, From $108</news:title>
+    </news:news>
+  </url>
 </urlset>

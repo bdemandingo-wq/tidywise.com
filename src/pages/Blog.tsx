@@ -21,6 +21,38 @@ interface BlogPost {
 const staticBlogPosts: BlogPost[] = [
   // Targeted local SEO posts — newest, highest priority
   {
+    slug: "house-cleaning-deerfield-beach",
+    title: "House Cleaning in Deerfield Beach, FL — Your Local Service, From $108",
+    excerpt: "TIDYWISE is headquartered in Deerfield Beach — not a franchise from another city. Faster response times, genuine local knowledge, and a commitment to getting it right in our own community.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-coral-gables",
+    title: "House Cleaning in Coral Gables, FL — Mediterranean Homes, Estates & What It Costs",
+    excerpt: "Coral Gables' Mediterranean Revival architecture and natural stone surfaces require specific expertise. Here's what homeowners need to know about pricing, neighborhoods, and finding the right cleaner.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-aventura",
+    title: "House Cleaning in Aventura, FL — Condos, High-Rises & Luxury Homes",
+    excerpt: "Williams Island, Turnberry Isle, and Aventura's luxury towers require a different approach than a standard suburban home. Here's what Aventura residents need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
+    slug: "house-cleaning-weston",
+    title: "House Cleaning in Weston, FL — Pricing, Services & What to Expect",
+    excerpt: "Weston's large luxury homes, gated communities, and HOA requirements mean professional cleaning needs specific expertise. Here's everything Weston homeowners need to know.",
+    date: "April 2026",
+    readTime: "5 min read",
+    category: "Local"
+  },
+  {
     slug: "house-cleaning-delray-beach",
     title: "House Cleaning in Delray Beach, FL — Pricing, Services & How to Book",
     excerpt: "Snowbirds, country club residents, and year-round homeowners: here's what Delray Beach homeowners need to know about professional cleaning — pricing, neighborhoods, and seasonal service.",
