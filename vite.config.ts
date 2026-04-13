@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { execSync } from "child_process";
+import prerender, { PuppeteerRenderer } from "vite-plugin-prerender";
 
 function sitemapPlugin(): Plugin {
   return {
@@ -17,6 +18,111 @@ function sitemapPlugin(): Plugin {
   };
 }
 
+// All SEO-critical routes to prerender as static HTML
+// This makes them visible to Googlebot, AI crawlers, and social preview scrapers
+const PRERENDER_ROUTES = [
+  // Core pages
+  "/",
+  "/blog",
+  "/service-areas",
+  "/faq",
+  "/sitemap",
+
+  // Service pages
+  "/deep-cleaning",
+  "/standard-cleaning",
+  "/move-in-out-cleaning",
+  "/carpet-cleaning",
+  "/upholstery-cleaning",
+  "/airbnb-cleaning",
+  "/office-cleaning",
+  "/post-construction-cleaning",
+
+  // County pages
+  "/broward-county-cleaning",
+  "/miami-dade-cleaning",
+  "/palm-beach-county-cleaning",
+
+  // City pages — Broward County
+  "/fort-lauderdale-cleaning",
+  "/hollywood-cleaning",
+  "/pompano-beach-cleaning",
+  "/plantation-cleaning",
+  "/sunrise-cleaning",
+  "/davie-cleaning",
+  "/pembroke-pines-cleaning",
+  "/weston-cleaning",
+  "/deerfield-beach-cleaning",
+  "/miramar-cleaning",
+  "/lauderhill-cleaning",
+  "/tamarac-cleaning",
+  "/coral-springs-cleaning",
+  "/coconut-creek-cleaning",
+  "/margate-cleaning",
+  "/hallandale-beach-cleaning",
+  "/parkland-cleaning",
+  "/cooper-city-cleaning",
+  "/oakland-park-cleaning",
+  "/wilton-manors-cleaning",
+
+  // City pages — Palm Beach County
+  "/boca-raton-cleaning",
+  "/west-palm-beach-cleaning",
+  "/delray-beach-cleaning",
+  "/boynton-beach-cleaning",
+  "/lake-worth-cleaning",
+  "/jupiter-cleaning",
+  "/palm-beach-gardens-cleaning",
+  "/wellington-cleaning",
+  "/royal-palm-beach-cleaning",
+
+  // City pages — Miami-Dade County
+  "/miami-cleaning",
+  "/miami-beach-cleaning",
+  "/hialeah-cleaning",
+  "/coral-gables-cleaning",
+  "/north-miami-cleaning",
+  "/north-miami-beach-cleaning",
+  "/aventura-cleaning",
+  "/sunny-isles-beach-cleaning",
+  "/doral-cleaning",
+  "/homestead-cleaning",
+  "/miami-gardens-cleaning",
+
+  // Blog posts
+  "/blog/move-in-out-cleaning-checklist",
+  "/blog/deep-cleaning-vs-standard-cleaning",
+  "/blog/pet-friendly-cleaning-tips",
+  "/blog/hurricane-season-cleaning-prep",
+  "/blog/how-to-prepare-for-cleaning-service",
+  "/blog/broward-cost-guide",
+  "/blog/miami-permit-rules",
+  "/blog/palm-beach-seasonal-discounts",
+  "/blog/spring-cleaning-guide-south-florida",
+  "/blog/eco-friendly-cleaning-products",
+  "/blog/allergy-free-home-cleaning",
+  "/blog/holiday-cleaning-checklist",
+  "/blog/bathroom-deep-cleaning-guide",
+  "/blog/kitchen-cleaning-hacks",
+  "/blog/airbnb-turnover-cleaning-tips",
+  "/blog/mold-prevention-florida-homes",
+  "/blog/condo-cleaning-rules-south-florida",
+  "/blog/post-construction-cleaning-guide",
+  "/blog/house-cleaning-fort-lauderdale",
+  "/blog/deep-cleaning-service-miami",
+  "/blog/move-out-cleaning-boca-raton",
+
+  // Competitor comparison pages (highest AI citation value)
+  "/molly-maid-alternative",
+  "/merry-maids-alternative",
+  "/handy-alternative",
+  "/the-maids-alternative",
+  "/cleaning-service-alternatives",
+
+  // Pricing / cost guide
+  "/house-cleaning-cost-south-florida",
+];
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -27,6 +133,24 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     sitemapPlugin(),
+    mode === "production" &&
+      prerender({
+        staticDir: path.join(__dirname, "dist"),
+        routes: PRERENDER_ROUTES,
+        renderer: new PuppeteerRenderer({
+          // Wait for network to be idle and React to finish rendering
+          renderAfterTime: 3000,
+          headless: true,
+          args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        }),
+        postProcess(renderedRoute) {
+          // Fix absolute paths for assets so prerendered pages load correctly
+          renderedRoute.html = renderedRoute.html
+            .replace(/href="\//g, 'href="/')
+            .replace(/src="\//g, 'src="/');
+          return renderedRoute;
+        },
+      }),
   ].filter(Boolean),
   resolve: {
     alias: {
