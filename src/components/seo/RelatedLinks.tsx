@@ -41,9 +41,23 @@ const comparisons = [
 ];
 
 const blogPosts = [
+  { name: "House Cleaning Miami", link: "/blog/house-cleaning-miami" },
   { name: "House Cleaning Fort Lauderdale", link: "/blog/house-cleaning-fort-lauderdale" },
+  { name: "House Cleaning West Palm Beach", link: "/blog/house-cleaning-west-palm-beach" },
+  { name: "House Cleaning Boca Raton", link: "/blog/house-cleaning-boca-raton" },
   { name: "House Cleaning Miami Beach", link: "/blog/house-cleaning-miami-beach" },
   { name: "House Cleaning Coral Springs", link: "/blog/house-cleaning-coral-springs" },
+  { name: "House Cleaning Coral Gables", link: "/blog/house-cleaning-coral-gables" },
+  { name: "House Cleaning Aventura", link: "/blog/house-cleaning-aventura" },
+  { name: "House Cleaning Weston", link: "/blog/house-cleaning-weston" },
+  { name: "House Cleaning Parkland", link: "/blog/house-cleaning-parkland" },
+  { name: "House Cleaning Wellington", link: "/blog/house-cleaning-wellington" },
+  { name: "House Cleaning Deerfield Beach", link: "/blog/house-cleaning-deerfield-beach" },
+  { name: "House Cleaning Hialeah", link: "/blog/house-cleaning-hialeah" },
+  { name: "House Cleaning Miami Gardens", link: "/blog/house-cleaning-miami-gardens" },
+  { name: "House Cleaning Royal Palm Beach", link: "/blog/house-cleaning-royal-palm-beach" },
+  { name: "House Cleaning Tamarac", link: "/blog/house-cleaning-tamarac" },
+  { name: "House Cleaning Coconut Creek", link: "/blog/house-cleaning-coconut-creek" },
   { name: "House Cleaning Pembroke Pines", link: "/blog/house-cleaning-pembroke-pines" },
   { name: "House Cleaning Pompano Beach", link: "/blog/house-cleaning-pompano-beach" },
   { name: "House Cleaning Delray Beach", link: "/blog/house-cleaning-delray-beach" },
