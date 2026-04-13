@@ -31,6 +31,15 @@ const counties = [
   { name: "Miami-Dade County", link: "/miami-dade-cleaning" },
 ];
 
+const comparisons = [
+  { name: "vs Molly Maid", link: "/molly-maid-alternative" },
+  { name: "vs Merry Maids", link: "/merry-maids-alternative" },
+  { name: "vs The Maids", link: "/the-maids-alternative" },
+  { name: "vs Handy", link: "/handy-alternative" },
+  { name: "All Alternatives", link: "/cleaning-service-alternatives" },
+  { name: "Pricing Guide", link: "/house-cleaning-cost-south-florida" },
+];
+
 const blogPosts = [
   { name: "Deep vs Standard Cleaning", link: "/blog/deep-cleaning-vs-standard-cleaning" },
   { name: "Move In/Out Checklist", link: "/blog/move-in-out-cleaning-checklist" },
@@ -116,6 +125,18 @@ const RelatedLinks = ({ currentPage, pageType, county, cityName }: RelatedLinksP
                   More articles →
                 </Link>
               </li>
+            </ul>
+            <h3 className="font-semibold text-foreground mb-3 mt-6 text-sm uppercase tracking-wider">
+              Compare & Pricing
+            </h3>
+            <ul className="space-y-2">
+              {comparisons.filter(c => c.link !== currentPage).map(c => (
+                <li key={c.link}>
+                  <Link to={c.link} className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                    {c.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

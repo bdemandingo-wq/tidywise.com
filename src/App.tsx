@@ -101,6 +101,11 @@ const CleaningServiceAlternatives = lazy(() => import("./pages/vs/CleaningServic
 // Programmatic SEO pages
 const HouseCleaningCostGuide = lazy(() => import("./pages/HouseCleaningCostGuide"));
 
+// Targeted local blog posts
+const HouseCleaningFortLauderdale = lazy(() => import("./pages/blog/HouseCleaningFortLauderdale"));
+const DeepCleaningServiceMiami = lazy(() => import("./pages/blog/DeepCleaningServiceMiami"));
+const MoveOutCleaningBocaRaton = lazy(() => import("./pages/blog/MoveOutCleaningBocaRaton"));
+
 // Redirect component for old /blog/ai/:slug URLs
 const AiBlogPostRedirect = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -240,6 +245,11 @@ const AppRoutes = () => {
 
         {/* Programmatic SEO pages */}
         <Route path="/house-cleaning-cost-south-florida" element={<HouseCleaningCostGuide />} />
+
+        {/* Targeted local blog posts */}
+        <Route path="/blog/house-cleaning-fort-lauderdale" element={<HouseCleaningFortLauderdale />} />
+        <Route path="/blog/deep-cleaning-service-miami" element={<DeepCleaningServiceMiami />} />
+        <Route path="/blog/move-out-cleaning-boca-raton" element={<MoveOutCleaningBocaRaton />} />
 
         {/* Redirect old /blog/ai/ URLs to /blog/ */}
         <Route path="/blog/ai/:slug" element={<AiBlogPostRedirect />} />
