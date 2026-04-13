@@ -91,6 +91,11 @@ const CondoCleaningRules = lazy(() => import("./pages/blog/CondoCleaningRules"))
 const PostConstructionCleaningGuide = lazy(() => import("./pages/blog/PostConstructionCleaningGuide"));
 const AiBlogPost = lazy(() => import("./pages/blog/AiBlogPost"));
 
+// Competitor comparison pages
+const MollyMaidAlternative = lazy(() => import("./pages/vs/MollyMaidAlternative"));
+const MerryMaidsAlternative = lazy(() => import("./pages/vs/MerryMaidsAlternative"));
+const HandyAlternative = lazy(() => import("./pages/vs/HandyAlternative"));
+
 // Redirect component for old /blog/ai/:slug URLs
 const AiBlogPostRedirect = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -221,6 +226,11 @@ const AppRoutes = () => {
         <Route path="/blog/condo-cleaning-rules-south-florida" element={<CondoCleaningRules />} />
         <Route path="/blog/post-construction-cleaning-guide" element={<PostConstructionCleaningGuide />} />
         
+        {/* Competitor comparison pages */}
+        <Route path="/molly-maid-alternative" element={<MollyMaidAlternative />} />
+        <Route path="/merry-maids-alternative" element={<MerryMaidsAlternative />} />
+        <Route path="/handy-alternative" element={<HandyAlternative />} />
+
         {/* Redirect old /blog/ai/ URLs to /blog/ */}
         <Route path="/blog/ai/:slug" element={<AiBlogPostRedirect />} />
 
