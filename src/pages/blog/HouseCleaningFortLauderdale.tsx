@@ -30,7 +30,7 @@ const HouseCleaningFortLauderdale = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Fort Lauderdale FL | TIDYWISE | From $108"
-        pageDescription="Professional house cleaning in Fort Lauderdale, FL. Licensed & insured. Serving Las Olas, Victoria Park, Coral Ridge & all Fort Lauderdale neighborhoods. Instant quotes from $108."
+        pageDescription="Professional house cleaning in Fort Lauderdale, FL. Licensed & insured. Serving Las Olas, Victoria Park, Coral Ridge & all neighborhoods. From $118. Instant quote."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-fort-lauderdale"
         pageType="blog"
         blogMeta={{ datePublished: "2026-01-15", dateModified: "2026-04-13", category: "Local Guides" }}

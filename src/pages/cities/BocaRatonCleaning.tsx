@@ -117,6 +117,15 @@ const BocaRatonCleaning = () => {
           </div>
         </section>
 
+        <section className="py-10 bg-muted/30">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Moving out of your Boca Raton home?</p>
+            <Link to="/blog/move-out-cleaning-boca-raton" className="text-primary font-semibold hover:underline">
+              Read our Boca Raton move-out cleaning guide — get your deposit back →
+            </Link>
+          </div>
+        </section>
+
         <RelatedLinks currentPage="/boca-raton-cleaning" pageType="city" cityName="Boca Raton" />
         <Footer />
       </main>
