@@ -10,13 +10,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ArrowLeft, User, Mail, Phone, Home, MapPin, MessageSquare, PawPrint, CalendarIcon, AlertTriangle } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, Home, MapPin, MessageSquare, PawPrint, CalendarIcon, AlertTriangle, Shield, Star, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface BookingState {
   sqft: number;
+  beds: string;
   serviceType: string;
   frequency: string;
   addOns: string[];
@@ -35,12 +36,9 @@ const BookingForm = () => {
     email: "",
     phone: "",
     address: "",
-    beds: "",
     baths: "",
-    accessInstructions: "",
-    focusAreas: "",
-    hasPets: "",
-    petDetails: "",
+    specialInstructions: "",
+    hasPets: false,
   });
   const [preferredDate, setPreferredDate] = useState<Date | undefined>();
 
@@ -69,7 +67,7 @@ const BookingForm = () => {
         customer_email: formData.email,
         customer_phone: formData.phone,
         address: formData.address,
-        beds: formData.beds,
+        beds: booking.beds,
         baths: formData.baths,
         sqft: booking.sqft,
         service_type: booking.serviceType,
@@ -77,8 +75,8 @@ const BookingForm = () => {
         add_ons: booking.addOns,
         total_price: parseFloat(booking.totalPrice),
         preferred_date: preferredDate ? format(preferredDate, "EEEE, MMMM d, yyyy") : "Not specified",
-        special_instructions: `${formData.accessInstructions}\n\nFocus Areas: ${formData.focusAreas}`.trim() || null,
-        pet_info: formData.hasPets !== "no" ? `${formData.hasPets} - ${formData.petDetails}` : null,
+        special_instructions: formData.specialInstructions || null,
+        pet_info: formData.hasPets ? "Yes" : null,
         status: "pending" as const,
       };
 
@@ -120,7 +118,7 @@ const BookingForm = () => {
               address: formData.address,
               serviceType: booking.serviceType,
               frequency: booking.frequency,
-              beds: formData.beds,
+              beds: booking.beds,
               baths: formData.baths,
               sqft: booking.sqft,
               totalPrice: booking.totalPrice,
@@ -151,7 +149,7 @@ const BookingForm = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -177,32 +175,17 @@ const BookingForm = () => {
         <Card className="shadow-elevated animate-scale-in">
           <CardContent className="p-8">
             {/* Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
               <h1 className="font-display text-3xl font-bold text-foreground mb-2">
-                Complete Your Booking
+                Almost Done!
               </h1>
               <p className="text-muted-foreground">
-                Please provide your details so we can schedule your cleaning service.
+                Lock in your price — takes under 2 minutes.
               </p>
             </div>
 
-            {/* Same Day Disclaimer */}
-            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-8 flex gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-display font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wide">
-                  For Same / Next Day Cleaning?
-                </p>
-                <p className="text-sm text-amber-700 dark:text-amber-500">
-                  Please call us directly at{" "}
-                  <a href="tel:+15615718725" className="font-semibold underline">(561) 571-8725</a>{" "}
-                  instead of booking online.
-                </p>
-              </div>
-            </div>
-
             {/* Booking Summary */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-8">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm text-muted-foreground">Your Service</p>
@@ -210,13 +193,28 @@ const BookingForm = () => {
                     {booking.serviceType} • {booking.frequency}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {booking.sqft.toLocaleString()} sq ft
+                    {booking.beds}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Total</p>
+                  <p className="text-sm text-muted-foreground">Estimated Total</p>
                   <p className="text-2xl font-bold text-primary">${booking.totalPrice}</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Same Day Disclaimer */}
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6 flex gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-display font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wide">
+                  Need Same / Next Day?
+                </p>
+                <p className="text-sm text-amber-700 dark:text-amber-500">
+                  Call us directly at{" "}
+                  <a href="tel:+15615718725" className="font-semibold underline">(561) 571-8725</a>{" "}
+                  — we'll fit you in.
+                </p>
               </div>
             </div>
 
@@ -335,122 +333,72 @@ const BookingForm = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="beds">Bedrooms *</Label>
-                    <Select
-                      value={formData.beds}
-                      onValueChange={(value) => handleInputChange("beds", value)}
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 Bedroom</SelectItem>
-                        <SelectItem value="2">2 Bedrooms</SelectItem>
-                        <SelectItem value="3">3 Bedrooms</SelectItem>
-                        <SelectItem value="4">4 Bedrooms</SelectItem>
-                        <SelectItem value="5">5 Bedrooms</SelectItem>
-                        <SelectItem value="6+">6+ Bedrooms</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="baths">Bathrooms *</Label>
-                    <Select
-                      value={formData.baths}
-                      onValueChange={(value) => handleInputChange("baths", value)}
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 Bathroom</SelectItem>
-                        <SelectItem value="1.5">1.5 Bathrooms</SelectItem>
-                        <SelectItem value="2">2 Bathrooms</SelectItem>
-                        <SelectItem value="2.5">2.5 Bathrooms</SelectItem>
-                        <SelectItem value="3">3 Bathrooms</SelectItem>
-                        <SelectItem value="3.5">3.5 Bathrooms</SelectItem>
-                        <SelectItem value="4+">4+ Bathrooms</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="baths">Bathrooms *</Label>
+                  <Select
+                    value={formData.baths}
+                    onValueChange={(value) => handleInputChange("baths", value)}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select number of bathrooms" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Bathroom</SelectItem>
+                      <SelectItem value="1.5">1.5 Bathrooms</SelectItem>
+                      <SelectItem value="2">2 Bathrooms</SelectItem>
+                      <SelectItem value="2.5">2.5 Bathrooms</SelectItem>
+                      <SelectItem value="3">3 Bathrooms</SelectItem>
+                      <SelectItem value="3.5">3.5 Bathrooms</SelectItem>
+                      <SelectItem value="4+">4+ Bathrooms</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
-              {/* Access & Pets */}
+              {/* Notes & Pets */}
               <div className="space-y-4">
                 <h2 className="font-semibold text-foreground flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-primary" />
-                  Special Instructions
+                  Anything we should know?
                 </h2>
 
                 <div className="space-y-2">
-                  <Label htmlFor="access">Access Instructions</Label>
+                  <Label htmlFor="specialInstructions">Special Instructions <span className="text-muted-foreground font-normal">(optional)</span></Label>
                   <Textarea
-                    id="access"
-                    placeholder="How should we access your property? (e.g., gate code, lockbox location, meet at door)"
+                    id="specialInstructions"
+                    placeholder="Access instructions (gate code, lockbox), areas to focus on, or anything else helpful for our team."
                     rows={3}
-                    value={formData.accessInstructions}
-                    onChange={(e) => handleInputChange("accessInstructions", e.target.value)}
+                    value={formData.specialInstructions}
+                    onChange={(e) => handleInputChange("specialInstructions", e.target.value)}
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="focus">Areas to Focus On</Label>
-                  <Textarea
-                    id="focus"
-                    placeholder="Any specific areas you'd like us to pay extra attention to?"
-                    rows={2}
-                    value={formData.focusAreas}
-                    onChange={(e) => handleInputChange("focusAreas", e.target.value)}
+                <div
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors"
+                  onClick={() => handleInputChange("hasPets", !formData.hasPets)}
+                >
+                  <PawPrint className="w-4 h-4 text-primary flex-shrink-0" />
+                  <Label className="cursor-pointer flex-1">We have pets at home</Label>
+                  <input
+                    type="checkbox"
+                    checked={formData.hasPets}
+                    onChange={(e) => handleInputChange("hasPets", e.target.checked)}
+                    className="w-4 h-4 accent-primary"
                   />
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <PawPrint className="w-4 h-4 text-primary" />
-                    <Label>Do you have pets?</Label>
-                  </div>
-                  <Select
-                    value={formData.hasPets}
-                    onValueChange={(value) => handleInputChange("hasPets", value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="no">No pets</SelectItem>
-                      <SelectItem value="dog">Yes - Dog(s)</SelectItem>
-                      <SelectItem value="cat">Yes - Cat(s)</SelectItem>
-                      <SelectItem value="both">Yes - Dogs & Cats</SelectItem>
-                      <SelectItem value="other">Yes - Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {formData.hasPets && formData.hasPets !== "no" && (
-                    <div className="space-y-2">
-                      <Label htmlFor="petDetails">Pet Details</Label>
-                      <Input
-                        id="petDetails"
-                        placeholder="Names, breeds, any special instructions"
-                        value={formData.petDetails}
-                        onChange={(e) => handleInputChange("petDetails", e.target.value)}
-                      />
-                    </div>
-                  )}
                 </div>
               </div>
 
-              <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Confirm Booking"}
-              </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
-                We'll contact you within <strong>15 minutes</strong> to confirm your appointment.
-              </p>
+              <div className="space-y-3 pt-2">
+                <Button type="submit" size="lg" className="w-full text-lg font-semibold" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending your booking..." : "Confirm My Booking"}
+                </Button>
+                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No credit card now</span>
+                  <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-primary" /> Confirmed in 15 min</span>
+                  <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-secondary text-secondary" /> Free re-clean guarantee</span>
+                </div>
+              </div>
             </form>
           </CardContent>
         </Card>

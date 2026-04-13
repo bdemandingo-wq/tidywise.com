@@ -2,10 +2,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Home, Phone } from "lucide-react";
+import { CheckCircle, Home, Phone, Star, Gift } from "lucide-react";
 
 interface BookingState {
   sqft: number;
+  beds: string;
   serviceType: string;
   frequency: string;
   addOns: string[];
@@ -14,12 +15,8 @@ interface BookingState {
   email: string;
   phone: string;
   address: string;
-  beds: string;
   baths: string;
-  accessInstructions?: string;
-  focusAreas?: string;
-  hasPets?: string;
-  petDetails?: string;
+  hasPets?: boolean;
 }
 
 const Confirmation = () => {
@@ -83,8 +80,8 @@ const Confirmation = () => {
             </div>
 
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Beds / Baths</span>
-              <span className="font-medium">{booking.beds} bed / {booking.baths} bath</span>
+              <span className="text-muted-foreground">Home Size</span>
+              <span className="font-medium">{booking.beds} / {booking.baths} bath</span>
             </div>
           </div>
 
@@ -93,8 +90,8 @@ const Confirmation = () => {
             <h2 className="font-semibold text-foreground mb-4">Service Details</h2>
             
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Property Size</span>
-              <span className="font-medium">{booking.sqft.toLocaleString()} sq ft</span>
+              <span className="text-muted-foreground">Home Size</span>
+              <span className="font-medium">{booking.beds}</span>
             </div>
             
             <div className="flex justify-between">
@@ -114,10 +111,10 @@ const Confirmation = () => {
               </div>
             )}
 
-            {booking.hasPets && booking.hasPets !== "no" && (
+            {booking.hasPets && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Pets</span>
-                <span className="font-medium">{booking.petDetails || booking.hasPets}</span>
+                <span className="font-medium">Yes — we'll note it for our team</span>
               </div>
             )}
             
@@ -129,31 +126,52 @@ const Confirmation = () => {
             </div>
           </div>
 
-          {/* Next Steps */}
-          <div className="text-center space-y-4">
+          {/* What Happens Next */}
+          <div className="text-center space-y-3 mb-6">
             <p className="text-sm text-muted-foreground">
-              A member of our team will reach out within <strong>15 minutes</strong> to confirm your appointment details.
+              Our team will call you within <strong>15 minutes</strong> to confirm your date and time.
             </p>
-            
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                variant="outline"
-                className="flex-1"
-                asChild
-              >
+              <Button variant="outline" className="flex-1" asChild>
                 <a href="tel:+15615718725" className="flex items-center justify-center gap-2">
                   <Phone className="w-4 h-4" />
                   Call Us Now
                 </a>
               </Button>
-              <Button
-                className="flex-1"
-                onClick={() => navigate("/")}
-              >
+              <Button className="flex-1" onClick={() => navigate("/")}>
                 <Home className="w-4 h-4 mr-2" />
                 Return Home
               </Button>
             </div>
+          </div>
+
+          {/* Recurring Upsell */}
+          {booking.frequency === "One-Time" && (
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-4 text-center">
+              <p className="text-sm font-semibold text-foreground mb-1">Save 10–15% every visit</p>
+              <p className="text-xs text-muted-foreground">
+                Ask us about bi-weekly or weekly plans when we call — regulars get priority scheduling too.
+              </p>
+            </div>
+          )}
+
+          {/* Referral CTA */}
+          <div className="bg-secondary/10 border border-secondary/20 rounded-lg p-4 mb-4 flex gap-3 items-start">
+            <Gift className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Know someone who needs a cleaner?</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Refer a friend — when they book, you both get a discount on your next cleaning. Just mention your name.
+              </p>
+            </div>
+          </div>
+
+          {/* Google Review Ask */}
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+              <Star className="w-3 h-3 fill-secondary text-secondary" />
+              After your clean, we'd love a Google review — it helps us a lot.
+            </p>
           </div>
         </CardContent>
       </Card>

@@ -2,12 +2,21 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Shield, Star, ArrowRight } from "lucide-react";
 
-// Pricing tiers based on square footage
+// Bedroom-to-sqft mapping (more intuitive for homeowners)
+const bedroomTiers = [
+  { beds: "studio", label: "Studio / 1BR", sqft: 750 },
+  { beds: "2br", label: "2 Bedrooms", sqft: 1250 },
+  { beds: "3br", label: "3 Bedrooms", sqft: 1800 },
+  { beds: "4br", label: "4 Bedrooms", sqft: 2400 },
+  { beds: "5br+", label: "5+ Bedrooms", sqft: 3600 },
+];
+
+// Keep sqft tiers for price lookup
 const pricingTiers = [
   { maxSqft: 750, label: "Up to 750 sf" },
   { maxSqft: 1000, label: "Up to 1000 sf" },
@@ -95,37 +104,27 @@ const getPriceForSqft = (sqft: number, prices: number[]): number => {
 
 const PricingCalculator = () => {
   const navigate = useNavigate();
-  const [sqft, setSqft] = useState([1500]);
+  const [selectedBeds, setSelectedBeds] = useState("2br");
   const [serviceType, setServiceType] = useState("standard");
   const [frequency, setFrequency] = useState("onetime");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
   const selectedService = serviceTypes.find((s) => s.value === serviceType)!;
   const selectedFrequency = frequencies.find((f) => f.value === frequency)!;
+  const selectedBedTier = bedroomTiers.find((b) => b.beds === selectedBeds)!;
   const isCustomService = 'isCustom' in selectedService && selectedService.isCustom;
 
   const totalPrice = useMemo(() => {
-    // Custom services don't have a calculated price
-    if (isCustomService || !selectedService.prices) {
-      return null;
-    }
-    
-    // Get base price from tier
-    let price = getPriceForSqft(sqft[0], selectedService.prices);
-
-    // Add add-ons
+    if (isCustomService || !selectedService.prices) return null;
+    let price = getPriceForSqft(selectedBedTier.sqft, selectedService.prices);
     const addOnTotal = selectedAddOns.reduce((sum, id) => {
       const addOn = addOns.find((a) => a.id === id);
       return sum + (addOn?.price || 0);
     }, 0);
-
     price += addOnTotal;
-
-    // Apply frequency discount
     price = price * (1 - selectedFrequency.discount);
-
     return price;
-  }, [sqft, selectedService, selectedFrequency, selectedAddOns, isCustomService]);
+  }, [selectedBedTier, selectedService, selectedFrequency, selectedAddOns, isCustomService]);
 
   const toggleAddOn = (id: string) => {
     setSelectedAddOns((prev) =>
@@ -146,11 +145,12 @@ const PricingCalculator = () => {
 
     navigate("/booking", {
       state: {
-        sqft: sqft[0],
+        sqft: selectedBedTier.sqft,
+        beds: selectedBedTier.label,
         serviceType: selectedService.label,
         frequency: selectedFrequency.label,
         addOns: selectedAddOns.map(id => addOns.find(a => a.id === id)?.label).filter(Boolean),
-        totalPrice: isCustomService ? "Custom Quote" : totalPrice?.toFixed(2),
+        totalPrice: isCustomService ? "Custom Quote" : totalPrice ? Math.round(totalPrice).toString() : "0",
       },
     });
   };
@@ -160,10 +160,10 @@ const PricingCalculator = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Transparent Pricing
+            Get an Instant Quote in Seconds
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Simple, upfront pricing with no hidden fees. Choose your service and book instantly.
+            No credit card. No phone call. Just your price, right now.
           </p>
         </div>
 
@@ -172,29 +172,24 @@ const PricingCalculator = () => {
             <CardTitle className="text-xl font-display">Select Your Service</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
-            {/* Property Size Slider */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="property-size-slider" className="text-base font-medium">Property Size</Label>
-                <span className="text-lg font-bold text-primary" aria-live="polite">{sqft[0].toLocaleString()} sq ft</span>
-              </div>
-              <Slider
-                id="property-size-slider"
-                value={sqft}
-                onValueChange={setSqft}
-                min={500}
-                max={10000}
-                step={100}
-                className="w-full"
-                aria-label="Property size in square feet"
-                aria-valuemin={500}
-                aria-valuemax={10000}
-                aria-valuenow={sqft[0]}
-                aria-valuetext={`${sqft[0].toLocaleString()} square feet`}
-              />
-              <div className="flex justify-between text-sm text-muted-foreground" aria-hidden="true">
-                <span>500 sq ft</span>
-                <span>10,000 sq ft</span>
+            {/* Home Size — bedroom buttons */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Home Size</Label>
+              <div className="grid grid-cols-5 gap-2">
+                {bedroomTiers.map((tier) => (
+                  <button
+                    key={tier.beds}
+                    type="button"
+                    onClick={() => setSelectedBeds(tier.beds)}
+                    className={`py-2 px-1 rounded-lg border text-sm font-medium transition-all ${
+                      selectedBeds === tier.beds
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background border-border hover:border-primary/50 text-foreground"
+                    }`}
+                  >
+                    {tier.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -241,8 +236,8 @@ const PricingCalculator = () => {
                 <p className="text-3xl font-bold text-primary">Get Quote</p>
               ) : (
                 <>
-                  <p className="text-4xl font-bold text-primary">${totalPrice?.toFixed(2)}</p>
-                  <p className="text-sm text-muted-foreground mt-1">+ add-ons</p>
+                  <p className="text-4xl font-bold text-primary">${totalPrice ? Math.round(totalPrice) : 0}</p>
+                  <p className="text-sm text-muted-foreground mt-1">+ any add-ons selected below</p>
                 </>
               )}
             </div>
@@ -277,13 +272,21 @@ const PricingCalculator = () => {
             )}
 
             {/* Book Button */}
-            <Button
-              size="lg"
-              className="w-full text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
-              onClick={handleBooking}
-            >
-              {isCustomService ? "Request Quote" : "Book This Service"}
-            </Button>
+            <div className="space-y-3">
+              <Button
+                size="lg"
+                className="w-full text-lg font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={handleBooking}
+              >
+                {isCustomService ? "Request a Free Quote" : "Book Now — No Credit Card Needed"}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Licensed &amp; Insured</span>
+                <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-secondary text-secondary" /> 5-Star Rated</span>
+                <span>Free re-clean guarantee</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
