@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Tamarac?",
+    a: "House cleaning in Tamarac costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices are based on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Tamarac, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Tamarac neighborhoods including Kings Point, Woodlands, Mainlands, Tamarac Lakes, and Colony West. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you serve Kings Point and senior communities in Tamarac?",
+    a: "Yes. TIDYWISE serves Kings Point, Woodlands, and all Tamarac senior and active adult communities. Our insured, background-checked teams are respectful and trustworthy — working efficiently with no long-term contracts required."
+  },
+  {
+    q: "How often should Tamarac homeowners book professional cleaning?",
+    a: "Tamarac's retiree population typically books monthly cleaning for regular upkeep. Active households may prefer bi-weekly service. TIDYWISE offers 5–15% discounts on recurring bookings and accommodates any schedule with no long-term commitment required."
+  }
+];
+
 const TamaracCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const TamaracCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/tamarac-cleaning"
         pageType="county"
         county="Tamarac"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

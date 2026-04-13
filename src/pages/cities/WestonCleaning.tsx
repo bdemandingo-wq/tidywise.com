@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Weston?",
+    a: "House cleaning in Weston costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Weston's larger luxury homes may be priced by square footage. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Weston, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Weston communities including Windmill Ranch Estates, The Ridges, Savanna, Sector 7, and Bonaventure. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you service Weston gated communities and HOA neighborhoods?",
+    a: "Yes. TIDYWISE is experienced with Weston's premier planned communities. Our teams handle visitor gate protocols, HOA parking requirements, and building access at Windmill Ranch, The Ridges, and all Weston gated communities."
+  },
+  {
+    q: "How often should Weston homeowners book professional cleaning?",
+    a: "Most Weston homeowners book bi-weekly cleaning. Weston's large luxury homes with extensive tile, pool areas, and premium finishes benefit from regular professional cleaning to prevent the buildup that South Florida's humidity accelerates. Recurring clients save 5–15%."
+  }
+];
+
 const WestonCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const WestonCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/weston-cleaning"
         pageType="county"
         county="Weston"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

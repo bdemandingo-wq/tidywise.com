@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Aventura?",
+    a: "House cleaning in Aventura costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Luxury high-rise condos may be priced based on square footage. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Aventura, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Aventura communities including Williams Island, Turnberry Isle, Harbor Centre, and Aventura Circle. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Aventura condos and luxury high-rises?",
+    a: "Yes. TIDYWISE specializes in Aventura condo and high-rise cleaning. Our teams handle building access protocols, service elevator use, and HOA requirements for Aventura's luxury towers."
+  },
+  {
+    q: "Do you offer Airbnb and vacation rental cleaning in Aventura?",
+    a: "Yes. Aventura has a strong short-term rental market. TIDYWISE provides same-day Airbnb turnovers, linen changes, and guest-ready preparation throughout Aventura. Contact us for short-term rental cleaning rates."
+  }
+];
+
 const AventuraCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const AventuraCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/aventura-cleaning"
         pageType="county"
         county="Aventura"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Delray Beach?",
+    a: "House cleaning in Delray Beach costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Seasonal opening and closing cleans start at $208. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Delray Beach, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Delray Beach communities including Mizner Country Club, Polo Club, Lake Ida, and downtown Atlantic Avenue. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you offer seasonal cleaning in Delray Beach for snowbirds?",
+    a: "Yes. Many Delray Beach residents are seasonal snowbirds who need reliable cleaning during the winter season and a thorough deep clean before they leave in spring. TIDYWISE accommodates flexible scheduling with no long-term contracts required."
+  },
+  {
+    q: "Do you service Delray Beach country clubs and gated communities?",
+    a: "Yes. TIDYWISE is experienced with Delray Beach's country club and gated communities including Mizner Country Club, Polo Club, and Gleneagles. Our teams handle visitor gate protocols, parking coordination, and HOA requirements smoothly."
+  }
+];
+
 const DelrayBeachCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const DelrayBeachCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/delray-beach-cleaning"
         pageType="county"
         county="Delray Beach"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

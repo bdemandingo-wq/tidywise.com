@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in North Miami Beach?",
+    a: "House cleaning in North Miami Beach costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices depend on home size and number of bathrooms. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in North Miami Beach, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all North Miami Beach neighborhoods including Keystone Point, Ojus, Sans Souci, and Ives Dairy. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean North Miami Beach condos and coastal properties?",
+    a: "Yes. TIDYWISE cleans all North Miami Beach property types including condos, high-rises, and single-family homes. Our teams handle salt air challenges, building access requirements, and the unique needs of coastal properties."
+  },
+  {
+    q: "Do you offer Airbnb and vacation rental cleaning in North Miami Beach?",
+    a: "Yes. TIDYWISE provides Airbnb turnover cleaning, linen changes, and guest-ready preparation throughout North Miami Beach. Contact us for short-term rental cleaning rates and availability."
+  }
+];
+
 const NorthMiamiBeachCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const NorthMiamiBeachCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/north-miami-beach-cleaning"
         pageType="county"
         county="North Miami Beach"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

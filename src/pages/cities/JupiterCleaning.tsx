@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Jupiter?",
+    a: "House cleaning in Jupiter costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Larger waterfront homes and estates may be priced by square footage. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Jupiter, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Jupiter communities including Admirals Cove, Abacoa, Jonathan's Landing, Rialto, and Frenchman's Creek. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Jupiter waterfront and boating community homes?",
+    a: "Yes. TIDYWISE is experienced with Jupiter's waterfront and boating communities. Our teams handle the unique cleaning challenges of dock-access homes, coastal salt air exposure, and the larger estate properties common throughout Jupiter."
+  },
+  {
+    q: "Do you offer seasonal cleaning in Jupiter for part-time residents?",
+    a: "Yes. Jupiter attracts many seasonal residents and snowbirds. TIDYWISE accommodates flexible scheduling with no long-term contracts — including deep cleaning for arrival in season and closing cleans before you head north for the summer."
+  }
+];
+
 const JupiterCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const JupiterCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/jupiter-cleaning"
         pageType="county"
         county="Jupiter"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

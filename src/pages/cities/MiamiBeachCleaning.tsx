@@ -7,6 +7,25 @@ import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Miami Beach?",
+    a: "House cleaning in Miami Beach costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Condo and high-rise cleaning may vary based on building access logistics. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Miami Beach, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Miami Beach neighborhoods including South Beach, Mid-Beach, North Beach, Sunset Harbour, and the Venetian Islands. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Miami Beach condos and oceanfront high-rises?",
+    a: "Yes. TIDYWISE specializes in Miami Beach condo and high-rise cleaning. Our teams navigate building access protocols, service elevators, HOA rules, and the unique challenges of oceanfront salt air and humidity."
+  },
+  {
+    q: "Do you offer same-day Airbnb turnover cleaning in Miami Beach?",
+    a: "Yes. Miami Beach is one of South Florida's largest short-term rental markets. TIDYWISE provides same-day Airbnb turnovers, linen changes, restocking, and guest-ready preparation throughout Miami Beach. Contact us for STR cleaning rates."
+  }
+];
+
 const MiamiBeachCleaning = () => {
   return (
     <>
@@ -16,6 +35,7 @@ const MiamiBeachCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/miami-beach-cleaning"
         pageType="county"
         county="Miami Beach"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

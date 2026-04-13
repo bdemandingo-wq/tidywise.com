@@ -7,6 +7,25 @@ import SEOSchema from "@/components/seo/SEOSchema";
 import CityPageNavigation from "@/components/seo/CityPageNavigation";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Coral Springs?",
+    a: "House cleaning in Coral Springs costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices depend on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Coral Springs, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Coral Springs neighborhoods including Eagle Trace, Heron Bay, Ramblewood, and North Springs. We are licensed, insured, and background-check all cleaners."
+  },
+  {
+    q: "Do you use eco-friendly products for Coral Springs families with kids?",
+    a: "Yes. TIDYWISE uses eco-friendly, non-toxic cleaning products as standard — a priority for the many Coral Springs families with young children and pets. Our products are tough on dirt but safe for your household."
+  },
+  {
+    q: "How often should Coral Springs homeowners book professional cleaning?",
+    a: "Most Coral Springs homeowners book bi-weekly service to manage South Florida's humidity and dust. Monthly deep cleaning is popular for larger homes with pools and patios. TIDYWISE offers 5–15% off recurring bookings."
+  }
+];
+
 const CoralSpringsCleaning = () => {
   return (
     <>
@@ -16,6 +35,7 @@ const CoralSpringsCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/coral-springs-cleaning"
         pageType="county"
         county="Coral Springs"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

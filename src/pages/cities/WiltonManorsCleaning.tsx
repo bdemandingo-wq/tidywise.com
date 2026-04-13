@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Wilton Manors?",
+    a: "House cleaning in Wilton Manors costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices depend on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Wilton Manors, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Wilton Manors neighborhoods including Jenada Isles, Wilton Manors Estates, and areas near Wilton Drive. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you use eco-friendly cleaning products in Wilton Manors?",
+    a: "Yes. TIDYWISE uses eco-friendly, non-toxic cleaning products as standard — a priority in Wilton Manors' environmentally conscious community. Our products are effective on Florida's humidity-driven buildup and safe for people and pets."
+  },
+  {
+    q: "How often should Wilton Manors homeowners book professional cleaning?",
+    a: "Most Wilton Manors homeowners book bi-weekly cleaning. The older home stock in Wilton Manors, many with tile and wood floors, benefits from regular professional attention to prevent South Florida's humidity from causing long-term surface damage."
+  }
+];
+
 const WiltonManorsCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const WiltonManorsCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/wilton-manors-cleaning"
         pageType="county"
         county="Wilton Manors"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

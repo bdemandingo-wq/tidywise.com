@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Miramar?",
+    a: "House cleaning in Miramar costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices are based on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Miramar, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Miramar communities including Monarch Lakes, Sunset Lakes, Riviera Isles, Miramar Country Club, and Nautica. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you service Miramar gated communities and HOA neighborhoods?",
+    a: "Yes. TIDYWISE is experienced with Miramar's gated and HOA communities. Our teams handle visitor gate protocols, parking coordination, and community access requirements so your appointment runs smoothly without any hassle."
+  },
+  {
+    q: "How often should Miramar homeowners book professional cleaning?",
+    a: "Most Miramar homeowners book bi-weekly service. Miramar's large planned community homes, many with pools and screen enclosures, benefit from regular professional cleaning to prevent South Florida humidity from causing long-term buildup."
+  }
+];
+
 const MiramarCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const MiramarCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/miramar-cleaning"
         pageType="county"
         county="Miramar"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

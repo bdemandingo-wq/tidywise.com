@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Plantation?",
+    a: "House cleaning in Plantation costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices depend on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Plantation, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Plantation neighborhoods including Jacaranda Country Club, Plantation Isles, Lauderdale West, Midtown Plantation, and Plantation Acres. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Jacaranda Country Club and Plantation gated communities?",
+    a: "Yes. TIDYWISE is experienced with Plantation's gated and country club communities. Our teams handle visitor access protocols, parking coordination, and HOA requirements so every appointment runs smoothly."
+  },
+  {
+    q: "How often should Plantation homeowners book professional cleaning?",
+    a: "Most Plantation homeowners book bi-weekly cleaning for regular maintenance. South Florida's humidity and Plantation's large family homes mean professional cleaning every two weeks keeps allergens and dust at manageable levels. Recurring clients save 5–15%."
+  }
+];
+
 const PlantationCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const PlantationCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/plantation-cleaning"
         pageType="county"
         county="Plantation"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

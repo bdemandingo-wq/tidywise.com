@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Margate?",
+    a: "House cleaning in Margate costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices are based on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Margate, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Margate neighborhoods including Century Village, Royal Crest Estates, Boulevard Heights, and Margate Isles. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Century Village and active adult communities in Margate?",
+    a: "Yes. TIDYWISE serves Century Village and all Margate active adult communities. Our background-checked, insured teams are professional and trustworthy. We work efficiently and quietly with no long-term contracts required."
+  },
+  {
+    q: "How often should Margate homeowners book professional cleaning?",
+    a: "Most Margate homeowners book bi-weekly cleaning for regular upkeep. Monthly service is popular with retirees and seasonal residents. TIDYWISE offers 5–15% discounts on recurring bookings and same-day availability for urgent needs."
+  }
+];
+
 const MargateCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const MargateCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/margate-cleaning"
         pageType="county"
         county="Margate"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

@@ -20,6 +20,25 @@ const services = [
   { name: "Move In/Out Cleaning", desc: "Complete move cleaning throughout Broward County" },
 ];
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Broward County?",
+    a: "House cleaning in Broward County costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices are based on home size and number of bathrooms. TIDYWISE provides instant online quotes for all Broward cities."
+  },
+  {
+    q: "What cities in Broward County does TIDYWISE serve?",
+    a: "TIDYWISE serves all 31 municipalities in Broward County including Fort Lauderdale, Hollywood, Coral Springs, Pompano Beach, Pembroke Pines, Miramar, Weston, Deerfield Beach, Plantation, Sunrise, Davie, and more. We cover all of Broward from the coast to the western suburbs."
+  },
+  {
+    q: "Is TIDYWISE licensed and insured in Broward County?",
+    a: "Yes. TIDYWISE is fully licensed and insured in Broward County, Florida. We carry general liability insurance and can provide a certificate of insurance on request. Every cleaner is background-checked before their first assignment."
+  },
+  {
+    q: "How do I book a cleaning service in Broward County?",
+    a: "Get an instant quote online at tidywisecleaning.com or call (561) 571-8725. You can book standard, deep, or move in/out cleaning for any Broward County city for the same day or a future date. Recurring bookings save 5–15%."
+  }
+];
+
 const BrowardCountyCleaning = () => {
   return (
     <>
@@ -29,6 +48,7 @@ const BrowardCountyCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/broward-county-cleaning"
         pageType="county"
         county="Broward County"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

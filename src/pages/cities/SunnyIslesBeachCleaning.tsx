@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Sunny Isles Beach?",
+    a: "House cleaning in Sunny Isles Beach costs $108–$500+ for standard cleaning, $208–$600+ for deep cleaning, and $283–$700+ for move in/out cleaning. Ultra-luxury condos are priced by square footage and specific requirements. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Sunny Isles Beach, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Sunny Isles Beach luxury towers including Acqualina, Jade Signature, Porsche Design Tower, and Turnberry Ocean Club. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Sunny Isles Beach luxury condos and ultra-high-rise towers?",
+    a: "Yes. TIDYWISE specializes in Sunny Isles Beach luxury condo cleaning. Our teams deliver white-glove service with complete discretion, handling building security protocols, concierge coordination, and the precise standards expected in Sunny Isles' world-class towers."
+  },
+  {
+    q: "Do you offer Airbnb and short-term rental cleaning in Sunny Isles Beach?",
+    a: "Yes. Many Sunny Isles Beach luxury units operate as short-term rentals. TIDYWISE provides same-day turnovers, linen changes, and guest-ready preparation. We understand the premium standards required in this market. Contact us for STR cleaning rates."
+  }
+];
+
 const SunnyIslesBeachCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const SunnyIslesBeachCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/sunny-isles-beach-cleaning"
         pageType="county"
         county="Sunny Isles Beach"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

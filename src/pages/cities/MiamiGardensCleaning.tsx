@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Miami Gardens?",
+    a: "House cleaning in Miami Gardens costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices are based on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Miami Gardens, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Miami Gardens neighborhoods including Carol City, Lake Lucerne, Andover, and Scott Lake. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do your Miami Gardens cleaning teams speak Spanish?",
+    a: "Yes. TIDYWISE cleaning teams are bilingual (English/Spanish), ensuring clear communication and excellent service throughout Miami Gardens' diverse community."
+  },
+  {
+    q: "How often should Miami Gardens homeowners book professional cleaning?",
+    a: "Most Miami Gardens homeowners book bi-weekly cleaning to stay on top of South Florida's humidity and dust. TIDYWISE offers 5–15% discounts on recurring bookings with priority scheduling for regular clients."
+  }
+];
+
 const MiamiGardensCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const MiamiGardensCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/miami-gardens-cleaning"
         pageType="county"
         county="Miami Gardens"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

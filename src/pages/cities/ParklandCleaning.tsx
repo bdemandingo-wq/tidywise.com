@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Parkland?",
+    a: "House cleaning in Parkland costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Parkland's larger luxury homes may be priced based on square footage. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Parkland, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Parkland communities including Parkland Golf & Country Club, Heron Bay, Watercrest, Parkland Reserve, and Meadow Run. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you service Parkland Golf & Country Club and gated communities?",
+    a: "Yes. TIDYWISE is experienced with Parkland's gated and country club communities. Our background-checked teams handle gate access, visitor parking, and HOA protocols — delivering high-end results consistent with Parkland's luxury standards."
+  },
+  {
+    q: "How often should Parkland homeowners book professional cleaning?",
+    a: "Most Parkland homeowners book bi-weekly cleaning for larger homes. Monthly deep cleaning is popular for maintaining high-end finishes, natural stone, and the premium features common in Parkland's luxury homes. Recurring clients save 5–15%."
+  }
+];
+
 const ParklandCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const ParklandCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/parkland-cleaning"
         pageType="county"
         county="Parkland"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

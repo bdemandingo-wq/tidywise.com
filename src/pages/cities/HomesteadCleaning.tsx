@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Homestead?",
+    a: "House cleaning in Homestead costs $108–$350 for standard cleaning, $208–$500 for deep cleaning, and $283–$600 for move in/out cleaning. Prices are based on home size and number of bathrooms. TIDYWISE provides instant online quotes with no hidden fees."
+  },
+  {
+    q: "What is the best cleaning service in Homestead, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Homestead neighborhoods as well as Florida City and Redland. We are licensed, insured, and background-check every cleaner before their first appointment."
+  },
+  {
+    q: "Do you serve rural and agricultural properties in Homestead?",
+    a: "Yes. TIDYWISE serves all Homestead property types including homes in the Redland agricultural area, new construction communities near the Homestead campus, and Florida City. We handle all sizes and configurations."
+  },
+  {
+    q: "How often should Homestead homeowners book professional cleaning?",
+    a: "Most Homestead homeowners book bi-weekly cleaning. The combination of South Florida heat, humidity, and outdoor dust means regular professional cleaning makes a significant difference in indoor air quality and overall cleanliness."
+  }
+];
+
 const HomesteadCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const HomesteadCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/homestead-cleaning"
         pageType="county"
         county="Homestead"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

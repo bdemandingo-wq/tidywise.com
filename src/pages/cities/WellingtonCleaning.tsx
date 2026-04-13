@@ -6,6 +6,25 @@ import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import RelatedLinks from "@/components/seo/RelatedLinks";
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Wellington?",
+    a: "House cleaning in Wellington costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Larger equestrian estates may be priced by square footage. TIDYWISE provides instant online quotes."
+  },
+  {
+    q: "What is the best cleaning service in Wellington, FL?",
+    a: "TIDYWISE is rated 4.9 stars across 127+ verified reviews and serves all Wellington communities including Palm Beach Polo Club, Wellington Preserve, Paddock Park, Mallet Hill, and Olympia. We are licensed, insured, and background-check every cleaner."
+  },
+  {
+    q: "Do you clean Wellington equestrian estates and large properties?",
+    a: "Yes. TIDYWISE serves all Wellington property types including equestrian estates and large luxury homes. Wellington's international polo and equestrian scene means many homes require thorough, professional cleaning — we handle all sizes and specifications."
+  },
+  {
+    q: "Do you offer seasonal cleaning during Wellington's equestrian season?",
+    a: "Yes. Wellington's world-class equestrian season brings a significant influx of seasonal residents from January through April. TIDYWISE accommodates flexible seasonal scheduling with no long-term contracts — including arrival deep cleans and departure cleans."
+  }
+];
+
 const WellingtonCleaning = () => {
   return (
     <>
@@ -15,6 +34,7 @@ const WellingtonCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/wellington-cleaning"
         pageType="county"
         county="Wellington"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />

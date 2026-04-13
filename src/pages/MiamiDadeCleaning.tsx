@@ -20,6 +20,25 @@ const services = [
   { name: "Move In/Out Cleaning", desc: "Complete move cleaning for apartments and houses in Miami-Dade" },
 ];
 
+const faqItems = [
+  {
+    q: "How much does house cleaning cost in Miami-Dade County?",
+    a: "House cleaning in Miami-Dade County costs $108–$400 for standard cleaning, $208–$550 for deep cleaning, and $283–$650 for move in/out cleaning. Luxury condos and high-rises may be priced by square footage. TIDYWISE provides instant online quotes for all Miami-Dade cities."
+  },
+  {
+    q: "What cities in Miami-Dade County does TIDYWISE serve?",
+    a: "TIDYWISE serves all major Miami-Dade municipalities including Miami, Miami Beach, Hialeah, Coral Gables, Aventura, Doral, North Miami, North Miami Beach, Sunny Isles Beach, Homestead, Miami Gardens, and surrounding areas. We cover all of Miami-Dade County."
+  },
+  {
+    q: "Is TIDYWISE licensed and insured in Miami-Dade County?",
+    a: "Yes. TIDYWISE is fully licensed and insured in Miami-Dade County, Florida. We carry general liability insurance and can provide a certificate of insurance on request. Every cleaner is background-checked before their first assignment."
+  },
+  {
+    q: "Do you clean Miami-Dade condos and high-rise apartments?",
+    a: "Yes. TIDYWISE specializes in Miami-Dade condo and high-rise cleaning. Our teams are familiar with building access requirements, HOA rules, service elevators, and the unique challenges of the county's dense urban and coastal building stock."
+  }
+];
+
 const MiamiDadeCleaning = () => {
   return (
     <>
@@ -29,6 +48,7 @@ const MiamiDadeCleaning = () => {
         canonicalUrl="https://www.tidywisecleaning.com/miami-dade-cleaning"
         pageType="county"
         county="Miami-Dade County"
+        faqItems={faqItems}
       />
       <main className="min-h-screen">
         <Navbar />
