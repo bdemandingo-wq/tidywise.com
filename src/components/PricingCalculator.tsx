@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Shield, Star, ArrowRight } from "lucide-react";
 
 // Bedroom-to-sqft mapping (more intuitive for homeowners)
@@ -104,14 +105,14 @@ const getPriceForSqft = (sqft: number, prices: number[]): number => {
 
 const PricingCalculator = () => {
   const navigate = useNavigate();
-  const [selectedBeds, setSelectedBeds] = useState("2br");
+  const [sizeIndex, setSizeIndex] = useState(2); // default 3 Bedrooms
   const [serviceType, setServiceType] = useState("standard");
   const [frequency, setFrequency] = useState("onetime");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
   const selectedService = serviceTypes.find((s) => s.value === serviceType)!;
   const selectedFrequency = frequencies.find((f) => f.value === frequency)!;
-  const selectedBedTier = bedroomTiers.find((b) => b.beds === selectedBeds)!;
+  const selectedBedTier = bedroomTiers[sizeIndex]!;
   const isCustomService = 'isCustom' in selectedService && selectedService.isCustom;
 
   const totalPrice = useMemo(() => {
@@ -172,24 +173,26 @@ const PricingCalculator = () => {
             <CardTitle className="text-xl font-display">Select Your Service</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
-            {/* Home Size — bedroom buttons */}
+            {/* Home Size — slider */}
             <div className="space-y-3">
-              <Label className="text-base font-medium">Home Size</Label>
-              <div className="grid grid-cols-5 gap-2">
-                {bedroomTiers.map((tier) => (
-                  <button
-                    key={tier.beds}
-                    type="button"
-                    onClick={() => setSelectedBeds(tier.beds)}
-                    className={`py-2 px-1 rounded-lg border text-sm font-medium transition-all ${
-                      selectedBeds === tier.beds
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background border-border hover:border-primary/50 text-foreground"
-                    }`}
-                  >
-                    {tier.label}
-                  </button>
-                ))}
+              <Label className="text-base font-medium">
+                Home Size:{" "}
+                <span className="text-primary font-bold">{selectedBedTier.label}</span>
+                <span className="text-muted-foreground font-normal text-sm">
+                  {" "}(~{selectedBedTier.sqft.toLocaleString()} sq ft)
+                </span>
+              </Label>
+              <Slider
+                value={[sizeIndex]}
+                onValueChange={(val) => setSizeIndex(val[0])}
+                min={0}
+                max={bedroomTiers.length - 1}
+                step={1}
+                className="py-2"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Studio / 1BR</span>
+                <span>5+ Bedrooms</span>
               </div>
             </div>
 
