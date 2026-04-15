@@ -257,7 +257,7 @@ const CustomerPortal = () => {
               </div>
               <div className="flex items-center gap-4">
                 <a 
-                  href="tel:5615718725" 
+                  href="tel:+15615718725"
                   className="inline-flex items-center gap-2 text-primary hover:underline"
                 >
                   <Phone className="h-4 w-4" />

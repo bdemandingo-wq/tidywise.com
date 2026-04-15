@@ -41,6 +41,7 @@ const AIChatbot = () => {
           !isOpen && "animate-pulse"
         )}
         size="icon"
+        id="chatbot-toggle"
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <MessageCircle className="h-6 w-6" aria-hidden="true" />}

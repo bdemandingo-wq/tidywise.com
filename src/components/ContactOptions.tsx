@@ -37,7 +37,7 @@ const ContactOptions = () => {
 
           <button
             onClick={() => {
-              const chatBtn = document.querySelector('[aria-label="Open chat"]') as HTMLElement;
+              const chatBtn = document.getElementById('chatbot-toggle') as HTMLElement;
               if (chatBtn) chatBtn.click();
             }}
             className="bg-card rounded-xl p-6 text-center border border-border hover:shadow-lg hover:-translate-y-1 transition-all group text-left"

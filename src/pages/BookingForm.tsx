@@ -340,7 +340,7 @@ const BookingForm = () => {
                     onValueChange={(value) => handleInputChange("baths", value)}
                     required
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="baths">
                       <SelectValue placeholder="Select number of bathrooms" />
                     </SelectTrigger>
                     <SelectContent>
