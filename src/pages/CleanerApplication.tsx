@@ -176,8 +176,8 @@ const CleanerApplication = () => {
   return (
     <>
       <SEOHead
-        title="Join Our Cleaning Team | Apply Now | TIDYWISE"
-        description="Apply to become a TIDYWISE cleaner. Flexible schedule, competitive pay. Serving Broward, Miami-Dade & Palm Beach County."
+        title="Cleaning Jobs South Florida | Apply Now | TIDYWISE Careers"
+        description="Now hiring experienced cleaners in Broward, Miami-Dade & Palm Beach County. Flexible schedule, competitive pay, steady recurring clients. Apply to TIDYWISE today."
         canonical="https://www.tidywisecleaning.com/apply"
       />
     <div className="min-h-screen bg-background">
@@ -186,7 +186,7 @@ const CleanerApplication = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="TIDYWISE Logo" className="h-10 w-auto" />
+              <img src={logo} alt="TIDYWISE — South Florida house cleaning company logo" className="h-10 w-auto" />
               <span className="font-display text-xl font-bold text-foreground">TIDYWISE</span>
             </Link>
           </div>
@@ -202,9 +202,55 @@ const CleanerApplication = () => {
           Back to Home
         </Link>
 
+        <header className="mb-8">
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Apply to Join the TIDYWISE Cleaning Team in South Florida
+          </h1>
+          <p className="text-muted-foreground mb-4">
+            TIDYWISE is hiring experienced, reliable cleaning professionals across{" "}
+            <Link to="/broward-county-cleaning" className="text-primary hover:underline">Broward County</Link>,{" "}
+            <Link to="/miami-dade-cleaning" className="text-primary hover:underline">Miami-Dade County</Link>, and{" "}
+            <Link to="/palm-beach-county-cleaning" className="text-primary hover:underline">Palm Beach County</Link>.
+            We serve over 40 South Florida cities including{" "}
+            <Link to="/fort-lauderdale-cleaning" className="text-primary hover:underline">Fort Lauderdale</Link>,{" "}
+            <Link to="/miami-cleaning" className="text-primary hover:underline">Miami</Link>,{" "}
+            <Link to="/boca-raton-cleaning" className="text-primary hover:underline">Boca Raton</Link>, and{" "}
+            <Link to="/west-palm-beach-cleaning" className="text-primary hover:underline">West Palm Beach</Link>.
+          </p>
+          <p className="text-muted-foreground mb-4">
+            We're looking for cleaners who take pride in their work and want consistent, well-paying jobs with a flexible schedule.
+            You'll be matched with residential clients booking{" "}
+            <Link to="/standard-cleaning" className="text-primary hover:underline">standard cleaning</Link>,{" "}
+            <Link to="/deep-cleaning" className="text-primary hover:underline">deep cleaning</Link>,{" "}
+            <Link to="/move-in-out-cleaning" className="text-primary hover:underline">move in/out cleaning</Link>, and{" "}
+            <Link to="/airbnb-cleaning" className="text-primary hover:underline">Airbnb turnover cleaning</Link> — plus
+            opportunities for{" "}
+            <Link to="/office-cleaning" className="text-primary hover:underline">commercial office cleaning</Link> and{" "}
+            <Link to="/post-construction-cleaning" className="text-primary hover:underline">post-construction cleaning</Link> jobs.
+          </p>
+          <h2 className="font-display text-xl font-bold text-foreground mt-6 mb-3">What We Look For</h2>
+          <ul className="list-disc list-inside space-y-1 text-muted-foreground mb-4">
+            <li>2+ years of professional cleaning experience preferred</li>
+            <li>Reliable transportation to client homes across South Florida</li>
+            <li>Your own basic cleaning supplies (we'll supply specialty items)</li>
+            <li>Liability insurance (or willingness to obtain it)</li>
+            <li>References from prior clients or employers</li>
+            <li>Strong attention to detail and consistent reliability</li>
+          </ul>
+          <h2 className="font-display text-xl font-bold text-foreground mt-6 mb-3">Why Cleaners Choose TIDYWISE</h2>
+          <p className="text-muted-foreground mb-4">
+            Competitive pay, flexible scheduling, and a steady stream of bookings. Our cleaners average more recurring clients than gig platforms because customers love working with the same trusted team. Read about our quality standards on our{" "}
+            <Link to="/faq" className="text-primary hover:underline">FAQ page</Link> or see how we compare to{" "}
+            <Link to="/handy-alternative" className="text-primary hover:underline">Handy</Link> and{" "}
+            <Link to="/molly-maid-alternative" className="text-primary hover:underline">Molly Maid</Link>.
+            Want to see all the cities we serve? Visit our{" "}
+            <Link to="/service-areas" className="text-primary hover:underline">South Florida service areas</Link> page.
+          </p>
+        </header>
+
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-display">Join Our Team</CardTitle>
+            <CardTitle className="text-2xl font-display">Application Form</CardTitle>
             <CardDescription>
               Apply to become a TIDYWISE cleaning professional
             </CardDescription>
