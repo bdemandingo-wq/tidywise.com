@@ -134,6 +134,29 @@ const HandyAlternative = () => {
           </div>
         </section>
 
+        {/* Related comparisons & service links */}
+        <section className="py-12 bg-muted/20 border-y">
+          <div className="container mx-auto px-4 max-w-4xl text-center">
+            <p className="text-muted-foreground mb-4">Compare more cleaning options:</p>
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {[
+                { label: "vs Molly Maid", to: "/molly-maid-alternative" },
+                { label: "vs Merry Maids", to: "/merry-maids-alternative" },
+                { label: "vs The Maids", to: "/the-maids-alternative" },
+                { label: "All Alternatives", to: "/cleaning-service-alternatives" },
+              ].map((l) => (
+                <Link key={l.to} to={l.to} className="text-sm text-primary underline underline-offset-2 hover:opacity-80">{l.label}</Link>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Explore <Link to="/standard-cleaning" className="text-primary hover:underline">standard cleaning</Link>, {" "}
+              <Link to="/deep-cleaning" className="text-primary hover:underline">deep cleaning</Link>, {" "}
+              <Link to="/move-in-out-cleaning" className="text-primary hover:underline">move in/out</Link>, or see {" "}
+              <Link to="/house-cleaning-cost-south-florida" className="text-primary hover:underline">house cleaning costs in South Florida</Link>.
+            </p>
+          </div>
+        </section>
+
         {/* FAQ */}
         <section className="py-16 bg-background">
           <div className="container mx-auto px-4 max-w-3xl">

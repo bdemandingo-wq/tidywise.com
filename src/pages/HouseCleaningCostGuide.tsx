@@ -270,6 +270,30 @@ const HouseCleaningCostGuide = () => {
           </div>
         </section>
 
+        {/* Related Services Internal Links */}
+        <section className="py-10 bg-muted/30 border-y">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="font-display text-2xl font-bold mb-4">Compare Services & Alternatives</h2>
+            <p className="text-muted-foreground mb-6">
+              Learn more about each service type or compare TIDYWISE to other South Florida cleaning options.
+            </p>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+              <Link to="/standard-cleaning" className="text-primary hover:underline">→ Standard Cleaning Service</Link>
+              <Link to="/deep-cleaning" className="text-primary hover:underline">→ Deep Cleaning Service</Link>
+              <Link to="/move-in-out-cleaning" className="text-primary hover:underline">→ Move In/Out Cleaning</Link>
+              <Link to="/airbnb-cleaning" className="text-primary hover:underline">→ Airbnb Turnover Cleaning</Link>
+              <Link to="/post-construction-cleaning" className="text-primary hover:underline">→ Post-Construction Cleaning</Link>
+              <Link to="/office-cleaning" className="text-primary hover:underline">→ Office Cleaning</Link>
+              <Link to="/molly-maid-alternative" className="text-primary hover:underline">→ vs Molly Maid</Link>
+              <Link to="/merry-maids-alternative" className="text-primary hover:underline">→ vs Merry Maids</Link>
+              <Link to="/the-maids-alternative" className="text-primary hover:underline">→ vs The Maids</Link>
+              <Link to="/handy-alternative" className="text-primary hover:underline">→ vs Handy</Link>
+              <Link to="/cleaning-service-alternatives" className="text-primary hover:underline">→ All Alternatives</Link>
+              <Link to="/blog" className="text-primary hover:underline">→ Cleaning Tips Blog</Link>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ */}
         <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4 max-w-3xl">
