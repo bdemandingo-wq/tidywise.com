@@ -671,7 +671,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_reviews: {
+        Row: {
+          booking_id: string | null
+          created_at: string | null
+          customer_name: string | null
+          id: string | null
+          location: string | null
+          rating: number | null
+          review_text: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          location?: string | null
+          rating?: number | null
+          review_text?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          location?: string | null
+          rating?: number | null
+          review_text?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
