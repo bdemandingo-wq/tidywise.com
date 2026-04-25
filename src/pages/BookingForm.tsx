@@ -156,8 +156,8 @@ const BookingForm = () => {
   return (
     <>
       <SEOHead
-        title="Book a Cleaning | TIDYWISE"
-        description="Complete your cleaning service booking with TIDYWISE. Professional house cleaning in South Florida. Licensed & insured."
+        title="Confirm Your Cleaning Booking | TIDYWISE South Florida"
+        description="Finalize your TIDYWISE house cleaning booking. Add your address, preferred date, and special instructions. Licensed, insured, satisfaction guaranteed."
         canonical="https://www.tidywisecleaning.com/booking"
         noIndex={true}
       />

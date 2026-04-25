@@ -5,6 +5,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 
+const PAGE_TITLE = "Best Cleaning Service Alternatives South Florida | TIDYWISE";
+const PAGE_DESCRIPTION = "Compare top cleaning service alternatives in South Florida — Molly Maid, Merry Maids, The Maids, Handy vs TIDYWISE. Transparent pricing from $108. Instant quotes.";
+
 const faqItems = [
   {
     q: "What are the best alternatives to national cleaning franchises in South Florida?",

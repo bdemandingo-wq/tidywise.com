@@ -13,6 +13,8 @@ const Hero = () => {
   return (
     <section
       id="home"
+      role="img"
+      aria-label="Bright, freshly cleaned modern South Florida living room with sunlight streaming in"
       className="relative min-h-screen flex items-center pt-16"
       style={{
         backgroundImage: "url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=75')",
@@ -21,7 +23,7 @@ const Hero = () => {
       }}
     >
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/55" />
+      <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Copy + CTAs */}

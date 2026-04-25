@@ -41,7 +41,7 @@ const TheMaidsAlternative = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="TIDYWISE vs The Maids South Florida | Local Cleaning Alternative"
+        pageTitle="The Maids Alternative South Florida | TIDYWISE Cleaning"
         pageDescription="Best The Maids alternative in South Florida. Transparent pricing from $118, instant booking, same team every visit. Fort Lauderdale, Miami, Boca Raton."
         canonicalUrl="https://www.tidywisecleaning.com/the-maids-alternative"
         pageType="service"

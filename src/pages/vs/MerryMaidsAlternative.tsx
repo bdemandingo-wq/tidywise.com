@@ -41,7 +41,7 @@ const MerryMaidsAlternative = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="TIDYWISE vs Merry Maids South Florida | Local Cleaning Alternative"
+        pageTitle="Merry Maids Alternative South Florida | TIDYWISE Cleaning"
         pageDescription="Best Merry Maids alternative in South Florida. Instant booking, transparent pricing from $118, eco-friendly cleaning. Fort Lauderdale, Miami, Boca Raton."
         canonicalUrl="https://www.tidywisecleaning.com/merry-maids-alternative"
         pageType="service"

@@ -44,8 +44,8 @@ const Index = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="South Florida House Cleaning | Licensed | TIDYWISE"
-        pageDescription="Professional house cleaning across 40+ South Florida cities. Licensed & insured. Instant quotes from $118. Satisfaction guaranteed. Book online today."
+        pageTitle="House Cleaning South Florida | Fort Lauderdale, Miami, Boca | TIDYWISE"
+        pageDescription="Book trusted house cleaning across Fort Lauderdale, Miami, Boca Raton & 40+ South Florida cities. Licensed, insured, eco-friendly. Instant quotes from $108."
         canonicalUrl="https://www.tidywisecleaning.com"
         pageType="home"
         faqItems={homepageFaqs}

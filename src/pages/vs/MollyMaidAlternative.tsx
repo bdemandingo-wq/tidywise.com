@@ -41,7 +41,7 @@ const MollyMaidAlternative = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="TIDYWISE vs Molly Maid South Florida | Better Local Alternative"
+        pageTitle="Molly Maid Alternative South Florida | TIDYWISE Cleaning"
         pageDescription="Best Molly Maid alternative in South Florida. Transparent pricing, same-day booking & eco-friendly cleaning. Fort Lauderdale, Boca Raton, Miami & 40+ cities."
         canonicalUrl="https://www.tidywisecleaning.com/molly-maid-alternative"
         pageType="service"
