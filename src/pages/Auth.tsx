@@ -187,7 +187,7 @@ const Auth = () => {
         <Card className="shadow-elevated">
           <CardContent className="p-8">
             <div className="text-center mb-8">
-              <img src={logo} alt="TIDYWISE Logo" className="h-16 w-auto mx-auto mb-4" />
+              <img src={logo} alt="TIDYWISE — South Florida house cleaning company logo" className="h-16 w-auto mx-auto mb-4" />
               <h1 className="font-display text-2xl font-bold text-foreground mb-2">
                 {isForgotPassword ? "Reset Password" : isLogin ? "Admin Login" : "Create Account"}
               </h1>
