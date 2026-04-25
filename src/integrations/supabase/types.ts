@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_leads: {
+        Row: {
+          answers: Json
+          conversation_id: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string | null
+          customer_phone: string | null
+          estimate_amount: number | null
+          flow_type: string
+          followup_sent: boolean
+          followup_sent_at: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          conversation_id?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          estimate_amount?: number | null
+          flow_type: string
+          followup_sent?: boolean
+          followup_sent_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          conversation_id?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string | null
+          customer_phone?: string | null
+          estimate_amount?: number | null
+          flow_type?: string
+          followup_sent?: boolean
+          followup_sent_at?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_leads_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chatbot_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           category: string
@@ -56,6 +109,27 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_blocked_dates: {
+        Row: {
+          blocked_date: string
+          created_at: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          blocked_date: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          blocked_date?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           add_ons: string[] | null
@@ -71,10 +145,12 @@ export type Database = {
           id: string
           pet_info: string | null
           preferred_date: string
+          review_email_sent_at: string | null
           service_type: string
           special_instructions: string | null
           sqft: number
           status: Database["public"]["Enums"]["booking_status"]
+          time_slot: string | null
           total_price: number
           updated_at: string
         }
@@ -92,10 +168,12 @@ export type Database = {
           id?: string
           pet_info?: string | null
           preferred_date: string
+          review_email_sent_at?: string | null
           service_type: string
           special_instructions?: string | null
           sqft: number
           status?: Database["public"]["Enums"]["booking_status"]
+          time_slot?: string | null
           total_price: number
           updated_at?: string
         }
@@ -113,11 +191,55 @@ export type Database = {
           id?: string
           pet_info?: string | null
           preferred_date?: string
+          review_email_sent_at?: string | null
           service_type?: string
           special_instructions?: string | null
           sqft?: number
           status?: Database["public"]["Enums"]["booking_status"]
+          time_slot?: string | null
           total_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      chatbot_conversations: {
+        Row: {
+          answers: Json
+          converted_to_booking: boolean
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          estimate_amount: number | null
+          flow_type: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          converted_to_booking?: boolean
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          estimate_amount?: number | null
+          flow_type: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          converted_to_booking?: boolean
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          estimate_amount?: number | null
+          flow_type?: string
+          id?: string
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -170,6 +292,63 @@ export type Database = {
           updated_at?: string
           work_areas?: string[]
           years_experience?: number
+        }
+        Relationships: []
+      }
+      commercial_requests: {
+        Row: {
+          address: string | null
+          city: string | null
+          company_name: string
+          contact_name: string
+          created_at: string
+          email: string
+          frequency: string | null
+          id: string
+          message: string | null
+          phone: string
+          property_type: string
+          square_feet: string | null
+          state: string | null
+          status: string
+          updated_at: string
+          zip: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company_name: string
+          contact_name: string
+          created_at?: string
+          email: string
+          frequency?: string | null
+          id?: string
+          message?: string | null
+          phone: string
+          property_type: string
+          square_feet?: string | null
+          state?: string | null
+          status?: string
+          updated_at?: string
+          zip?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          email?: string
+          frequency?: string | null
+          id?: string
+          message?: string | null
+          phone?: string
+          property_type?: string
+          square_feet?: string | null
+          state?: string | null
+          status?: string
+          updated_at?: string
+          zip?: string | null
         }
         Relationships: []
       }
@@ -227,6 +406,218 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_requests: {
+        Row: {
+          address: string
+          bathrooms: string
+          bedrooms: string
+          city: string
+          consent_email: boolean
+          consent_sms: boolean
+          created_at: string
+          current_clean_level: string
+          email: string
+          first_name: string
+          frequency: string
+          id: string
+          last_name: string
+          phone: string
+          square_feet: string
+          state: string
+          status: string
+          updated_at: string
+          zip: string
+        }
+        Insert: {
+          address: string
+          bathrooms: string
+          bedrooms: string
+          city: string
+          consent_email?: boolean
+          consent_sms?: boolean
+          created_at?: string
+          current_clean_level: string
+          email: string
+          first_name: string
+          frequency: string
+          id?: string
+          last_name: string
+          phone: string
+          square_feet: string
+          state: string
+          status?: string
+          updated_at?: string
+          zip: string
+        }
+        Update: {
+          address?: string
+          bathrooms?: string
+          bedrooms?: string
+          city?: string
+          consent_email?: boolean
+          consent_sms?: boolean
+          created_at?: string
+          current_clean_level?: string
+          email?: string
+          first_name?: string
+          frequency?: string
+          id?: string
+          last_name?: string
+          phone?: string
+          square_feet?: string
+          state?: string
+          status?: string
+          updated_at?: string
+          zip?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          customer_name: string
+          id: string
+          location: string | null
+          rating: number
+          review_text: string
+          review_token: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          customer_name: string
+          id?: string
+          location?: string | null
+          rating: number
+          review_text: string
+          review_token?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          location?: string | null
+          rating?: number
+          review_text?: string
+          review_token?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_areas: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          state: string
+          tier: string
+          travel_fee: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          state?: string
+          tier?: string
+          travel_fee?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          state?: string
+          tier?: string
+          travel_fee?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      service_pricing: {
+        Row: {
+          base_price: number
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          max_sqft: number
+          service_type: string
+          tier_index: number
+          updated_at: string
+        }
+        Insert: {
+          base_price: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          max_sqft: number
+          service_type: string
+          tier_index: number
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          max_sqft?: number
+          service_type?: string
+          tier_index?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -245,6 +636,36 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      work_cards: {
+        Row: {
+          caption: string
+          created_at: string
+          id: string
+          image_url: string
+          platform: string
+          post_url: string
+          sort_order: number
+        }
+        Insert: {
+          caption?: string
+          created_at?: string
+          id?: string
+          image_url: string
+          platform?: string
+          post_url?: string
+          sort_order?: number
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          platform?: string
+          post_url?: string
+          sort_order?: number
         }
         Relationships: []
       }
