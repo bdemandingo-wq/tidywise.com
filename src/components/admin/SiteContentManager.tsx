@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,14 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save } from "lucide-react";
+import { Save, AlertCircle } from "lucide-react";
 
 type ContentMap = Record<string, string>;
+
+const SERVICE_PRICING_KEYS_SOURCE = ["standard", "deep", "moveinout", "carpet", "upholstery", "airbnb", "office", "postconstruction"];
+const SERVICE_PRICING_KEYS = SERVICE_PRICING_KEYS_SOURCE.flatMap((s) => [
+  `service_${s}_title`,
+  `service_${s}_price`,
+  `service_${s}_desc`,
+]);
 
 const SiteContentManager = () => {
   const [content, setContent] = useState<ContentMap>({});
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
+  const initialContentRef = useRef<ContentMap>({});
+  const [, forceTick] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -22,12 +31,44 @@ const SiteContentManager = () => {
       const map: ContentMap = {};
       (data || []).forEach((row: any) => (map[row.key] = row.value));
       setContent(map);
+      initialContentRef.current = { ...map };
       setLoading(false);
     })();
   }, []);
 
-  const setField = (key: string, value: string) =>
+  const setField = (key: string, value: string) => {
     setContent((prev) => ({ ...prev, [key]: value }));
+    forceTick((n) => n + 1); // ensure dirty calc re-runs
+  };
+
+  const isDirty = (key: string) =>
+    (content[key] ?? "") !== (initialContentRef.current[key] ?? "");
+
+  // Service Pricing dirty tracking
+  const dirtyPricingKeys = useMemo(
+    () => SERVICE_PRICING_KEYS.filter(isDirty),
+    [content]
+  );
+  const dirtyPricingRows = useMemo(() => {
+    const rows = new Set<string>();
+    dirtyPricingKeys.forEach((k) => {
+      const match = k.match(/^service_(.+?)_(title|price|desc)$/);
+      if (match) rows.add(match[1]);
+    });
+    return rows;
+  }, [dirtyPricingKeys]);
+
+  // Warn before leaving with unsaved pricing changes
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (dirtyPricingKeys.length > 0) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [dirtyPricingKeys.length]);
 
   const saveKeys = async (keys: string[], label: string) => {
     setSavingKey(label);
@@ -46,20 +87,43 @@ const SiteContentManager = () => {
       description: hasError ? `Failed to save ${label}.` : `${label} updated.`,
       variant: hasError ? "destructive" : "default",
     });
+    if (!hasError) {
+      // Mark these keys as clean
+      keys.forEach((k) => {
+        initialContentRef.current[k] = content[k] ?? "";
+      });
+      forceTick((n) => n + 1);
+    }
     setSavingKey(null);
+  };
+
+  const saveAllPricing = async () => {
+    if (dirtyPricingKeys.length === 0) return;
+    await saveKeys(dirtyPricingKeys, "Service Cards");
   };
 
   if (loading) {
     return <div className="text-center py-8 text-muted-foreground">Loading...</div>;
   }
 
-  const Field = ({ label, k, multi = false, rows = 2 }: { label: string; k: string; multi?: boolean; rows?: number }) => (
+  const Field = ({ label, k, multi = false, rows = 2, highlight = false }: { label: string; k: string; multi?: boolean; rows?: number; highlight?: boolean }) => (
     <div>
       <Label htmlFor={k}>{label}</Label>
       {multi ? (
-        <Textarea id={k} rows={rows} value={content[k] || ""} onChange={(e) => setField(k, e.target.value)} />
+        <Textarea
+          id={k}
+          rows={rows}
+          value={content[k] || ""}
+          onChange={(e) => setField(k, e.target.value)}
+          className={highlight && isDirty(k) ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20" : ""}
+        />
       ) : (
-        <Input id={k} value={content[k] || ""} onChange={(e) => setField(k, e.target.value)} />
+        <Input
+          id={k}
+          value={content[k] || ""}
+          onChange={(e) => setField(k, e.target.value)}
+          className={highlight && isDirty(k) ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20" : ""}
+        />
       )}
     </div>
   );
@@ -180,31 +244,49 @@ const SiteContentManager = () => {
       {/* Service Pricing Display */}
       <Card>
         <CardHeader>
-          <CardTitle>Service Card Pricing Labels</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            These are the "starting from" prices shown on service cards. They don't affect the calculator.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <CardTitle>Service Card Pricing Labels</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                These are the "starting from" prices shown on service cards. They don't affect the calculator.
+              </p>
+            </div>
+            <Button
+              onClick={saveAllPricing}
+              disabled={dirtyPricingKeys.length === 0 || savingKey === "Service Cards"}
+              className="shrink-0"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {savingKey === "Service Cards"
+                ? "Saving..."
+                : `Save All${dirtyPricingKeys.length > 0 ? ` (${dirtyPricingKeys.length})` : ""}`}
+            </Button>
+          </div>
+          {dirtyPricingKeys.length > 0 && (
+            <div className="flex items-center gap-2 mt-3 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-700 rounded-md px-3 py-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>
+                You have unsaved changes in {dirtyPricingRows.size} row{dirtyPricingRows.size === 1 ? "" : "s"} ({dirtyPricingKeys.length} field{dirtyPricingKeys.length === 1 ? "" : "s"}).
+              </span>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
-          {["standard", "deep", "moveinout", "carpet", "upholstery", "airbnb", "office", "postconstruction"].map((s) => (
-            <div key={s} className="grid md:grid-cols-3 gap-3">
-              <Field label={`${s} - Title`} k={`service_${s}_title`} />
-              <Field label={`${s} - Price label`} k={`service_${s}_price`} />
-              <Field label={`${s} - Short desc`} k={`service_${s}_desc`} />
-            </div>
-          ))}
-          <Button
-            onClick={() => saveKeys(
-              ["standard", "deep", "moveinout", "carpet", "upholstery", "airbnb", "office", "postconstruction"].flatMap((s) => [
-                `service_${s}_title`, `service_${s}_price`, `service_${s}_desc`,
-              ]),
-              "Service Cards"
-            )}
-            disabled={savingKey === "Service Cards"}
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {savingKey === "Service Cards" ? "Saving..." : "Save Service Cards"}
-          </Button>
+          {SERVICE_PRICING_KEYS_SOURCE.map((s) => {
+            const rowDirty = dirtyPricingRows.has(s);
+            return (
+              <div
+                key={s}
+                className={`grid md:grid-cols-3 gap-3 p-3 rounded-md transition-colors ${
+                  rowDirty ? "bg-amber-50 dark:bg-amber-950/10 ring-1 ring-amber-300 dark:ring-amber-700" : ""
+                }`}
+              >
+                <Field label={`${s} - Title`} k={`service_${s}_title`} highlight />
+                <Field label={`${s} - Price label`} k={`service_${s}_price`} highlight />
+                <Field label={`${s} - Short desc`} k={`service_${s}_desc`} highlight />
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
 
