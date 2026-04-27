@@ -1,11 +1,19 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Calendar, Clock, ArrowRight, Sparkles } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
 import StickyCallButton from "@/components/seo/StickyCallButton";
 import { supabase } from "@/integrations/supabase/client";
+
+// Parse "Month YYYY" or ISO date strings to a sortable timestamp
+const parsePostDate = (s: string): number => {
+  const t = Date.parse(s);
+  if (!isNaN(t)) return t;
+  const t2 = Date.parse(`1 ${s}`);
+  return isNaN(t2) ? 0 : t2;
+};
 
 interface BlogPost {
   slug: string;
@@ -493,7 +501,16 @@ const POSTS_PER_PAGE = 12;
 const Blog = () => {
   const [allPosts, setAllPosts] = useState<BlogPost[]>(staticBlogPosts);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+
+  const setCurrentPage = (page: number) => {
+    const next = new URLSearchParams(searchParams);
+    if (page <= 1) next.delete("page");
+    else next.set("page", String(page));
+    setSearchParams(next, { replace: false });
+  };
 
   useEffect(() => {
     const fetchAiPosts = async () => {
@@ -529,12 +546,19 @@ const Blog = () => {
 
   // Reset to page 1 when category changes
   useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage !== 1) setCurrentPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory]);
 
-  const filteredPosts = selectedCategory === "All" 
-    ? allPosts 
-    : allPosts.filter(post => post.category === selectedCategory);
+  // Sort posts by date (newest first) before filtering/paginating
+  const sortedPosts = useMemo(
+    () => [...allPosts].sort((a, b) => parsePostDate(b.date) - parsePostDate(a.date)),
+    [allPosts]
+  );
+
+  const filteredPosts = selectedCategory === "All"
+    ? sortedPosts
+    : sortedPosts.filter(post => post.category === selectedCategory);
 
   const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
   const safePage = Math.min(currentPage, totalPages);
@@ -542,6 +566,27 @@ const Blog = () => {
     (safePage - 1) * POSTS_PER_PAGE,
     safePage * POSTS_PER_PAGE
   );
+
+  // Inject rel="prev" / rel="next" into <head> for paginated pages
+  useEffect(() => {
+    const base = "https://www.tidywisecleaning.com/blog";
+    const ensureLink = (rel: "prev" | "next", href: string | null) => {
+      let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
+      if (!href) { el?.remove(); return; }
+      if (!el) {
+        el = document.createElement("link");
+        el.rel = rel;
+        document.head.appendChild(el);
+      }
+      el.href = href;
+    };
+    ensureLink("prev", safePage > 1 ? (safePage - 1 === 1 ? base : `${base}?page=${safePage - 1}`) : null);
+    ensureLink("next", safePage < totalPages ? `${base}?page=${safePage + 1}` : null);
+    return () => {
+      document.head.querySelector('link[rel="prev"]')?.remove();
+      document.head.querySelector('link[rel="next"]')?.remove();
+    };
+  }, [safePage, totalPages]);
 
   return (
     <>
@@ -641,47 +686,83 @@ const Blog = () => {
             {totalPages > 1 && (
               <nav
                 aria-label="Blog pagination"
-                className="flex flex-wrap items-center justify-center gap-2 mt-12"
+                className="mt-12 flex flex-col items-center gap-3"
               >
-                <button
-                  onClick={() => {
-                    setCurrentPage((p) => Math.max(1, p - 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  disabled={safePage === 1}
-                  className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Previous page"
-                >
-                  Previous
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                {/* Mobile: simple Prev / indicator / Next */}
+                <div className="flex sm:hidden items-center justify-center gap-3 w-full">
                   <button
-                    key={page}
                     onClick={() => {
-                      setCurrentPage(page);
+                      setCurrentPage(Math.max(1, safePage - 1));
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
-                    aria-current={page === safePage ? "page" : undefined}
-                    className={`min-w-[40px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      page === safePage
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-border text-foreground hover:bg-muted"
-                    }`}
+                    disabled={safePage === 1}
+                    className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Previous page"
                   >
-                    {page}
+                    Previous
                   </button>
-                ))}
-                <button
-                  onClick={() => {
-                    setCurrentPage((p) => Math.min(totalPages, p + 1));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  disabled={safePage === totalPages}
-                  className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  aria-label="Next page"
-                >
-                  Next
-                </button>
+                  <span className="text-sm text-muted-foreground" aria-live="polite">
+                    Page {safePage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setCurrentPage(Math.min(totalPages, safePage + 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={safePage === totalPages}
+                    className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Next page"
+                  >
+                    Next
+                  </button>
+                </div>
+
+                {/* Desktop: full numbered controls */}
+                <div className="hidden sm:flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    onClick={() => {
+                      setCurrentPage(Math.max(1, safePage - 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={safePage === 1}
+                    className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Previous page"
+                  >
+                    Previous
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => {
+                        setCurrentPage(page);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      aria-current={page === safePage ? "page" : undefined}
+                      className={`min-w-[40px] px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        page === safePage
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-border text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setCurrentPage(Math.min(totalPages, safePage + 1));
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={safePage === totalPages}
+                    className="px-4 py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    aria-label="Next page"
+                  >
+                    Next
+                  </button>
+                </div>
+
+                <p className="hidden sm:block text-sm text-muted-foreground" aria-live="polite">
+                  Page {safePage} of {totalPages}
+                </p>
               </nav>
             )}
           </div>
