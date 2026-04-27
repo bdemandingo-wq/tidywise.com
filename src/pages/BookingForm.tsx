@@ -156,8 +156,8 @@ const BookingForm = () => {
   return (
     <>
       <SEOHead
-        title="Confirm Your Cleaning Booking | TIDYWISE South Florida"
-        description="Confirm your TIDYWISE cleaning appointment. Add address, date, and any special instructions — your spot is secured once submitted. Insured & guaranteed."
+        title="Book Cleaning Online | TidyWise South Florida"
+        description="Book your professional house cleaning in 60 seconds. Instant quote, flexible scheduling, vetted cleaners. Serving Deerfield Beach, Boca Raton & all South Florida."
         canonical="https://www.tidywisecleaning.com/booking"
         noIndex={true}
       />
