@@ -22,6 +22,19 @@ const WEBSITE = "https://www.tidywisecleaning.com";
 const BUSINESS_NAME = "TIDYWISE Cleaning Services";
 const PHONE = "+1-561-571-8725";
 
+/**
+ * Force every canonical URL to the www apex. Prevents non-www duplicates
+ * from ever appearing in canonical / og:url / hreflang / JSON-LD.
+ */
+const normalizeCanonical = (input: string): string => {
+  if (!input) return WEBSITE;
+  const path = input
+    .replace(/^https?:\/\/(www\.)?tidywisecleaning\.com/i, "")
+    .replace(/^https?:\/\/[^/]+/i, "");
+  const cleanPath = path.startsWith("/") || path === "" ? path : `/${path}`;
+  return `${WEBSITE}${cleanPath}`;
+};
+
 const cleaningServiceSchema = {
   "@context": "https://schema.org",
   "@type": "CleaningService",
