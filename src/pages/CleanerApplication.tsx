@@ -481,6 +481,17 @@ const CleanerApplication = () => {
             </form>
           </CardContent>
         </Card>
+
+        <section className="max-w-3xl mx-auto px-4 py-8 border-t mt-8">
+          <h3 className="text-xl font-semibold mb-4">Learn More About TidyWise</h3>
+          <ul className="list-disc pl-6 space-y-2">
+            <li><Link to="/" className="text-primary hover:underline">About TidyWise Cleaning Services</Link></li>
+            <li><Link to="/reviews" className="text-primary hover:underline">See Our 4.9★ Customer Reviews</Link></li>
+            <li><Link to="/deerfield-beach-cleaning" className="text-primary hover:underline">Cleaning Services in Deerfield Beach</Link></li>
+            <li><Link to="/fort-lauderdale-cleaning" className="text-primary hover:underline">Cleaning Services in Fort Lauderdale</Link></li>
+            <li><Link to="/boca-raton-cleaning" className="text-primary hover:underline">Cleaning Services in Boca Raton</Link></li>
+          </ul>
+        </section>
       </main>
     </div>
     </>
