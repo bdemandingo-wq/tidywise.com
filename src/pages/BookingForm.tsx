@@ -161,8 +161,30 @@ const BookingForm = () => {
         canonical="https://www.tidywisecleaning.com/booking"
         noIndex={true}
       />
-    <div className="min-h-screen bg-muted py-12 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-muted">
+      <section className="bg-gradient-to-b from-primary/10 to-background py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Book Your South Florida Cleaning in 60 Seconds
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
+            Instant pricing. Flexible scheduling. Vetted, insured cleaners. No phone calls required — book online and we'll handle the rest.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-accent" /> Easy online booking
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-accent" /> Transparent pricing
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-accent" /> 4.9★ rated by 127+ customers
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-2xl mx-auto py-12 px-4">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -176,9 +198,9 @@ const BookingForm = () => {
           <CardContent className="p-8">
             {/* Header */}
             <div className="text-center mb-6">
-              <h1 className="font-display text-3xl font-bold text-foreground mb-2">
+              <h2 className="font-display text-2xl font-bold text-foreground mb-2">
                 Almost Done!
-              </h1>
+              </h2>
               <p className="text-muted-foreground">
                 Lock in your price — takes under 2 minutes.
               </p>
