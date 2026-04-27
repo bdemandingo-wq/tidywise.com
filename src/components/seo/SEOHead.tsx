@@ -53,13 +53,13 @@ const SEOHead = ({
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href={canonical} />
+      <link rel="canonical" href={canonicalUrl} />
       <meta name="robots" content={robotsContent} />
 
       {/* Open Graph */}
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:url" content={canonical} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content="website" />
       <meta property="og:image" content={image} />
       <meta property="og:image:width" content="1200" />
@@ -75,8 +75,8 @@ const SEOHead = ({
       <meta name="twitter:image" content={image} />
 
       {/* Hreflang */}
-      <link rel="alternate" hrefLang="en-us" href={canonical} />
-      <link rel="alternate" hrefLang="x-default" href={canonical} />
+      <link rel="alternate" hrefLang="en-us" href={canonicalUrl} />
+      <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
 
       {/* Schema JSON-LD */}
       {schemas.map((schema, i) => (
