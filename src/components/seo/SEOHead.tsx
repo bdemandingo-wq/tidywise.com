@@ -13,6 +13,22 @@ const WEBSITE = "https://www.tidywisecleaning.com";
 const BUSINESS_NAME = "TIDYWISE Cleaning Services";
 const DEFAULT_OG_IMAGE = `${WEBSITE}/og-image.webp`;
 
+/**
+ * Force every canonical URL to the www apex (https://www.tidywisecleaning.com).
+ * Accepts absolute URLs (www or non-www, http or https) and relative paths.
+ * This guarantees Google never sees a non-www canonical, even if a caller
+ * passes a stale value or a relative path.
+ */
+const normalizeCanonical = (input: string): string => {
+  if (!input) return WEBSITE;
+  // Strip protocol + any host variant (www / non-www, http / https) to get the path
+  const path = input
+    .replace(/^https?:\/\/(www\.)?tidywisecleaning\.com/i, "")
+    .replace(/^https?:\/\/[^/]+/i, ""); // any other accidental host
+  const cleanPath = path.startsWith("/") || path === "" ? path : `/${path}`;
+  return `${WEBSITE}${cleanPath}`;
+};
+
 const SEOHead = ({
   title,
   description,
@@ -22,6 +38,7 @@ const SEOHead = ({
   schemaJson,
 }: SEOHeadProps) => {
   const image = ogImage || DEFAULT_OG_IMAGE;
+  const canonicalUrl = normalizeCanonical(canonical);
   const robotsContent = noIndex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
