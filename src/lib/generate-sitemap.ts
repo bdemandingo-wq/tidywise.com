@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, statSync, existsSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { parse } from "@babel/parser";
@@ -9,6 +9,7 @@ const traverse = (typeof _traverse === "function" ? _traverse : (_traverse as an
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const PROJECT_ROOT = resolve(__dirname, "../..");
 
 // ======== CONFIGURATION ========
 const BASE_URL = "https://www.tidywisecleaning.com";
