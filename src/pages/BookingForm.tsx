@@ -192,7 +192,12 @@ const BookingForm = () => {
         .map((id) => ADD_ONS.find((a) => a.id === id)?.label)
         .filter(Boolean) as string[];
 
+      // Generate ID client-side so we don't need a post-insert SELECT
+      // (anonymous users have no SELECT policy on bookings — by design)
+      const bookingId = crypto.randomUUID();
+
       const bookingData = {
+        id: bookingId,
         customer_name: parsed.data.name,
         customer_email: parsed.data.email,
         customer_phone: parsed.data.phone,
@@ -213,24 +218,15 @@ const BookingForm = () => {
         idempotency_key: idempotencyKey.current,
       };
 
-      const { data: inserted, error: dbError } = await supabase
+      const { error: dbError } = await supabase
         .from("bookings")
-        .insert(bookingData)
-        .select("id, idempotency_key")
-        .single();
+        .insert(bookingData);
 
       if (dbError) {
-        // Unique violation = duplicate submit; treat as success and recover the row
+        // Unique violation on idempotency_key = duplicate submit; recover via RPC
         if (dbError.code === "23505") {
-          const { data: existing } = await supabase
-            .rpc("get_booking_by_idempotency_key", {
-              _booking_id: "00000000-0000-0000-0000-000000000000",
-              _idempotency_key: idempotencyKey.current,
-            });
-          if (existing && existing.length > 0) {
-            navigate(`/confirmation/${existing[0].id}?k=${encodeURIComponent(idempotencyKey.current)}`, { replace: true });
-            return;
-          }
+          navigate(`/confirmation/${bookingId}?k=${encodeURIComponent(idempotencyKey.current)}`, { replace: true });
+          return;
         }
         console.error("Database error:", dbError);
         toast({
@@ -243,8 +239,6 @@ const BookingForm = () => {
         setIsSubmitting(false);
         return;
       }
-
-      const bookingId = inserted!.id;
 
       // GA4 conversion
       if (typeof window.gtag === "function") {
