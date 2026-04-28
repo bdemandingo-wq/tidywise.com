@@ -96,28 +96,23 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Defer non-critical scripts -->
+    <!-- Defer GA4 load until first user interaction or 5s, then push a single config to the shared gtag instance -->
     <script>
-      var gaLoaded = false;
-      function loadGA() {
-        if (gaLoaded) return;
-        gaLoaded = true;
+      var ga4Loaded = false;
+      function loadGA4() {
+        if (ga4Loaded) return;
+        ga4Loaded = true;
         var script = document.createElement('script');
         script.src = 'https://www.googletagmanager.com/gtag/js?id=G-7GMDF04SNZ';
         script.async = true;
         document.head.appendChild(script);
-        script.onload = function() {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('js', new Date());
-          gtag('config', 'G-7GMDF04SNZ');
-        };
+        // gtag + dataLayer were initialized in <head>; just push the GA4 config.
+        window.gtag('config', 'G-7GMDF04SNZ');
       }
       ['scroll', 'click', 'touchstart', 'keydown'].forEach(function(evt) {
-        window.addEventListener(evt, loadGA, { once: true, passive: true });
+        window.addEventListener(evt, loadGA4, { once: true, passive: true });
       });
-      setTimeout(loadGA, 5000);
+      setTimeout(loadGA4, 5000);
     </script>
   </body>
 </html>
