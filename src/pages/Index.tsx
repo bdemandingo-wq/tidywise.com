@@ -33,9 +33,39 @@ const homepageFaqs = [
   { q: "What's included in a deep clean vs. a standard clean?", a: "A standard clean covers all basic cleaning — vacuuming, mopping, bathroom sanitization, kitchen cleaning, and dusting. A deep clean includes all of that PLUS baseboards, inside cabinets, light fixtures, door handles, window sills, and all add-on services." },
 ];
 
-// Lightweight skeleton with reserved height to prevent CLS
+// Section-shaped skeleton with subtle shimmer that mirrors a typical content
+// section: title bar + description bar + 3 cards. Reserves height to prevent CLS
+// while feeling like real loading content (much better than a blank gap).
+const SectionSkeleton = ({ minHeight }: { minHeight: number }) => {
+  if (minHeight === 0) return null; // Floating widgets (chatbot, sticky CTA) — render nothing while loading
+  return (
+    <section
+      style={{ minHeight }}
+      aria-hidden="true"
+      aria-busy="true"
+      className="container mx-auto px-4 py-12 animate-pulse"
+    >
+      <div className="max-w-2xl mx-auto mb-8 space-y-3">
+        <div className="h-7 md:h-8 bg-muted rounded-md w-2/3 mx-auto" />
+        <div className="h-4 bg-muted rounded-md w-full" />
+        <div className="h-4 bg-muted rounded-md w-5/6 mx-auto" />
+      </div>
+      <div className="grid md:grid-cols-3 gap-6">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="rounded-xl border border-border bg-card/50 p-6 space-y-3">
+            <div className="h-10 w-10 bg-muted rounded-full" />
+            <div className="h-5 bg-muted rounded w-3/4" />
+            <div className="h-4 bg-muted rounded w-full" />
+            <div className="h-4 bg-muted rounded w-5/6" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 const LazySection = ({ children, minHeight = 200 }: { children: React.ReactNode; minHeight?: number }) => (
-  <Suspense fallback={<div style={{ minHeight }} aria-hidden="true" />}>
+  <Suspense fallback={<SectionSkeleton minHeight={minHeight} />}>
     {children}
   </Suspense>
 );
