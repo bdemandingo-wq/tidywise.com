@@ -1,5 +1,30 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://esm.sh/zod@3.23.8";
+
+// HTML-escape user-supplied strings to prevent HTML/script injection in admin email
+function escapeHtml(input: unknown): string {
+  const s = String(input ?? "");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const ApplicationSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  email: z.string().trim().email().max(255),
+  phone: z.string().trim().min(1).max(50),
+  hasTransportation: z.boolean(),
+  hasSupplies: z.boolean(),
+  yearsExperience: z.number().int().min(0).max(80),
+  hasInsurance: z.boolean(),
+  canProvideReferences: z.boolean(),
+  workAreas: z.array(z.string().max(50)).max(20),
+  supplyPictures: z.array(z.string().max(500)).max(20),
+});
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
