@@ -92,9 +92,25 @@ const Testimonials = () => {
           ))}
         </div>
         
-        {/* CTA */}
+        {/* Google Reviews CTA */}
         <div className="text-center mt-10 space-y-3">
-          <Link 
+          <p className="text-sm text-muted-foreground">
+            Trusted by homeowners across South Florida ⭐ 4.9 on Google
+          </p>
+          <a
+            href="https://search.google.com/local/reviews?placeid=ChIJ49KSUfgd2YgRH2RMjA6X9jM"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-md border border-input bg-background text-foreground font-semibold hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            <Star className="w-4 h-4 fill-secondary text-secondary" />
+            See All Reviews on Google
+          </a>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mt-6 space-y-3">
+          <Link
             to="/service-areas"
             className="inline-flex items-center gap-2 text-primary font-semibold hover:underline"
           >
