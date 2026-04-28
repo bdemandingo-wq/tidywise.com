@@ -21,18 +21,24 @@ import {
   ADD_ONS,
   FREQUENCIES,
   SERVICES,
-  SIZE_TIERS,
+  SERVICE_INCLUSIONS,
+  AUTO_INCLUDED_ADDONS,
+  SQFT_MIN,
+  SQFT_MAX,
+  SQFT_STEP,
+  SQFT_DEFAULT,
   computePrice,
   getServiceMeta,
   loadPricingTiers,
   type ServiceKey,
 } from "@/lib/pricing";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
 
 interface IncomingState {
   service?: ServiceKey;
   sqft?: number;
-  bedsLabel?: string;
-  sizeIndex?: number;
   frequency?: string;
   addOnIds?: string[];
 }
@@ -68,9 +74,11 @@ const BookingForm = () => {
 
   // Defaults if user lands without state — sensible fallbacks rather than redirect
   const [service, setService] = useState<ServiceKey>(incoming?.service ?? "standard");
-  const [sizeIndex, setSizeIndex] = useState<number>(incoming?.sizeIndex ?? 2);
+  const [sqft, setSqft] = useState<number>(incoming?.sqft ?? SQFT_DEFAULT);
   const [frequency, setFrequency] = useState<string>(incoming?.frequency ?? "onetime");
-  const [addOnIds, setAddOnIds] = useState<string[]>(incoming?.addOnIds ?? []);
+  const [userAddOnIds, setUserAddOnIds] = useState<string[]>(
+    (incoming?.addOnIds ?? []).filter((id) => !(AUTO_INCLUDED_ADDONS[incoming?.service ?? "standard"] ?? []).includes(id))
+  );
   const [tiers, setTiers] = useState<Awaited<ReturnType<typeof loadPricingTiers>>>([]);
   const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
 
@@ -123,16 +131,25 @@ const BookingForm = () => {
     return { minDate: min, maxDate: max };
   }, []);
 
-  const currentTier = SIZE_TIERS[sizeIndex];
+  const autoIncluded = AUTO_INCLUDED_ADDONS[service] ?? [];
+  const inclusions = SERVICE_INCLUSIONS[service] ?? [];
+  const isCustomService = service === "carpets" || service === "upholstery";
+
+  // Effective add-ons = user-selected + auto-included
+  const addOnIds = useMemo(() => {
+    const set = new Set([...userAddOnIds, ...autoIncluded]);
+    return Array.from(set);
+  }, [userAddOnIds, autoIncluded]);
+
   const breakdown = useMemo(
     () =>
       computePrice(tiers, {
         service,
-        sqft: currentTier.sqft,
+        sqft,
         frequency,
         addOnIds,
       }),
-    [tiers, service, currentTier.sqft, frequency, addOnIds],
+    [tiers, service, sqft, frequency, addOnIds],
   );
 
   const meta = getServiceMeta(service);
@@ -146,7 +163,8 @@ const BookingForm = () => {
   };
 
   const toggleAddOn = (id: string) => {
-    setAddOnIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    if (autoIncluded.includes(id)) return; // can't toggle auto-included
+    setUserAddOnIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const isDateDisabled = (date: Date) => {
@@ -202,9 +220,9 @@ const BookingForm = () => {
         customer_email: parsed.data.email,
         customer_phone: parsed.data.phone,
         address: parsed.data.address,
-        beds: currentTier.bedsLabel,
+        beds: `${sqft.toLocaleString()} sq ft`,
         baths: parsed.data.baths,
-        sqft: currentTier.sqft,
+        sqft,
         service_type: serviceLabel,
         frequency: freqLabel,
         add_ons: addOnLabels,
@@ -267,9 +285,9 @@ const BookingForm = () => {
               address: parsed.data.address,
               serviceType: serviceLabel,
               frequency: freqLabel,
-              beds: currentTier.bedsLabel,
+              beds: `${sqft.toLocaleString()} sq ft`,
               baths: parsed.data.baths,
-              sqft: currentTier.sqft,
+              sqft,
               totalPrice: isCustomQuote ? "Custom Quote" : breakdown.total.toString(),
               preferredDate: format(preferredDate, "EEEE, MMMM d, yyyy"),
               smsConsent: parsed.data.smsConsent === true,
@@ -347,7 +365,7 @@ const BookingForm = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Your Service</p>
                     <p className="font-semibold text-foreground">{meta?.label} • {FREQUENCIES.find((f) => f.key === frequency)?.label}</p>
-                    <p className="text-sm text-muted-foreground">{currentTier.bedsLabel} (~{currentTier.sqft.toLocaleString()} sq ft)</p>
+                    <p className="text-sm text-muted-foreground">{sqft.toLocaleString()} sq ft</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Estimated Total</p>
@@ -361,6 +379,28 @@ const BookingForm = () => {
                     )}
                   </div>
                 </div>
+
+                {/* What's Included */}
+                <div className="border-t border-primary/10 pt-3">
+                  <p className="text-sm font-medium text-foreground mb-2">What's Included</p>
+                  {isCustomService ? (
+                    <p className="text-sm text-muted-foreground flex items-start gap-2">
+                      <Phone className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary" />
+                      Custom quote — call us at{" "}
+                      <a href="tel:+15615718725" className="text-primary font-medium underline">(561) 571-8725</a> for a personalized estimate.
+                    </p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {inclusions.map((item, i) => (
+                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                          <Check className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-accent" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
                 {addOnIds.length > 0 && (
                   <div className="text-sm text-muted-foreground border-t border-primary/10 pt-2">
                     <span className="font-medium text-foreground">Add-ons:</span> {addOnIds.map((id) => ADD_ONS.find((a) => a.id === id)?.label).filter(Boolean).join(", ")}
@@ -405,43 +445,65 @@ const BookingForm = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="bf-size">Home Size: <span className="text-primary font-bold">{currentTier.bedsLabel}</span></Label>
-                    <Select value={String(sizeIndex)} onValueChange={(v) => setSizeIndex(parseInt(v, 10))}>
-                      <SelectTrigger id="bf-size"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {SIZE_TIERS.map((t) => (
-                          <SelectItem key={t.index} value={String(t.index)}>
-                            {t.bedsLabel} (~{t.sqft.toLocaleString()} sq ft)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="bf-size">Property Size</Label>
+                      <span className="text-primary font-bold text-sm">{sqft.toLocaleString()} sq ft</span>
+                    </div>
+                    <Slider
+                      id="bf-size"
+                      value={[sqft]}
+                      onValueChange={(v) => setSqft(v[0])}
+                      min={SQFT_MIN}
+                      max={SQFT_MAX}
+                      step={SQFT_STEP}
+                      className="py-2"
+                      aria-label="Property size in square feet"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{SQFT_MIN.toLocaleString()} sq ft</span>
+                      <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
+                    </div>
                   </div>
                 </fieldset>
 
-                {/* Add-ons editable */}
-                <fieldset className="space-y-3">
-                  <legend className="font-semibold text-foreground">Add-Ons (optional)</legend>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {ADD_ONS.map((a) => {
-                      const checked = addOnIds.includes(a.id);
-                      return (
-                        <label
-                          key={a.id}
-                          htmlFor={`bf-addon-${a.id}`}
-                          className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer text-sm ${checked ? "border-primary bg-primary/5" : "border-border"}`}
-                        >
-                          <Checkbox
-                            id={`bf-addon-${a.id}`}
-                            checked={checked}
-                            onCheckedChange={() => toggleAddOn(a.id)}
-                          />
-                          <span>{a.label}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
+                {/* Add-ons editable (hidden for custom services) */}
+                {!isCustomService && (
+                  <fieldset className="space-y-3">
+                    <legend className="font-semibold text-foreground">Add-Ons (optional)</legend>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {ADD_ONS.map((a) => {
+                        const isAuto = autoIncluded.includes(a.id);
+                        const checked = isAuto || userAddOnIds.includes(a.id);
+                        return (
+                          <label
+                            key={a.id}
+                            htmlFor={`bf-addon-${a.id}`}
+                            className={`flex items-center gap-2 p-2 rounded-md border text-sm ${
+                              isAuto
+                                ? "border-border bg-muted opacity-60 cursor-not-allowed"
+                                : checked
+                                  ? "border-primary bg-primary/5 cursor-pointer"
+                                  : "border-border cursor-pointer"
+                            }`}
+                          >
+                            <Checkbox
+                              id={`bf-addon-${a.id}`}
+                              checked={checked}
+                              disabled={isAuto}
+                              onCheckedChange={() => toggleAddOn(a.id)}
+                            />
+                            <span className="flex-1 flex items-center gap-1.5 flex-wrap">
+                              <span>{a.label}</span>
+                              {isAuto && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
+                              )}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
 
                 {/* Preferred Date */}
                 <fieldset className="space-y-4">
