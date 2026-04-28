@@ -143,6 +143,7 @@ export type Database = {
           customer_phone: string
           frequency: string
           id: string
+          idempotency_key: string | null
           pet_info: string | null
           preferred_date: string
           review_email_sent_at: string | null
@@ -166,6 +167,7 @@ export type Database = {
           customer_phone: string
           frequency: string
           id?: string
+          idempotency_key?: string | null
           pet_info?: string | null
           preferred_date: string
           review_email_sent_at?: string | null
@@ -189,6 +191,7 @@ export type Database = {
           customer_phone?: string
           frequency?: string
           id?: string
+          idempotency_key?: string | null
           pet_info?: string | null
           preferred_date?: string
           review_email_sent_at?: string | null
@@ -639,6 +642,42 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_send_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_type: string
+          provider_message_id: string | null
+          recipient: string
+          recipient_type: string
+          related_booking_id: string | null
+          success: boolean
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_type: string
+          provider_message_id?: string | null
+          recipient: string
+          recipient_type: string
+          related_booking_id?: string | null
+          success: boolean
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_type?: string
+          provider_message_id?: string | null
+          recipient?: string
+          recipient_type?: string
+          related_booking_id?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -738,6 +777,39 @@ export type Database = {
       }
     }
     Functions: {
+      get_booking_by_idempotency_key: {
+        Args: { _booking_id: string; _idempotency_key: string }
+        Returns: {
+          add_ons: string[] | null
+          address: string
+          baths: string
+          beds: string
+          created_at: string
+          customer_email: string
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          frequency: string
+          id: string
+          idempotency_key: string | null
+          pet_info: string | null
+          preferred_date: string
+          review_email_sent_at: string | null
+          service_type: string
+          special_instructions: string | null
+          sqft: number
+          status: Database["public"]["Enums"]["booking_status"]
+          time_slot: string | null
+          total_price: number
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
