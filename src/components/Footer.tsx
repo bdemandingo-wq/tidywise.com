@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Shield, Leaf } from "lucide-react";
+import { trackPhoneCall } from "@/lib/trackPhoneCall";
 
 const Footer = () => {
   return (
