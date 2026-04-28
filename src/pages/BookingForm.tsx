@@ -30,17 +30,23 @@ import {
   computePrice,
   getServiceMeta,
   loadPricingTiers,
+  supportsFrequency,
+  estimateHours,
+  formatHours,
+  isUnitAddOn,
   type ServiceKey,
+  type AddOnQuantities,
 } from "@/lib/pricing";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { Check, Clock, Minus, Plus } from "lucide-react";
 
 interface IncomingState {
   service?: ServiceKey;
   sqft?: number;
   frequency?: string;
   addOnIds?: string[];
+  addOnQuantities?: AddOnQuantities;
 }
 
 // Zod schema mirroring DB constraints
@@ -79,6 +85,7 @@ const BookingForm = () => {
   const [userAddOnIds, setUserAddOnIds] = useState<string[]>(
     (incoming?.addOnIds ?? []).filter((id) => !(AUTO_INCLUDED_ADDONS[incoming?.service ?? "standard"] ?? []).includes(id))
   );
+  const [addOnQuantities, setAddOnQuantities] = useState<AddOnQuantities>(incoming?.addOnQuantities ?? {});
   const [tiers, setTiers] = useState<Awaited<ReturnType<typeof loadPricingTiers>>>([]);
   const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
 
@@ -134,8 +141,13 @@ const BookingForm = () => {
   const autoIncluded = AUTO_INCLUDED_ADDONS[service] ?? [];
   const inclusions = SERVICE_INCLUSIONS[service] ?? [];
   const isCustomService = service === "carpets" || service === "upholstery";
+  const showFrequency = supportsFrequency(service);
 
-  // Effective add-ons = user-selected + auto-included
+  // Force one-time when switching to a service that doesn't support frequency
+  useEffect(() => {
+    if (!showFrequency && frequency !== "onetime") setFrequency("onetime");
+  }, [showFrequency, frequency]);
+
   const addOnIds = useMemo(() => {
     const set = new Set([...userAddOnIds, ...autoIncluded]);
     return Array.from(set);
@@ -148,9 +160,12 @@ const BookingForm = () => {
         sqft,
         frequency,
         addOnIds,
+        addOnQuantities,
       }),
-    [tiers, service, sqft, frequency, addOnIds],
+    [tiers, service, sqft, frequency, addOnIds, addOnQuantities],
   );
+
+  const hours = useMemo(() => estimateHours(service, sqft), [service, sqft]);
 
   const meta = getServiceMeta(service);
   const isCustomQuote = breakdown.isCustom;
@@ -163,8 +178,25 @@ const BookingForm = () => {
   };
 
   const toggleAddOn = (id: string) => {
-    if (autoIncluded.includes(id)) return; // can't toggle auto-included
-    setUserAddOnIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    if (autoIncluded.includes(id)) return;
+    setUserAddOnIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      if (!prev.includes(id)) {
+        const def = ADD_ONS.find((a) => a.id === id);
+        if (def && isUnitAddOn(def) && !addOnQuantities[id]) {
+          setAddOnQuantities((q) => ({ ...q, [id]: 1 }));
+        }
+      }
+      return next;
+    });
+  };
+
+  const adjustQty = (id: string, delta: number) => {
+    setAddOnQuantities((prev) => {
+      const cur = prev[id] ?? 1;
+      const next = Math.max(1, Math.min(20, cur + delta));
+      return { ...prev, [id]: next };
+    });
   };
 
   const isDateDisabled = (date: Date) => {
@@ -207,7 +239,14 @@ const BookingForm = () => {
       const serviceLabel = meta?.label ?? service;
       const freqLabel = FREQUENCIES.find((f) => f.key === frequency)?.label ?? frequency;
       const addOnLabels = addOnIds
-        .map((id) => ADD_ONS.find((a) => a.id === id)?.label)
+        .map((id) => {
+          const a = ADD_ONS.find((x) => x.id === id);
+          if (!a) return null;
+          const qty = addOnQuantities[id] ?? 1;
+          return isUnitAddOn(a) && !autoIncluded.includes(id) && qty > 1
+            ? `${a.label} ×${qty}`
+            : a.label;
+        })
         .filter(Boolean) as string[];
 
       // Generate ID client-side so we don't need a post-insert SELECT
@@ -364,8 +403,16 @@ const BookingForm = () => {
                 <div className="flex justify-between items-start gap-3">
                   <div>
                     <p className="text-sm text-muted-foreground">Your Service</p>
-                    <p className="font-semibold text-foreground">{meta?.label} • {FREQUENCIES.find((f) => f.key === frequency)?.label}</p>
+                    <p className="font-semibold text-foreground">
+                      {meta?.label}{showFrequency ? ` • ${FREQUENCIES.find((f) => f.key === frequency)?.label}` : ""}
+                    </p>
                     <p className="text-sm text-muted-foreground">{sqft.toLocaleString()} sq ft</p>
+                    {hours !== null && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3 h-3" aria-hidden="true" />
+                        Est. {formatHours(hours)}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Estimated Total</p>
@@ -374,7 +421,14 @@ const BookingForm = () => {
                     ) : (
                       <>
                         <p className="text-2xl font-bold text-primary">${breakdown.total}</p>
-                        <p className="text-xs text-muted-foreground">{breakdown.range}</p>
+                        {breakdown.needsConfirmation ? (
+                          <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
+                            <Phone className="w-3 h-3" aria-hidden="true" />
+                            Call to confirm
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">{breakdown.range}</p>
+                        )}
                       </>
                     )}
                   </div>
@@ -424,7 +478,7 @@ const BookingForm = () => {
                   <legend className="font-semibold text-foreground flex items-center gap-2">
                     <Home className="w-4 h-4 text-primary" /> Service Details
                   </legend>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className={`grid grid-cols-1 ${showFrequency ? "sm:grid-cols-2" : ""} gap-4`}>
                     <div className="space-y-2">
                       <Label htmlFor="bf-service">Service Type</Label>
                       <Select value={service} onValueChange={(v) => setService(v as ServiceKey)}>
@@ -434,15 +488,21 @@ const BookingForm = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="bf-freq">Frequency</Label>
-                      <Select value={frequency} onValueChange={setFrequency}>
-                        <SelectTrigger id="bf-freq"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {FREQUENCIES.map((f) => <SelectItem key={f.key} value={f.key}>{f.label}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {showFrequency && (
+                      <div className="space-y-2">
+                        <Label htmlFor="bf-freq">Frequency</Label>
+                        <Select value={frequency} onValueChange={setFrequency}>
+                          <SelectTrigger id="bf-freq"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {FREQUENCIES.map((f) => (
+                              <SelectItem key={f.key} value={f.key}>
+                                {f.label}{f.baseDiscount > 0 ? ` (${Math.round(f.baseDiscount * 100)}% off)` : ""}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
@@ -461,8 +521,14 @@ const BookingForm = () => {
                     />
                     <div className="flex justify-between text-xs text-muted-foreground">
                       <span>{SQFT_MIN.toLocaleString()} sq ft</span>
-                      <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
+                      <span>{SQFT_MAX.toLocaleString()} sq ft</span>
                     </div>
+                    {hours !== null && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Clock className="w-3 h-3" aria-hidden="true" />
+                        Estimated time: <span className="font-medium text-foreground">{formatHours(hours)}</span>
+                      </p>
+                    )}
                   </div>
                 </fieldset>
 
@@ -470,35 +536,76 @@ const BookingForm = () => {
                 {!isCustomService && (
                   <fieldset className="space-y-3">
                     <legend className="font-semibold text-foreground">Add-Ons (optional)</legend>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {ADD_ONS.map((a) => {
                         const isAuto = autoIncluded.includes(a.id);
                         const checked = isAuto || userAddOnIds.includes(a.id);
+                        const isUnit = isUnitAddOn(a);
+                        const qty = addOnQuantities[a.id] ?? 1;
+                        const lineTotal = isAuto ? 0 : a.basePrice * (isUnit ? qty : 1);
                         return (
-                          <label
+                          <div
                             key={a.id}
-                            htmlFor={`bf-addon-${a.id}`}
-                            className={`flex items-center gap-2 p-2 rounded-md border text-sm ${
+                            className={`flex flex-col gap-2 p-2 rounded-md border text-sm ${
                               isAuto
-                                ? "border-border bg-muted opacity-60 cursor-not-allowed"
+                                ? "border-border bg-muted opacity-70"
                                 : checked
-                                  ? "border-primary bg-primary/5 cursor-pointer"
-                                  : "border-border cursor-pointer"
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border"
                             }`}
                           >
-                            <Checkbox
-                              id={`bf-addon-${a.id}`}
-                              checked={checked}
-                              disabled={isAuto}
-                              onCheckedChange={() => toggleAddOn(a.id)}
-                            />
-                            <span className="flex-1 flex items-center gap-1.5 flex-wrap">
-                              <span>{a.label}</span>
-                              {isAuto && (
-                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
-                              )}
-                            </span>
-                          </label>
+                            <div className="flex items-center gap-2">
+                              <Checkbox
+                                id={`bf-addon-${a.id}`}
+                                checked={checked}
+                                disabled={isAuto}
+                                onCheckedChange={() => toggleAddOn(a.id)}
+                              />
+                              <label
+                                htmlFor={`bf-addon-${a.id}`}
+                                className={`flex-1 flex items-center gap-1.5 flex-wrap ${isAuto ? "cursor-not-allowed" : "cursor-pointer"}`}
+                              >
+                                <span className="font-medium">{a.label}</span>
+                                {isAuto ? (
+                                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
+                                ) : (
+                                  <span className="text-muted-foreground text-xs">
+                                    ${a.basePrice}{a.unitLabel ? ` ${a.unitLabel}` : ""}
+                                  </span>
+                                )}
+                              </label>
+                            </div>
+                            {isUnit && checked && !isAuto && (
+                              <div className="flex items-center justify-between pl-6">
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onClick={() => adjustQty(a.id, -1)}
+                                    aria-label={`Decrease ${a.label} quantity`}
+                                    disabled={qty <= 1}
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </Button>
+                                  <span className="min-w-[2ch] text-center text-sm font-medium" aria-live="polite">{qty}</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onClick={() => adjustQty(a.id, 1)}
+                                    aria-label={`Increase ${a.label} quantity`}
+                                    disabled={qty >= 20}
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                                <span className="text-xs font-semibold text-primary">${lineTotal}</span>
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>

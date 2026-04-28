@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock, Phone } from "lucide-react";
 import {
   SERVICES,
   SQFT_MIN,
@@ -13,6 +13,8 @@ import {
   SQFT_DEFAULT,
   loadPricingTiers,
   computePrice,
+  estimateHours,
+  formatHours,
   type ServiceKey,
 } from "@/lib/pricing";
 
@@ -36,6 +38,8 @@ const HeroEstimator = () => {
       }),
     [tiers, service, sqft],
   );
+
+  const hours = useMemo(() => estimateHours(service, sqft), [service, sqft]);
 
   const handleProceed = () => {
     navigate("/booking", {
@@ -92,16 +96,32 @@ const HeroEstimator = () => {
             />
             <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground mt-0.5">
               <span>{SQFT_MIN.toLocaleString()} sq ft</span>
-              <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
+              <span>{SQFT_MAX.toLocaleString()} sq ft</span>
             </div>
+            {hours !== null && (
+              <p className="text-[11px] sm:text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
+                <Clock className="w-3 h-3" aria-hidden="true" />
+                Estimated time: <span className="font-medium text-foreground">{formatHours(hours)}</span>
+              </p>
+            )}
           </div>
         </div>
 
         <div className="bg-primary/5 rounded-lg p-2.5 sm:p-4 text-center" aria-live="polite">
           <p className="text-xs sm:text-sm text-muted-foreground mb-0.5">Estimated Price</p>
-          <p className="text-xl sm:text-2xl font-bold text-primary">
-            {breakdown.isCustom ? "Request Quote" : `From ${breakdown.range}`}
-          </p>
+          {breakdown.isCustom ? (
+            <p className="text-xl sm:text-2xl font-bold text-primary">Request Quote</p>
+          ) : (
+            <>
+              <p className="text-xl sm:text-2xl font-bold text-primary">${breakdown.total}</p>
+              {breakdown.needsConfirmation && (
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 flex items-center justify-center gap-1">
+                  <Phone className="w-3 h-3" aria-hidden="true" />
+                  Custom quote — call to confirm
+                </p>
+              )}
+            </>
+          )}
         </div>
 
         <Button
