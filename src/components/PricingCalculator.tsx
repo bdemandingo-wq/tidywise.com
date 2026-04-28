@@ -6,11 +6,18 @@ import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Check, Phone } from "lucide-react";
 import {
   SERVICES,
-  SIZE_TIERS,
   FREQUENCIES,
   ADD_ONS,
+  SQFT_MIN,
+  SQFT_MAX,
+  SQFT_STEP,
+  SQFT_DEFAULT,
+  SERVICE_INCLUSIONS,
+  AUTO_INCLUDED_ADDONS,
   loadPricingTiers,
   computePrice,
   type ServiceKey,
@@ -18,7 +25,7 @@ import {
 
 const PricingCalculator = () => {
   const navigate = useNavigate();
-  const [sizeIndex, setSizeIndex] = useState(2);
+  const [sqft, setSqft] = useState<number>(SQFT_DEFAULT);
   const [serviceType, setServiceType] = useState<ServiceKey>("standard");
   const [frequency, setFrequency] = useState("onetime");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
@@ -28,20 +35,29 @@ const PricingCalculator = () => {
     loadPricingTiers().then(setTiers);
   }, []);
 
-  const currentTier = SIZE_TIERS[sizeIndex];
+  const autoIncluded = AUTO_INCLUDED_ADDONS[serviceType] ?? [];
+  const inclusions = SERVICE_INCLUSIONS[serviceType] ?? [];
+  const isCustomService = serviceType === "carpets" || serviceType === "upholstery";
+
+  // Combine selected + auto-included for pricing & booking
+  const effectiveAddOns = useMemo(() => {
+    const set = new Set([...selectedAddOns, ...autoIncluded]);
+    return Array.from(set);
+  }, [selectedAddOns, autoIncluded]);
 
   const breakdown = useMemo(
     () =>
       computePrice(tiers, {
         service: serviceType,
-        sqft: currentTier.sqft,
+        sqft,
         frequency,
-        addOnIds: selectedAddOns,
+        addOnIds: effectiveAddOns,
       }),
-    [tiers, serviceType, currentTier.sqft, frequency, selectedAddOns],
+    [tiers, serviceType, sqft, frequency, effectiveAddOns],
   );
 
   const toggleAddOn = (id: string) => {
+    if (autoIncluded.includes(id)) return; // can't toggle auto-included
     setSelectedAddOns((prev) =>
       prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
     );
@@ -51,11 +67,9 @@ const PricingCalculator = () => {
     navigate("/booking", {
       state: {
         service: serviceType,
-        sqft: currentTier.sqft,
-        bedsLabel: currentTier.bedsLabel,
-        sizeIndex,
+        sqft,
         frequency,
-        addOnIds: selectedAddOns,
+        addOnIds: effectiveAddOns,
         estimatedTotal: breakdown.total,
         estimatedRange: breakdown.range,
         isCustom: breakdown.isCustom,
@@ -80,27 +94,25 @@ const PricingCalculator = () => {
             <CardTitle className="text-xl font-display">Select Your Service</CardTitle>
           </CardHeader>
           <CardContent className="space-y-8">
-            {/* Property Size — bedroom tiers (matches Hero UX) */}
+            {/* Property Size — raw sqft */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Label htmlFor="calc-size" className="text-base font-medium">Home Size</Label>
-                <span className="text-lg font-bold text-primary">
-                  {currentTier.bedsLabel} <span className="text-sm text-muted-foreground font-normal">(~{currentTier.sqft.toLocaleString()} sq ft)</span>
-                </span>
+                <Label htmlFor="calc-size" className="text-base font-medium">Property Size</Label>
+                <span className="text-lg font-bold text-primary">{sqft.toLocaleString()} sq ft</span>
               </div>
               <Slider
                 id="calc-size"
-                value={[sizeIndex]}
-                onValueChange={(v) => setSizeIndex(v[0])}
-                min={0}
-                max={SIZE_TIERS.length - 1}
-                step={1}
+                value={[sqft]}
+                onValueChange={(v) => setSqft(v[0])}
+                min={SQFT_MIN}
+                max={SQFT_MAX}
+                step={SQFT_STEP}
                 className="w-full py-3"
-                aria-label="Home size in bedrooms"
+                aria-label="Property size in square feet"
               />
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Studio</span>
-                <span>5+ BR</span>
+                <span>{SQFT_MIN.toLocaleString()} sq ft</span>
+                <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
               </div>
             </div>
 
@@ -119,6 +131,30 @@ const PricingCalculator = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* What's Included */}
+            <div className="bg-background border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-foreground mb-3 text-sm">What's Included</h3>
+              {isCustomService ? (
+                <p className="text-sm text-muted-foreground flex items-start gap-2">
+                  <Phone className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary" />
+                  Custom quote — call us at{" "}
+                  <a href="tel:+15615718725" className="text-primary font-medium underline">
+                    (561) 571-8725
+                  </a>{" "}
+                  for a personalized estimate.
+                </p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {inclusions.map((item, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-accent" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Frequency */}
@@ -152,37 +188,54 @@ const PricingCalculator = () => {
               )}
             </div>
 
-            {/* Add-ons */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Add-On Services</Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {ADD_ONS.map((addOn) => {
-                  const scaledPrice = addOn.sqftScaling > 0
-                    ? Math.round(addOn.basePrice + addOn.basePrice * addOn.sqftScaling * (currentTier.sqft / 1000))
-                    : addOn.basePrice;
-                  return (
-                    <div
-                      key={addOn.id}
-                      className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-all ${
-                        selectedAddOns.includes(addOn.id)
-                          ? "bg-primary/10 border-primary"
-                          : "bg-background border-border hover:border-primary/50"
-                      }`}
-                      onClick={() => toggleAddOn(addOn.id)}
-                    >
-                      <Checkbox
-                        id={`addon-${addOn.id}`}
-                        checked={selectedAddOns.includes(addOn.id)}
-                        onCheckedChange={() => toggleAddOn(addOn.id)}
-                      />
-                      <label htmlFor={`addon-${addOn.id}`} className="text-sm cursor-pointer flex-1">
-                        {addOn.label} <span className="text-muted-foreground">(${scaledPrice})</span>
-                      </label>
-                    </div>
-                  );
-                })}
+            {/* Add-ons (hidden for custom services) */}
+            {!isCustomService && (
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Add-On Services</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {ADD_ONS.map((addOn) => {
+                    const isAuto = autoIncluded.includes(addOn.id);
+                    const checked = isAuto || selectedAddOns.includes(addOn.id);
+                    const scaledPrice = addOn.sqftScaling > 0
+                      ? Math.round(addOn.basePrice + addOn.basePrice * addOn.sqftScaling * (sqft / 1000))
+                      : addOn.basePrice;
+                    return (
+                      <div
+                        key={addOn.id}
+                        className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+                          isAuto
+                            ? "bg-muted border-border opacity-60 cursor-not-allowed"
+                            : checked
+                              ? "bg-primary/10 border-primary cursor-pointer"
+                              : "bg-background border-border hover:border-primary/50 cursor-pointer"
+                        }`}
+                        onClick={() => toggleAddOn(addOn.id)}
+                      >
+                        <Checkbox
+                          id={`addon-${addOn.id}`}
+                          checked={checked}
+                          disabled={isAuto}
+                          onCheckedChange={() => toggleAddOn(addOn.id)}
+                        />
+                        <label
+                          htmlFor={`addon-${addOn.id}`}
+                          className={`text-sm flex-1 ${isAuto ? "cursor-not-allowed" : "cursor-pointer"}`}
+                        >
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span>{addOn.label}</span>
+                            {isAuto ? (
+                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
+                            ) : (
+                              <span className="text-muted-foreground">(${scaledPrice})</span>
+                            )}
+                          </div>
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Book Button */}
             <Button
