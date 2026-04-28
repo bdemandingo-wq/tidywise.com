@@ -1,11 +1,7 @@
 // Shared helper to fire a Google Ads / GA4 conversion event for phone clicks.
 // All tel: links across Hero, Navbar, Footer, and StickyCallButton route through this
 // so phone-call conversion data is consistent regardless of where the user clicks.
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
+// (window.gtag is declared elsewhere in the project)
 
 export function trackPhoneCall(label: string) {
   try {
