@@ -183,9 +183,12 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
+            ref={hamburgerRef}
             className="md:hidden p-2"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-nav-menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -193,7 +196,14 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in relative z-[60] bg-background">
+          <div
+            ref={mobileMenuRef}
+            id="mobile-nav-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+            className="md:hidden py-4 border-t border-border animate-fade-in relative z-[60] bg-background"
+          >
             <div className="flex flex-col gap-2">
               <Link
                 to="/"
