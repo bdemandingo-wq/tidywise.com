@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, ChevronDown, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackPhoneCall } from "@/lib/trackPhoneCall";
 import {
   DropdownMenu,
   DropdownMenuContent,
