@@ -472,6 +472,24 @@ export type Database = {
         }
         Relationships: []
       }
+      review_submission_log: {
+        Row: {
+          created_at: string
+          id: string
+          identifier: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          identifier: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          identifier?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           booking_id: string | null
@@ -483,6 +501,7 @@ export type Database = {
           review_text: string
           review_token: string | null
           status: string
+          token_expires_at: string | null
           updated_at: string
         }
         Insert: {
@@ -495,6 +514,7 @@ export type Database = {
           review_text: string
           review_token?: string | null
           status?: string
+          token_expires_at?: string | null
           updated_at?: string
         }
         Update: {
@@ -507,6 +527,7 @@ export type Database = {
           review_text?: string
           review_token?: string | null
           status?: string
+          token_expires_at?: string | null
           updated_at?: string
         }
         Relationships: [

@@ -1,5 +1,30 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://esm.sh/zod@3.23.8";
+
+// HTML-escape user-supplied strings to prevent HTML/script injection in admin email
+function escapeHtml(input: unknown): string {
+  const s = String(input ?? "");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const ApplicationSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  email: z.string().trim().email().max(255),
+  phone: z.string().trim().min(1).max(50),
+  hasTransportation: z.boolean(),
+  hasSupplies: z.boolean(),
+  yearsExperience: z.number().int().min(0).max(80),
+  hasInsurance: z.boolean(),
+  canProvideReferences: z.boolean(),
+  workAreas: z.array(z.string().max(50)).max(20),
+  supplyPictures: z.array(z.string().max(500)).max(20),
+});
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
@@ -59,11 +84,19 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const application: CleanerApplicationRequest = await req.json();
+    const rawBody = await req.json();
+    const parsed = ApplicationSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid application data", details: parsed.error.flatten().fieldErrors }),
+        { status: 400, headers: { "Content-Type": "application/json", ...getCorsHeaders(req) } }
+      );
+    }
+    const application = parsed.data;
     console.log("Processing application from:", application.name);
 
     const workAreasFormatted = application.workAreas
-      .map((area) => workAreaLabels[area] || area)
+      .map((area) => escapeHtml(workAreaLabels[area] || area))
       .join(", ");
 
     // Generate signed URLs for supply pictures (valid for 7 days)
@@ -115,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "TIDYWISE <support@tidywisecleaning.com>",
         to: ["support@tidywisecleaning.com"],
-        subject: `New Cleaner Application from ${application.name}`,
+        subject: `New Cleaner Application from ${escapeHtml(application.name)}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
@@ -128,14 +161,14 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
                 <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
-                <p style="margin: 5px 0;"><strong>Name:</strong> ${application.name}</p>
-                <p style="margin: 5px 0;"><strong>Email:</strong> ${application.email}</p>
-                <p style="margin: 5px 0;"><strong>Phone:</strong> ${application.phone}</p>
+                <p style="margin: 5px 0;"><strong>Name:</strong> ${escapeHtml(application.name)}</p>
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${escapeHtml(application.email)}</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> ${escapeHtml(application.phone)}</p>
               </div>
               
               <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
                 <h3 style="color: #333; margin-top: 0;">Experience & Qualifications</h3>
-                <p style="margin: 5px 0;"><strong>Years of Experience:</strong> ${application.yearsExperience}</p>
+                <p style="margin: 5px 0;"><strong>Years of Experience:</strong> ${escapeHtml(application.yearsExperience)}</p>
                 <p style="margin: 5px 0;"><strong>Has Transportation:</strong> ${application.hasTransportation ? "✅ Yes" : "❌ No"}</p>
                 <p style="margin: 5px 0;"><strong>Has Own Supplies:</strong> ${application.hasSupplies ? "✅ Yes" : "❌ No"}</p>
                 <p style="margin: 5px 0;"><strong>Has Insurance:</strong> ${application.hasInsurance ? "✅ Yes" : "❌ No"}</p>
