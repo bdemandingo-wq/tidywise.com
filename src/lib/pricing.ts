@@ -240,7 +240,10 @@ export function computePrice(
   const baseAfterDiscount = basePrice * (1 - freq.baseDiscount);
 
   // Add-ons never receive frequency discount (per business rule).
+  // Auto-included add-ons are baked into the base price → skip them in the sum.
+  const autoIncluded = new Set(AUTO_INCLUDED_ADDONS[opts.service] ?? []);
   const addOnsTotal = opts.addOnIds.reduce((sum, id) => {
+    if (autoIncluded.has(id)) return sum;
     const a = ADD_ONS.find((x) => x.id === id);
     if (!a) return sum;
     const scaled = a.sqftScaling > 0
