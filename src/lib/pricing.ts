@@ -163,7 +163,7 @@ export const SERVICE_INCLUSIONS: Record<ServiceKey, string[]> = {
     "Inside of oven and fridge",
     "Light fixtures",
     "Sliding door tracks",
-    "Detailed bathroom scrubbing (grout, tile)",
+    "Detailed bathroom scrubbing",
     "Detailed kitchen degreasing",
   ],
   moveinout: [
