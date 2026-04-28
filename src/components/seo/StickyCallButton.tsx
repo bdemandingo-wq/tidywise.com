@@ -39,7 +39,7 @@ const StickyCallButton = () => {
           className="flex-1 bg-primary text-primary-foreground font-semibold"
           asChild
         >
-          <a href={telLink} className="flex items-center justify-center gap-2">
+          <a href={telLink} onClick={() => trackPhoneCall("sticky_mobile")} className="flex items-center justify-center gap-2">
             <Phone className="w-5 h-5" aria-hidden="true" />
             <span>Call Now</span>
           </a>
