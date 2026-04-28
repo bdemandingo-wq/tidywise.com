@@ -30,17 +30,23 @@ import {
   computePrice,
   getServiceMeta,
   loadPricingTiers,
+  supportsFrequency,
+  estimateHours,
+  formatHours,
+  isUnitAddOn,
   type ServiceKey,
+  type AddOnQuantities,
 } from "@/lib/pricing";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { Check, Clock, Minus, Plus } from "lucide-react";
 
 interface IncomingState {
   service?: ServiceKey;
   sqft?: number;
   frequency?: string;
   addOnIds?: string[];
+  addOnQuantities?: AddOnQuantities;
 }
 
 // Zod schema mirroring DB constraints
