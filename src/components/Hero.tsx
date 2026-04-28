@@ -36,7 +36,7 @@ const Hero = () => {
               <span className="text-sm font-medium">Booking Available Today</span>
             </div>
 
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            <h1 id="hero-heading" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
               Your Home Deserves Better Than Average.
             </h1>
 
