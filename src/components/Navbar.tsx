@@ -277,7 +277,7 @@ const Navbar = () => {
               )}
               <div className="flex gap-2 mt-2">
                 <Button variant="outline" className="flex-1 border-primary text-primary" asChild>
-                  <a href="tel:+15615718725" className="flex items-center justify-center gap-1.5">
+                  <a href="tel:+15615718725" className="flex items-center justify-center gap-1.5" onClick={() => trackPhoneCall("navbar_mobile")}>
                     <Phone className="w-4 h-4" />
                     Call
                   </a>
