@@ -20,7 +20,7 @@
     --secondary-foreground: 0 0% 100%;
 
     --muted: 40 20% 95%;
-    --muted-foreground: 20 10% 40%;
+    --muted-foreground: 20 12% 32%;
 
     --accent: 224 76% 48%;
     --accent-foreground: 0 0% 100%;
@@ -101,6 +101,19 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+
+  /* Accessibility: visible focus outline for all interactive elements */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 
   @media (prefers-reduced-motion: reduce) {
