@@ -171,7 +171,7 @@ const Navbar = () => {
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               asChild
             >
-              <a href="tel:+15615718725" className="flex items-center gap-1.5">
+              <a href="tel:+15615718725" className="flex items-center gap-1.5" onClick={() => trackPhoneCall("navbar_desktop")}>
                 <Phone className="w-4 h-4" />
                 Call Now
               </a>
