@@ -148,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "TIDYWISE <support@tidywisecleaning.com>",
         to: ["support@tidywisecleaning.com"],
-        subject: `New Cleaner Application from ${application.name}`,
+        subject: `New Cleaner Application from ${escapeHtml(application.name)}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);">
@@ -161,14 +161,14 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
                 <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
-                <p style="margin: 5px 0;"><strong>Name:</strong> ${application.name}</p>
-                <p style="margin: 5px 0;"><strong>Email:</strong> ${application.email}</p>
-                <p style="margin: 5px 0;"><strong>Phone:</strong> ${application.phone}</p>
+                <p style="margin: 5px 0;"><strong>Name:</strong> ${escapeHtml(application.name)}</p>
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${escapeHtml(application.email)}</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> ${escapeHtml(application.phone)}</p>
               </div>
               
               <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
                 <h3 style="color: #333; margin-top: 0;">Experience & Qualifications</h3>
-                <p style="margin: 5px 0;"><strong>Years of Experience:</strong> ${application.yearsExperience}</p>
+                <p style="margin: 5px 0;"><strong>Years of Experience:</strong> ${escapeHtml(application.yearsExperience)}</p>
                 <p style="margin: 5px 0;"><strong>Has Transportation:</strong> ${application.hasTransportation ? "✅ Yes" : "❌ No"}</p>
                 <p style="margin: 5px 0;"><strong>Has Own Supplies:</strong> ${application.hasSupplies ? "✅ Yes" : "❌ No"}</p>
                 <p style="margin: 5px 0;"><strong>Has Insurance:</strong> ${application.hasInsurance ? "✅ Yes" : "❌ No"}</p>
