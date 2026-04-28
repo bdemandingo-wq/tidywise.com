@@ -131,16 +131,25 @@ const BookingForm = () => {
     return { minDate: min, maxDate: max };
   }, []);
 
-  const currentTier = SIZE_TIERS[sizeIndex];
+  const autoIncluded = AUTO_INCLUDED_ADDONS[service] ?? [];
+  const inclusions = SERVICE_INCLUSIONS[service] ?? [];
+  const isCustomService = service === "carpets" || service === "upholstery";
+
+  // Effective add-ons = user-selected + auto-included
+  const addOnIds = useMemo(() => {
+    const set = new Set([...userAddOnIds, ...autoIncluded]);
+    return Array.from(set);
+  }, [userAddOnIds, autoIncluded]);
+
   const breakdown = useMemo(
     () =>
       computePrice(tiers, {
         service,
-        sqft: currentTier.sqft,
+        sqft,
         frequency,
         addOnIds,
       }),
-    [tiers, service, currentTier.sqft, frequency, addOnIds],
+    [tiers, service, sqft, frequency, addOnIds],
   );
 
   const meta = getServiceMeta(service);
@@ -154,7 +163,8 @@ const BookingForm = () => {
   };
 
   const toggleAddOn = (id: string) => {
-    setAddOnIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    if (autoIncluded.includes(id)) return; // can't toggle auto-included
+    setUserAddOnIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const isDateDisabled = (date: Date) => {
