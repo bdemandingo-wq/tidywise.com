@@ -13,8 +13,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      role="img"
-      aria-label="Bright, freshly cleaned modern South Florida living room with sunlight streaming in"
+      aria-labelledby="hero-heading"
       className="relative min-h-screen flex items-center pt-16"
       style={{
         backgroundImage: "url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=75')",
