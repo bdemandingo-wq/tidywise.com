@@ -32,24 +32,6 @@ export const SERVICES: ServiceMeta[] = [
 export const getServiceMeta = (key: string): ServiceMeta | undefined =>
   SERVICES.find((s) => s.key === key);
 
-/** Bedroom-tier sliders (matches DB tier_index 0..6 buckets). */
-export interface SizeTier {
-  index: number;        // slider index 0..6
-  bedsLabel: string;    // e.g. "2 BR"
-  sqft: number;         // representative sqft
-  dbTierIndex: number;  // index into service_pricing.tier_index for that sqft
-}
-
-export const SIZE_TIERS: SizeTier[] = [
-  { index: 0, bedsLabel: "Studio",  sqft: 500,  dbTierIndex: 0 },
-  { index: 1, bedsLabel: "1 BR",    sqft: 750,  dbTierIndex: 0 },
-  { index: 2, bedsLabel: "2 BR",    sqft: 1250, dbTierIndex: 2 },
-  { index: 3, bedsLabel: "3 BR",    sqft: 1800, dbTierIndex: 4 },
-  { index: 4, bedsLabel: "4 BR",    sqft: 2400, dbTierIndex: 6 },
-  { index: 5, bedsLabel: "5 BR",    sqft: 3000, dbTierIndex: 8 },
-  { index: 6, bedsLabel: "5+ BR",   sqft: 3600, dbTierIndex: 10 },
-];
-
 export interface FrequencyOpt {
   key: string;
   label: string;
@@ -57,37 +39,55 @@ export interface FrequencyOpt {
   baseDiscount: number;
 }
 
+/**
+ * Frequency discounts. Per business rule, ONLY apply to Standard cleans.
+ * Deep / Move-In/Out / Post-Construction are typically one-time and the
+ * UI hides the frequency selector for those services.
+ */
 export const FREQUENCIES: FrequencyOpt[] = [
   { key: "onetime",  label: "One-Time",   baseDiscount: 0 },
-  { key: "weekly",   label: "Weekly",     baseDiscount: 0.15 },
-  { key: "biweekly", label: "Bi-Weekly",  baseDiscount: 0.10 },
   { key: "monthly",  label: "Monthly",    baseDiscount: 0.05 },
+  { key: "biweekly", label: "Bi-Weekly",  baseDiscount: 0.15 },
+  { key: "weekly",   label: "Weekly",     baseDiscount: 0.20 },
 ];
 
 /**
- * Add-on definition. `sqftScaling` makes the price scale with home size for
- * size-sensitive services (carpets, walls, baseboards).
+ * Add-on definition. `unit` controls quantity behavior:
+ * - "flat":          single checkbox; total = basePrice
+ * - "per_pet" | "per_blind" | "per_load" | "per_window":
+ *                    quantity stepper (1-20); total = basePrice × qty
  */
+export type AddOnUnit =
+  | "flat"
+  | "per_pet"
+  | "per_blind"
+  | "per_load"
+  | "per_window";
+
 export interface AddOnDef {
   id: string;
   label: string;
   basePrice: number;
-  /** Multiplier per 1000 sqft (e.g. 1 = price * sqft/1000). 0 = flat. */
-  sqftScaling: number;
+  unit: AddOnUnit;
+  /** Display label shown next to the quantity stepper, e.g. "per pet". */
+  unitLabel?: string;
 }
 
 export const ADD_ONS: AddOnDef[] = [
-  { id: "windows",    label: "Interior Windows",  basePrice: 30, sqftScaling: 0 },
-  { id: "appliances", label: "Inside Appliances", basePrice: 50, sqftScaling: 0 },
-  { id: "baseboards", label: "Baseboards",        basePrice: 25, sqftScaling: 0.6 },
-  { id: "walls",      label: "Wall Spot Cleaning",basePrice: 25, sqftScaling: 0.6 },
-  { id: "carpets",    label: "Carpets",           basePrice: 75, sqftScaling: 1.0 },
-  { id: "laundry",    label: "Laundry Load",      basePrice: 10, sqftScaling: 0 },
-  { id: "dishes",     label: "Dishes",            basePrice: 15, sqftScaling: 0 },
+  { id: "inside_oven",       label: "Inside Oven",            basePrice: 50, unit: "flat" },
+  { id: "inside_fridge",     label: "Inside Fridge",          basePrice: 50, unit: "flat" },
+  { id: "inside_dishwasher", label: "Inside Dishwasher",      basePrice: 50, unit: "flat" },
+  { id: "pet_hair",          label: "Extra Pet Hair Shed",    basePrice: 25, unit: "per_pet",    unitLabel: "per pet" },
+  { id: "window_blinds",     label: "Wet Wipe Window Blinds", basePrice: 10, unit: "per_blind",  unitLabel: "per blind" },
+  { id: "laundry",           label: "Wash & Fold Laundry",    basePrice: 25, unit: "per_load",   unitLabel: "per load" },
+  { id: "dishes",            label: "Sink of Dishes",         basePrice: 25, unit: "flat" },
+  { id: "windows",           label: "Interior Windows",       basePrice: 6,  unit: "per_window", unitLabel: "per window" },
 ];
 
+export const isUnitAddOn = (a: AddOnDef): boolean => a.unit !== "flat";
+
 export const PRICE_FLOOR = 99;
-export const PRICE_CAP = 1500;
+export const PRICE_CAP = 5000;
 
 /** Raw sqft slider config — used by Hero & Calculator. */
 export const SQFT_MIN = 500;
@@ -95,9 +95,54 @@ export const SQFT_MAX = 10000;
 export const SQFT_STEP = 100;
 export const SQFT_DEFAULT = 1250;
 
+/** Sqft above this requires extrapolation + custom-quote confirmation. */
+export const SQFT_EXTRAPOLATE_ABOVE = 6000;
+
+/** Per-sqft rate used when sqft > SQFT_EXTRAPOLATE_ABOVE. */
+export const EXTRAPOLATE_RATE_PER_SQFT: Record<ServiceKey, number> = {
+  standard: 0.130,
+  deep: 0.240,
+  moveinout: 0.280,
+  postconstruction: 0.420,
+  carpets: 0,
+  upholstery: 0,
+};
+
+/**
+ * Per-sqft cleaning rate used to estimate how long a job will take.
+ * Returns sqft/minute. Hours = sqft / (rate * 60).
+ */
+export const TIME_SQFT_PER_MIN: Record<ServiceKey, number> = {
+  standard: 8,
+  deep: 5,
+  moveinout: 4,
+  postconstruction: 2.5,
+  carpets: 0,
+  upholstery: 0,
+};
+
+export function estimateHours(service: ServiceKey, sqft: number): number | null {
+  const rate = TIME_SQFT_PER_MIN[service];
+  if (!rate) return null;
+  return sqft / (rate * 60);
+}
+
+export function formatHours(h: number): string {
+  if (h < 1) {
+    const mins = Math.max(15, Math.round(h * 60 / 15) * 15);
+    return `${mins} min`;
+  }
+  // Round to nearest 0.25 hour
+  const rounded = Math.round(h * 4) / 4;
+  const whole = Math.floor(rounded);
+  const frac = rounded - whole;
+  const fracLabel = frac === 0 ? "" : frac === 0.25 ? "¼" : frac === 0.5 ? "½" : "¾";
+  const out = whole > 0 ? `${whole}${fracLabel}` : `${fracLabel || "0"}`;
+  return `${out} hour${rounded === 1 ? "" : "s"}`;
+}
+
 /**
  * What's included per service (verbatim copy — do not modify wording).
- * Each entry is a bullet shown in the calculator and booking summary.
  */
 export const SERVICE_INCLUSIONS: Record<ServiceKey, string[]> = {
   standard: [
@@ -115,7 +160,7 @@ export const SERVICE_INCLUSIONS: Record<ServiceKey, string[]> = {
     "Walls (spot cleaning)",
     "Baseboards",
     "Reachable ceiling fans",
-    "Inside of all appliances (oven, microwave, fridge)",
+    "Inside of oven and fridge",
     "Light fixtures",
     "Sliding door tracks",
     "Detailed bathroom scrubbing (grout, tile)",
@@ -124,6 +169,7 @@ export const SERVICE_INCLUSIONS: Record<ServiceKey, string[]> = {
   moveinout: [
     "Everything in Deep, PLUS:",
     "Inside of all cabinets and drawers",
+    "Inside dishwasher",
     "Window sills",
     "Door frames",
     "Light switches and outlet covers",
@@ -140,17 +186,22 @@ export const SERVICE_INCLUSIONS: Record<ServiceKey, string[]> = {
 };
 
 /**
- * Add-ons that are baked into the base price for each service.
- * These render as checked + disabled in the UI and contribute $0 to the total.
+ * Add-ons baked into the base price for each service.
+ * Render as checked + disabled with an "Included" badge; contribute $0 to total.
  */
 export const AUTO_INCLUDED_ADDONS: Record<ServiceKey, string[]> = {
   standard: [],
-  deep: ["appliances", "baseboards", "walls", "windows"],
-  moveinout: ["appliances", "baseboards", "walls", "windows"],
-  postconstruction: ["appliances", "baseboards", "walls", "windows"],
+  deep: ["inside_oven", "inside_fridge"],
+  moveinout: ["inside_oven", "inside_fridge", "inside_dishwasher"],
+  postconstruction: ["inside_oven", "inside_fridge", "inside_dishwasher"],
   carpets: [],
   upholstery: [],
 };
+
+/** Services that allow recurring frequency discounts. */
+export const SUPPORTS_FREQUENCY: ServiceKey[] = ["standard"];
+export const supportsFrequency = (s: ServiceKey): boolean =>
+  SUPPORTS_FREQUENCY.includes(s);
 
 // ----- DB tier loading + caching -----
 
@@ -185,7 +236,12 @@ export async function loadPricingTiers(): Promise<PricingTier[]> {
   return tierCachePromise;
 }
 
-/** Find the smallest tier whose max_sqft covers the requested sqft. */
+/**
+ * Resolve the base price for a given (service, sqft).
+ * - For sqft <= 6000: pick smallest tier whose max_sqft covers the request.
+ * - For sqft > 6000: extrapolate using EXTRAPOLATE_RATE_PER_SQFT.
+ * Returns null if the service is not tiered (custom-quote service).
+ */
 export function resolveTierBasePrice(
   tiers: PricingTier[],
   service: ServiceKey,
@@ -193,6 +249,12 @@ export function resolveTierBasePrice(
 ): number | null {
   const meta = getServiceMeta(service);
   if (!meta || !meta.tiered) return null;
+
+  if (sqft > SQFT_EXTRAPOLATE_ABOVE) {
+    const rate = EXTRAPOLATE_RATE_PER_SQFT[service] ?? 0;
+    return Math.round(sqft * rate);
+  }
+
   const subset = tiers
     .filter((t) => t.service_type === service)
     .sort((a, b) => a.max_sqft - b.max_sqft);
@@ -201,13 +263,17 @@ export function resolveTierBasePrice(
   return Number(match.base_price);
 }
 
+export type AddOnQuantities = Record<string, number>;
+
 export interface PriceBreakdown {
   basePrice: number;
   baseAfterDiscount: number;
   addOnsTotal: number;
   total: number;
-  /** True if this service requires a custom quote. */
+  /** True if this service has no tiered pricing (carpets/upholstery). */
   isCustom: boolean;
+  /** True if sqft is above the extrapolation threshold — needs phone confirmation. */
+  needsConfirmation: boolean;
   /** Estimated range string (low–high) for display. */
   range: string;
 }
@@ -219,6 +285,8 @@ export function computePrice(
     sqft: number;
     frequency: string;
     addOnIds: string[];
+    /** Quantity per add-on id. Defaults to 1 for unit add-ons; ignored for flat. */
+    addOnQuantities?: AddOnQuantities;
   },
 ): PriceBreakdown {
   const meta = getServiceMeta(opts.service);
@@ -231,41 +299,48 @@ export function computePrice(
       addOnsTotal: 0,
       total: 0,
       isCustom: true,
+      needsConfirmation: false,
       range: "Custom",
     };
   }
 
   const basePrice = resolveTierBasePrice(tiers, opts.service, opts.sqft) ?? 0;
-  const freq = FREQUENCIES.find((f) => f.key === opts.frequency) ?? FREQUENCIES[0];
-  const baseAfterDiscount = basePrice * (1 - freq.baseDiscount);
+  const needsConfirmation = opts.sqft > SQFT_EXTRAPOLATE_ABOVE;
 
-  // Add-ons never receive frequency discount (per business rule).
+  // Frequency discounts only apply to services that support it (Standard).
+  const allowFreqDiscount = supportsFrequency(opts.service);
+  const freq = FREQUENCIES.find((f) => f.key === opts.frequency) ?? FREQUENCIES[0];
+  const discount = allowFreqDiscount ? freq.baseDiscount : 0;
+  const baseAfterDiscount = basePrice * (1 - discount);
+
   // Auto-included add-ons are baked into the base price → skip them in the sum.
   const autoIncluded = new Set(AUTO_INCLUDED_ADDONS[opts.service] ?? []);
   const addOnsTotal = opts.addOnIds.reduce((sum, id) => {
     if (autoIncluded.has(id)) return sum;
     const a = ADD_ONS.find((x) => x.id === id);
     if (!a) return sum;
-    const scaled = a.sqftScaling > 0
-      ? a.basePrice + a.basePrice * a.sqftScaling * (opts.sqft / 1000)
-      : a.basePrice;
-    return sum + scaled;
+    const qty = a.unit === "flat"
+      ? 1
+      : Math.max(1, Math.min(20, Math.round(opts.addOnQuantities?.[id] ?? 1)));
+    return sum + a.basePrice * qty;
   }, 0);
 
   let total = baseAfterDiscount + addOnsTotal;
   total = Math.max(PRICE_FLOOR, Math.min(PRICE_CAP, total));
+  total = Math.round(total);
 
-  // Display range: ±15% around total
-  const low = Math.round(total * 0.93);
-  const high = Math.round(total * 1.13);
+  // Display range: ±10% around total
+  const low = Math.round(total * 0.9);
+  const high = Math.round(total * 1.1);
   const range = `$${low}–$${high}`;
 
   return {
     basePrice,
     baseAfterDiscount,
     addOnsTotal,
-    total: Math.round(total),
+    total,
     isCustom: false,
+    needsConfirmation,
     range,
   };
 }
