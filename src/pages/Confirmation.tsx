@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Home, Phone, Star, Gift } from "lucide-react";
+import { CheckCircle, Home, Phone, Mail, Star, Gift, Clock, MessageSquare, Sparkles } from "lucide-react";
 
 interface BookingState {
   sqft: number;
@@ -127,23 +127,58 @@ const Confirmation = () => {
           </div>
 
           {/* What Happens Next */}
-          <div className="text-center space-y-3 mb-6">
-            <p className="text-sm text-muted-foreground">
-              Our team will call you within <strong>15 minutes</strong> to confirm your date and time.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button variant="outline" className="flex-1" asChild>
-                <a href="tel:+15615718725" className="flex items-center justify-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Call Us Now
-                </a>
-              </Button>
-              <Button className="flex-1" onClick={() => navigate("/")}>
-                <Home className="w-4 h-4 mr-2" />
-                Return Home
-              </Button>
+          <div className="mb-8">
+            <h2 className="font-display font-bold text-foreground mb-4 text-lg">What happens next</h2>
+            <ol className="space-y-4">
+              {[
+                { icon: Clock, title: "We'll confirm your cleaner within 15 min", desc: "During business hours (9 AM – 6 PM EST), expect a quick call or text to lock in your time." },
+                { icon: MessageSquare, title: "You'll receive a text reminder 24 hours before", desc: "We'll send a friendly SMS so you're never caught off-guard on cleaning day." },
+                { icon: Sparkles, title: "Your cleaner arrives ready to make your home spotless", desc: "Vetted, insured, and equipped with eco-friendly supplies — just unlock the door." },
+              ].map((step, i) => (
+                <li key={i} className="flex gap-4">
+                  <div className="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm" aria-hidden="true">
+                    {i + 1}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-foreground flex items-center gap-2">
+                      <step.icon className="w-4 h-4 text-primary" aria-hidden="true" />
+                      {step.title}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{step.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* Contact Info */}
+          <div className="bg-muted rounded-lg p-4 mb-6">
+            <p className="text-sm font-semibold text-foreground mb-2">Questions? We're here.</p>
+            <div className="flex flex-col sm:flex-row gap-3 text-sm">
+              <a href="tel:+15615718725" className="flex items-center gap-2 text-primary hover:underline" aria-label="Call TIDYWISE at (561) 571-8725">
+                <Phone className="w-4 h-4" aria-hidden="true" />
+                (561) 571-8725
+              </a>
+              <a href="mailto:support@tidywisecleaning.com" className="flex items-center gap-2 text-primary hover:underline" aria-label="Email TIDYWISE support">
+                <Mail className="w-4 h-4" aria-hidden="true" />
+                support@tidywisecleaning.com
+              </a>
             </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <Button variant="outline" className="flex-1" asChild>
+              <a href="tel:+15615718725" className="flex items-center justify-center gap-2" aria-label="Call us now">
+                <Phone className="w-4 h-4" aria-hidden="true" />
+                Call Us Now
+              </a>
+            </Button>
+            <Button className="flex-1" onClick={() => navigate("/")} aria-label="Back to home">
+              <Home className="w-4 h-4 mr-2" aria-hidden="true" />
+              Back to Home
+            </Button>
+          </div>
+
 
           {/* Recurring Upsell */}
           {booking.frequency === "One-Time" && (

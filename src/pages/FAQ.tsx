@@ -39,7 +39,7 @@ const faqs = [
     questions: [
       {
         q: "How do I book a cleaning?",
-        a: "You can book online through our website (click 'Book Now'), call us at (561) 571-8725, or use our AI chat assistant. We respond within 15 minutes during business hours!"
+        a: "You can book online through our website (click 'Book Now'), call us at (561) 571-8725, or use our AI chat assistant. We respond within 15 minutes during business hours (9 AM – 6 PM EST)."
       },
       {
         q: "Can I book same-day or next-day cleaning?",
@@ -224,7 +224,7 @@ const FAQ = () => {
               Still Have Questions?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              We're here to help! Reach out and we'll respond within 15 minutes during business hours.
+              We're here to help! Reach out and we'll respond within 15 minutes during business hours (9 AM – 6 PM EST).
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>

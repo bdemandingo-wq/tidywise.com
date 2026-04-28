@@ -19,7 +19,7 @@ const contactInfo = [
     icon: Mail,
     title: "Email",
     value: "support@tidywisecleaning.com",
-    subtitle: "Response in 15 minutes or less",
+    subtitle: "Reply within 15 min (9 AM – 6 PM EST)",
   },
   {
     icon: MapPin,
@@ -57,7 +57,7 @@ const Contact = () => {
 
     toast({
       title: "Message Sent!",
-      description: "We'll get back to you within 15 minutes.",
+      description: "We respond within 15 minutes during business hours (9 AM – 6 PM EST).",
     });
     setFormData({ name: "", email: "", message: "" });
   };
