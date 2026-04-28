@@ -141,8 +141,13 @@ const BookingForm = () => {
   const autoIncluded = AUTO_INCLUDED_ADDONS[service] ?? [];
   const inclusions = SERVICE_INCLUSIONS[service] ?? [];
   const isCustomService = service === "carpets" || service === "upholstery";
+  const showFrequency = supportsFrequency(service);
 
-  // Effective add-ons = user-selected + auto-included
+  // Force one-time when switching to a service that doesn't support frequency
+  useEffect(() => {
+    if (!showFrequency && frequency !== "onetime") setFrequency("onetime");
+  }, [showFrequency, frequency]);
+
   const addOnIds = useMemo(() => {
     const set = new Set([...userAddOnIds, ...autoIncluded]);
     return Array.from(set);
@@ -155,9 +160,12 @@ const BookingForm = () => {
         sqft,
         frequency,
         addOnIds,
+        addOnQuantities,
       }),
-    [tiers, service, sqft, frequency, addOnIds],
+    [tiers, service, sqft, frequency, addOnIds, addOnQuantities],
   );
+
+  const hours = useMemo(() => estimateHours(service, sqft), [service, sqft]);
 
   const meta = getServiceMeta(service);
   const isCustomQuote = breakdown.isCustom;
@@ -170,8 +178,25 @@ const BookingForm = () => {
   };
 
   const toggleAddOn = (id: string) => {
-    if (autoIncluded.includes(id)) return; // can't toggle auto-included
-    setUserAddOnIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    if (autoIncluded.includes(id)) return;
+    setUserAddOnIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+      if (!prev.includes(id)) {
+        const def = ADD_ONS.find((a) => a.id === id);
+        if (def && isUnitAddOn(def) && !addOnQuantities[id]) {
+          setAddOnQuantities((q) => ({ ...q, [id]: 1 }));
+        }
+      }
+      return next;
+    });
+  };
+
+  const adjustQty = (id: string, delta: number) => {
+    setAddOnQuantities((prev) => {
+      const cur = prev[id] ?? 1;
+      const next = Math.max(1, Math.min(20, cur + delta));
+      return { ...prev, [id]: next };
+    });
   };
 
   const isDateDisabled = (date: Date) => {
