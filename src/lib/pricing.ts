@@ -89,6 +89,69 @@ export const ADD_ONS: AddOnDef[] = [
 export const PRICE_FLOOR = 99;
 export const PRICE_CAP = 1500;
 
+/** Raw sqft slider config — used by Hero & Calculator. */
+export const SQFT_MIN = 500;
+export const SQFT_MAX = 10000;
+export const SQFT_STEP = 100;
+export const SQFT_DEFAULT = 1250;
+
+/**
+ * What's included per service (verbatim copy — do not modify wording).
+ * Each entry is a bullet shown in the calculator and booking summary.
+ */
+export const SERVICE_INCLUSIONS: Record<ServiceKey, string[]> = {
+  standard: [
+    "Dusting all reachable surfaces",
+    "Vacuuming carpets and rugs",
+    "Mopping all hard floors",
+    "Cleaning kitchen counters, stovetop exterior, and sinks",
+    "Cleaning bathrooms (toilets, tubs, showers, sinks, mirrors)",
+    "Emptying trash bins",
+    "Making beds (linens left by client)",
+    "General tidying",
+  ],
+  deep: [
+    "Everything in Standard, PLUS:",
+    "Walls (spot cleaning)",
+    "Baseboards",
+    "Reachable ceiling fans",
+    "Inside of all appliances (oven, microwave, fridge)",
+    "Light fixtures",
+    "Sliding door tracks",
+    "Detailed bathroom scrubbing (grout, tile)",
+    "Detailed kitchen degreasing",
+  ],
+  moveinout: [
+    "Everything in Deep, PLUS:",
+    "Inside of all cabinets and drawers",
+    "Window sills",
+    "Door frames",
+    "Light switches and outlet covers",
+  ],
+  postconstruction: [
+    "Everything in Move-In/Out, PLUS:",
+    "Removing paint chippings",
+    "Removing construction dust from all surfaces",
+    "Vacuuming inside vents and registers",
+    "Wiping down all newly installed fixtures",
+  ],
+  carpets: [],
+  upholstery: [],
+};
+
+/**
+ * Add-ons that are baked into the base price for each service.
+ * These render as checked + disabled in the UI and contribute $0 to the total.
+ */
+export const AUTO_INCLUDED_ADDONS: Record<ServiceKey, string[]> = {
+  standard: [],
+  deep: ["appliances", "baseboards", "walls", "windows"],
+  moveinout: ["appliances", "baseboards", "walls", "windows"],
+  postconstruction: ["appliances", "baseboards", "walls", "windows"],
+  carpets: [],
+  upholstery: [],
+};
+
 // ----- DB tier loading + caching -----
 
 interface PricingTier {
