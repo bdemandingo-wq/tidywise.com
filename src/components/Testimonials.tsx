@@ -48,8 +48,8 @@ const Testimonials = () => {
               <Star key={i} className="w-6 h-6 fill-secondary text-secondary" />
             ))}
           </div>
-          <span className="text-lg font-semibold text-foreground">5.0</span>
-          <span className="text-muted-foreground">from 100+ reviews</span>
+          <span className="text-lg font-semibold text-foreground">4.9</span>
+          <span className="text-muted-foreground">from 138 reviews</span>
         </div>
         
         <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground text-center mb-4">
