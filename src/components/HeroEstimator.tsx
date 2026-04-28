@@ -7,7 +7,10 @@ import { Slider } from "@/components/ui/slider";
 import { ArrowRight } from "lucide-react";
 import {
   SERVICES,
-  SIZE_TIERS,
+  SQFT_MIN,
+  SQFT_MAX,
+  SQFT_STEP,
+  SQFT_DEFAULT,
   loadPricingTiers,
   computePrice,
   type ServiceKey,
@@ -16,37 +19,31 @@ import {
 const HeroEstimator = () => {
   const navigate = useNavigate();
   const [service, setService] = useState<ServiceKey>("standard");
-  const [sizeIndex, setSizeIndex] = useState(2);
+  const [sqft, setSqft] = useState<number>(SQFT_DEFAULT);
   const [tiers, setTiers] = useState<Awaited<ReturnType<typeof loadPricingTiers>>>([]);
 
   useEffect(() => {
     loadPricingTiers().then(setTiers);
   }, []);
 
-  const currentTier = SIZE_TIERS[sizeIndex];
-
   const breakdown = useMemo(
     () =>
       computePrice(tiers, {
         service,
-        sqft: currentTier.sqft,
+        sqft,
         frequency: "onetime",
         addOnIds: [],
       }),
-    [tiers, service, currentTier.sqft],
+    [tiers, service, sqft],
   );
 
   const handleProceed = () => {
     navigate("/booking", {
       state: {
         service,
-        sqft: currentTier.sqft,
-        bedsLabel: currentTier.bedsLabel,
-        sizeIndex,
+        sqft,
         frequency: "onetime",
         addOnIds: [],
-        // Frontend will recompute, but pass the estimate so the form shows
-        // the same number the user just saw.
         estimatedTotal: breakdown.total,
         estimatedRange: breakdown.range,
         isCustom: breakdown.isCustom,
@@ -81,22 +78,21 @@ const HeroEstimator = () => {
 
           <div>
             <label htmlFor="hero-size" className="text-xs sm:text-sm font-medium text-foreground mb-1 sm:mb-2 block">
-              Home Size: <span className="text-primary font-bold">{currentTier.bedsLabel}</span>
-              <span className="text-muted-foreground font-normal"> (~{currentTier.sqft.toLocaleString()} sq ft)</span>
+              Property Size: <span className="text-primary font-bold">{sqft.toLocaleString()} sq ft</span>
             </label>
             <Slider
               id="hero-size"
-              value={[sizeIndex]}
-              onValueChange={(val) => setSizeIndex(val[0])}
-              min={0}
-              max={SIZE_TIERS.length - 1}
-              step={1}
+              value={[sqft]}
+              onValueChange={(val) => setSqft(val[0])}
+              min={SQFT_MIN}
+              max={SQFT_MAX}
+              step={SQFT_STEP}
               className="py-2"
-              aria-label="Home size in bedrooms"
+              aria-label="Property size in square feet"
             />
             <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground mt-0.5">
-              <span>Studio</span>
-              <span>5+ BR</span>
+              <span>{SQFT_MIN.toLocaleString()} sq ft</span>
+              <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
             </div>
           </div>
         </div>
