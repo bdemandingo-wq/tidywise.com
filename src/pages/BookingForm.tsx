@@ -365,7 +365,7 @@ const BookingForm = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Your Service</p>
                     <p className="font-semibold text-foreground">{meta?.label} • {FREQUENCIES.find((f) => f.key === frequency)?.label}</p>
-                    <p className="text-sm text-muted-foreground">{currentTier.bedsLabel} (~{currentTier.sqft.toLocaleString()} sq ft)</p>
+                    <p className="text-sm text-muted-foreground">{sqft.toLocaleString()} sq ft</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Estimated Total</p>
@@ -379,6 +379,28 @@ const BookingForm = () => {
                     )}
                   </div>
                 </div>
+
+                {/* What's Included */}
+                <div className="border-t border-primary/10 pt-3">
+                  <p className="text-sm font-medium text-foreground mb-2">What's Included</p>
+                  {isCustomService ? (
+                    <p className="text-sm text-muted-foreground flex items-start gap-2">
+                      <Phone className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary" />
+                      Custom quote — call us at{" "}
+                      <a href="tel:+15615718725" className="text-primary font-medium underline">(561) 571-8725</a> for a personalized estimate.
+                    </p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {inclusions.map((item, i) => (
+                        <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                          <Check className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-accent" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
                 {addOnIds.length > 0 && (
                   <div className="text-sm text-muted-foreground border-t border-primary/10 pt-2">
                     <span className="font-medium text-foreground">Add-ons:</span> {addOnIds.map((id) => ADD_ONS.find((a) => a.id === id)?.label).filter(Boolean).join(", ")}
