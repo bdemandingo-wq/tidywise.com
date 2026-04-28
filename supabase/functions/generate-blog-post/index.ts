@@ -84,16 +84,14 @@ serve(async (req) => {
     }
 
     // ============ AUTHENTICATION CHECK ============
-    // Check if this is an internal cron call
+    // Check if this is an internal cron call using a dedicated server-side secret.
+    // We intentionally do NOT accept the public anon key here, since it is exposed
+    // in client-side code and would let anyone bypass admin auth.
     const authHeader = req.headers.get('Authorization');
     const token = authHeader?.replace('Bearer ', '').trim();
-    
-    // The anon key JWT used by pg_cron - this is a static, long-lived token
-    // that doesn't represent a user session but allows internal scheduled calls
-    const CRON_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVrc2Vha2p4YXJoanVqbmdva2x6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3MzMzOTcsImV4cCI6MjA4MTMwOTM5N30.TWAsnXvAgSCtbQSLYq7cX9Ga7uKJQBKRqIWAnfpP_CE';
-    
-    // Check if this is a cron job call using the anon key
-    const isCronCall = token === CRON_ANON_KEY;
+
+    const CRON_SECRET = Deno.env.get('CRON_SECRET');
+    const isCronCall = !!CRON_SECRET && token === CRON_SECRET;
     
     console.log('Auth check - isCronCall:', isCronCall);
     
