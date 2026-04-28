@@ -85,6 +85,7 @@ const BookingForm = () => {
   const [userAddOnIds, setUserAddOnIds] = useState<string[]>(
     (incoming?.addOnIds ?? []).filter((id) => !(AUTO_INCLUDED_ADDONS[incoming?.service ?? "standard"] ?? []).includes(id))
   );
+  const [addOnQuantities, setAddOnQuantities] = useState<AddOnQuantities>(incoming?.addOnQuantities ?? {});
   const [tiers, setTiers] = useState<Awaited<ReturnType<typeof loadPricingTiers>>>([]);
   const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
 
