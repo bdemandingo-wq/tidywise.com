@@ -29,7 +29,13 @@ const GoogleReviews = () => {
     <section className="py-16 bg-background" aria-label="Customer Reviews">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <a
+            href="https://search.google.com/local/reviews?placeid=ChIJ49KSUfgd2YgRH2RMjA6X9jM"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 mb-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md px-2 py-1"
+            aria-label="Read all TIDYWISE reviews on Google (opens in a new tab)"
+          >
             <img 
               src="https://www.google.com/favicon.ico" 
               alt="Google" 
@@ -39,7 +45,7 @@ const GoogleReviews = () => {
               height={24}
             />
             <span className="text-lg font-semibold text-foreground">Google Reviews</span>
-          </div>
+          </a>
           <div className="flex items-center justify-center gap-1 mb-2">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="w-6 h-6 fill-secondary text-secondary" aria-hidden="true" />
