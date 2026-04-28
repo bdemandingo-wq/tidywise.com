@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Check, Phone } from "lucide-react";
+import { Check, Phone, Clock, Minus, Plus } from "lucide-react";
 import {
   SERVICES,
   FREQUENCIES,
@@ -20,7 +20,12 @@ import {
   AUTO_INCLUDED_ADDONS,
   loadPricingTiers,
   computePrice,
+  supportsFrequency,
+  estimateHours,
+  formatHours,
+  isUnitAddOn,
   type ServiceKey,
+  type AddOnQuantities,
 } from "@/lib/pricing";
 
 const PricingCalculator = () => {
@@ -29,6 +34,7 @@ const PricingCalculator = () => {
   const [serviceType, setServiceType] = useState<ServiceKey>("standard");
   const [frequency, setFrequency] = useState("onetime");
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  const [addOnQuantities, setAddOnQuantities] = useState<AddOnQuantities>({});
   const [tiers, setTiers] = useState<Awaited<ReturnType<typeof loadPricingTiers>>>([]);
 
   useEffect(() => {
@@ -38,8 +44,13 @@ const PricingCalculator = () => {
   const autoIncluded = AUTO_INCLUDED_ADDONS[serviceType] ?? [];
   const inclusions = SERVICE_INCLUSIONS[serviceType] ?? [];
   const isCustomService = serviceType === "carpets" || serviceType === "upholstery";
+  const showFrequency = supportsFrequency(serviceType);
 
-  // Combine selected + auto-included for pricing & booking
+  // Reset frequency when switching to a service that doesn't support it
+  useEffect(() => {
+    if (!showFrequency && frequency !== "onetime") setFrequency("onetime");
+  }, [showFrequency, frequency]);
+
   const effectiveAddOns = useMemo(() => {
     const set = new Set([...selectedAddOns, ...autoIncluded]);
     return Array.from(set);
@@ -52,15 +63,34 @@ const PricingCalculator = () => {
         sqft,
         frequency,
         addOnIds: effectiveAddOns,
+        addOnQuantities,
       }),
-    [tiers, serviceType, sqft, frequency, effectiveAddOns],
+    [tiers, serviceType, sqft, frequency, effectiveAddOns, addOnQuantities],
   );
 
+  const hours = useMemo(() => estimateHours(serviceType, sqft), [serviceType, sqft]);
+
   const toggleAddOn = (id: string) => {
-    if (autoIncluded.includes(id)) return; // can't toggle auto-included
-    setSelectedAddOns((prev) =>
-      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
-    );
+    if (autoIncluded.includes(id)) return;
+    setSelectedAddOns((prev) => {
+      const next = prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id];
+      // Initialize quantity to 1 for unit add-ons when first selected
+      if (!prev.includes(id)) {
+        const def = ADD_ONS.find((a) => a.id === id);
+        if (def && isUnitAddOn(def) && !addOnQuantities[id]) {
+          setAddOnQuantities((q) => ({ ...q, [id]: 1 }));
+        }
+      }
+      return next;
+    });
+  };
+
+  const adjustQty = (id: string, delta: number) => {
+    setAddOnQuantities((prev) => {
+      const cur = prev[id] ?? 1;
+      const next = Math.max(1, Math.min(20, cur + delta));
+      return { ...prev, [id]: next };
+    });
   };
 
   const handleBooking = () => {
@@ -70,6 +100,7 @@ const PricingCalculator = () => {
         sqft,
         frequency,
         addOnIds: effectiveAddOns,
+        addOnQuantities,
         estimatedTotal: breakdown.total,
         estimatedRange: breakdown.range,
         isCustom: breakdown.isCustom,
@@ -85,7 +116,7 @@ const PricingCalculator = () => {
             Transparent Pricing
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Simple, upfront pricing with no hidden fees. Final price confirmed after we verify bedroom and bathroom count.
+            Simple, upfront pricing with no hidden fees. Final price confirmed after we verify the property details.
           </p>
         </div>
 
@@ -112,8 +143,14 @@ const PricingCalculator = () => {
               />
               <div className="flex justify-between text-sm text-muted-foreground">
                 <span>{SQFT_MIN.toLocaleString()} sq ft</span>
-                <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
+                <span>{SQFT_MAX.toLocaleString()} sq ft</span>
               </div>
+              {hours !== null && (
+                <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                  <Clock className="w-4 h-4" aria-hidden="true" />
+                  Estimated time: <span className="font-medium text-foreground">{formatHours(hours)}</span>
+                </p>
+              )}
             </div>
 
             {/* Service Type */}
@@ -157,23 +194,25 @@ const PricingCalculator = () => {
               )}
             </div>
 
-            {/* Frequency */}
-            <div className="space-y-2">
-              <Label htmlFor="calc-freq" className="text-base font-medium">Frequency</Label>
-              <Select value={frequency} onValueChange={setFrequency}>
-                <SelectTrigger id="calc-freq">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FREQUENCIES.map((freq) => (
-                    <SelectItem key={freq.key} value={freq.key}>
-                      {freq.label}{freq.baseDiscount > 0 ? ` (${Math.round(freq.baseDiscount * 100)}% off base)` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">Recurring discounts apply to the base service only — add-ons are charged at full price.</p>
-            </div>
+            {/* Frequency — only for Standard */}
+            {showFrequency && (
+              <div className="space-y-2">
+                <Label htmlFor="calc-freq" className="text-base font-medium">Frequency</Label>
+                <Select value={frequency} onValueChange={setFrequency}>
+                  <SelectTrigger id="calc-freq">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FREQUENCIES.map((freq) => (
+                      <SelectItem key={freq.key} value={freq.key}>
+                        {freq.label}{freq.baseDiscount > 0 ? ` (${Math.round(freq.baseDiscount * 100)}% off base)` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Recurring discounts apply to the base service only — add-ons are charged at full price.</p>
+              </div>
+            )}
 
             {/* Price Display */}
             <div className="bg-primary/5 rounded-lg p-6 text-center" aria-live="polite">
@@ -183,7 +222,14 @@ const PricingCalculator = () => {
               ) : (
                 <>
                   <p className="text-4xl font-bold text-primary">${breakdown.total}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Range: {breakdown.range}</p>
+                  {breakdown.needsConfirmation ? (
+                    <p className="text-sm text-muted-foreground mt-2 flex items-center justify-center gap-1.5">
+                      <Phone className="w-4 h-4" aria-hidden="true" />
+                      Custom quote — call to confirm
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mt-1">Range: {breakdown.range}</p>
+                  )}
                 </>
               )}
             </div>
@@ -192,44 +238,78 @@ const PricingCalculator = () => {
             {!isCustomService && (
               <div className="space-y-4">
                 <Label className="text-base font-medium">Add-On Services</Label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {ADD_ONS.map((addOn) => {
                     const isAuto = autoIncluded.includes(addOn.id);
                     const checked = isAuto || selectedAddOns.includes(addOn.id);
-                    const scaledPrice = addOn.sqftScaling > 0
-                      ? Math.round(addOn.basePrice + addOn.basePrice * addOn.sqftScaling * (sqft / 1000))
-                      : addOn.basePrice;
+                    const isUnit = isUnitAddOn(addOn);
+                    const qty = addOnQuantities[addOn.id] ?? 1;
+                    const lineTotal = isAuto ? 0 : addOn.basePrice * (isUnit ? qty : 1);
                     return (
                       <div
                         key={addOn.id}
-                        className={`flex items-center gap-2 p-3 rounded-lg border transition-all ${
+                        className={`flex flex-col gap-2 p-3 rounded-lg border transition-all ${
                           isAuto
-                            ? "bg-muted border-border opacity-60 cursor-not-allowed"
+                            ? "bg-muted border-border opacity-70"
                             : checked
-                              ? "bg-primary/10 border-primary cursor-pointer"
-                              : "bg-background border-border hover:border-primary/50 cursor-pointer"
+                              ? "bg-primary/10 border-primary"
+                              : "bg-background border-border hover:border-primary/50"
                         }`}
-                        onClick={() => toggleAddOn(addOn.id)}
                       >
-                        <Checkbox
-                          id={`addon-${addOn.id}`}
-                          checked={checked}
-                          disabled={isAuto}
-                          onCheckedChange={() => toggleAddOn(addOn.id)}
-                        />
-                        <label
-                          htmlFor={`addon-${addOn.id}`}
-                          className={`text-sm flex-1 ${isAuto ? "cursor-not-allowed" : "cursor-pointer"}`}
-                        >
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span>{addOn.label}</span>
-                            {isAuto ? (
-                              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
-                            ) : (
-                              <span className="text-muted-foreground">(${scaledPrice})</span>
-                            )}
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            id={`addon-${addOn.id}`}
+                            checked={checked}
+                            disabled={isAuto}
+                            onCheckedChange={() => toggleAddOn(addOn.id)}
+                          />
+                          <label
+                            htmlFor={`addon-${addOn.id}`}
+                            className={`text-sm flex-1 ${isAuto ? "cursor-not-allowed" : "cursor-pointer"}`}
+                          >
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-medium">{addOn.label}</span>
+                              {isAuto ? (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">
+                                  ${addOn.basePrice}{addOn.unitLabel ? ` ${addOn.unitLabel}` : ""}
+                                </span>
+                              )}
+                            </div>
+                          </label>
+                        </div>
+                        {/* Quantity stepper for unit add-ons (when selected & not auto) */}
+                        {isUnit && checked && !isAuto && (
+                          <div className="flex items-center justify-between pl-6">
+                            <div className="flex items-center gap-1">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => adjustQty(addOn.id, -1)}
+                                aria-label={`Decrease ${addOn.label} quantity`}
+                                disabled={qty <= 1}
+                              >
+                                <Minus className="h-3 w-3" />
+                              </Button>
+                              <span className="min-w-[2ch] text-center text-sm font-medium" aria-live="polite">{qty}</span>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => adjustQty(addOn.id, 1)}
+                                aria-label={`Increase ${addOn.label} quantity`}
+                                disabled={qty >= 20}
+                              >
+                                <Plus className="h-3 w-3" />
+                              </Button>
+                            </div>
+                            <span className="text-xs font-semibold text-primary">${lineTotal}</span>
                           </div>
-                        </label>
+                        )}
                       </div>
                     );
                   })}
