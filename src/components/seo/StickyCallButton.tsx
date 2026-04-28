@@ -2,6 +2,7 @@ import { Phone, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { trackPhoneCall } from "@/lib/trackPhoneCall";
 
 const StickyCallButton = () => {
   const [isVisible, setIsVisible] = useState(false);
