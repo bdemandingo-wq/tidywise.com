@@ -84,11 +84,19 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const application: CleanerApplicationRequest = await req.json();
+    const rawBody = await req.json();
+    const parsed = ApplicationSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid application data", details: parsed.error.flatten().fieldErrors }),
+        { status: 400, headers: { "Content-Type": "application/json", ...getCorsHeaders(req) } }
+      );
+    }
+    const application = parsed.data;
     console.log("Processing application from:", application.name);
 
     const workAreasFormatted = application.workAreas
-      .map((area) => workAreaLabels[area] || area)
+      .map((area) => escapeHtml(workAreaLabels[area] || area))
       .join(", ");
 
     // Generate signed URLs for supply pictures (valid for 7 days)
