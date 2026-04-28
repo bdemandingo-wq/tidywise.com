@@ -239,7 +239,14 @@ const BookingForm = () => {
       const serviceLabel = meta?.label ?? service;
       const freqLabel = FREQUENCIES.find((f) => f.key === frequency)?.label ?? frequency;
       const addOnLabels = addOnIds
-        .map((id) => ADD_ONS.find((a) => a.id === id)?.label)
+        .map((id) => {
+          const a = ADD_ONS.find((x) => x.id === id);
+          if (!a) return null;
+          const qty = addOnQuantities[id] ?? 1;
+          return isUnitAddOn(a) && !autoIncluded.includes(id) && qty > 1
+            ? `${a.label} ×${qty}`
+            : a.label;
+        })
         .filter(Boolean) as string[];
 
       // Generate ID client-side so we don't need a post-insert SELECT
