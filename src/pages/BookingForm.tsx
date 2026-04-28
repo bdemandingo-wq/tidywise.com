@@ -445,43 +445,65 @@ const BookingForm = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="bf-size">Home Size: <span className="text-primary font-bold">{currentTier.bedsLabel}</span></Label>
-                    <Select value={String(sizeIndex)} onValueChange={(v) => setSizeIndex(parseInt(v, 10))}>
-                      <SelectTrigger id="bf-size"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {SIZE_TIERS.map((t) => (
-                          <SelectItem key={t.index} value={String(t.index)}>
-                            {t.bedsLabel} (~{t.sqft.toLocaleString()} sq ft)
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="bf-size">Property Size</Label>
+                      <span className="text-primary font-bold text-sm">{sqft.toLocaleString()} sq ft</span>
+                    </div>
+                    <Slider
+                      id="bf-size"
+                      value={[sqft]}
+                      onValueChange={(v) => setSqft(v[0])}
+                      min={SQFT_MIN}
+                      max={SQFT_MAX}
+                      step={SQFT_STEP}
+                      className="py-2"
+                      aria-label="Property size in square feet"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{SQFT_MIN.toLocaleString()} sq ft</span>
+                      <span>{SQFT_MAX.toLocaleString()}+ sq ft</span>
+                    </div>
                   </div>
                 </fieldset>
 
-                {/* Add-ons editable */}
-                <fieldset className="space-y-3">
-                  <legend className="font-semibold text-foreground">Add-Ons (optional)</legend>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {ADD_ONS.map((a) => {
-                      const checked = addOnIds.includes(a.id);
-                      return (
-                        <label
-                          key={a.id}
-                          htmlFor={`bf-addon-${a.id}`}
-                          className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer text-sm ${checked ? "border-primary bg-primary/5" : "border-border"}`}
-                        >
-                          <Checkbox
-                            id={`bf-addon-${a.id}`}
-                            checked={checked}
-                            onCheckedChange={() => toggleAddOn(a.id)}
-                          />
-                          <span>{a.label}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
+                {/* Add-ons editable (hidden for custom services) */}
+                {!isCustomService && (
+                  <fieldset className="space-y-3">
+                    <legend className="font-semibold text-foreground">Add-Ons (optional)</legend>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {ADD_ONS.map((a) => {
+                        const isAuto = autoIncluded.includes(a.id);
+                        const checked = isAuto || userAddOnIds.includes(a.id);
+                        return (
+                          <label
+                            key={a.id}
+                            htmlFor={`bf-addon-${a.id}`}
+                            className={`flex items-center gap-2 p-2 rounded-md border text-sm ${
+                              isAuto
+                                ? "border-border bg-muted opacity-60 cursor-not-allowed"
+                                : checked
+                                  ? "border-primary bg-primary/5 cursor-pointer"
+                                  : "border-border cursor-pointer"
+                            }`}
+                          >
+                            <Checkbox
+                              id={`bf-addon-${a.id}`}
+                              checked={checked}
+                              disabled={isAuto}
+                              onCheckedChange={() => toggleAddOn(a.id)}
+                            />
+                            <span className="flex-1 flex items-center gap-1.5 flex-wrap">
+                              <span>{a.label}</span>
+                              {isAuto && (
+                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">Included</Badge>
+                              )}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </fieldset>
+                )}
 
                 {/* Preferred Date */}
                 <fieldset className="space-y-4">
