@@ -403,8 +403,16 @@ const BookingForm = () => {
                 <div className="flex justify-between items-start gap-3">
                   <div>
                     <p className="text-sm text-muted-foreground">Your Service</p>
-                    <p className="font-semibold text-foreground">{meta?.label} • {FREQUENCIES.find((f) => f.key === frequency)?.label}</p>
+                    <p className="font-semibold text-foreground">
+                      {meta?.label}{showFrequency ? ` • ${FREQUENCIES.find((f) => f.key === frequency)?.label}` : ""}
+                    </p>
                     <p className="text-sm text-muted-foreground">{sqft.toLocaleString()} sq ft</p>
+                    {hours !== null && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <Clock className="w-3 h-3" aria-hidden="true" />
+                        Est. {formatHours(hours)}
+                      </p>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Estimated Total</p>
@@ -413,7 +421,14 @@ const BookingForm = () => {
                     ) : (
                       <>
                         <p className="text-2xl font-bold text-primary">${breakdown.total}</p>
-                        <p className="text-xs text-muted-foreground">{breakdown.range}</p>
+                        {breakdown.needsConfirmation ? (
+                          <p className="text-xs text-muted-foreground flex items-center justify-end gap-1">
+                            <Phone className="w-3 h-3" aria-hidden="true" />
+                            Call to confirm
+                          </p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">{breakdown.range}</p>
+                        )}
                       </>
                     )}
                   </div>
