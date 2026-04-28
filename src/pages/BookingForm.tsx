@@ -74,9 +74,11 @@ const BookingForm = () => {
 
   // Defaults if user lands without state — sensible fallbacks rather than redirect
   const [service, setService] = useState<ServiceKey>(incoming?.service ?? "standard");
-  const [sizeIndex, setSizeIndex] = useState<number>(incoming?.sizeIndex ?? 2);
+  const [sqft, setSqft] = useState<number>(incoming?.sqft ?? SQFT_DEFAULT);
   const [frequency, setFrequency] = useState<string>(incoming?.frequency ?? "onetime");
-  const [addOnIds, setAddOnIds] = useState<string[]>(incoming?.addOnIds ?? []);
+  const [userAddOnIds, setUserAddOnIds] = useState<string[]>(
+    (incoming?.addOnIds ?? []).filter((id) => !(AUTO_INCLUDED_ADDONS[incoming?.service ?? "standard"] ?? []).includes(id))
+  );
   const [tiers, setTiers] = useState<Awaited<ReturnType<typeof loadPricingTiers>>>([]);
   const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
 
