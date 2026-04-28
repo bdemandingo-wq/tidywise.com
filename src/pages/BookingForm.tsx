@@ -21,18 +21,24 @@ import {
   ADD_ONS,
   FREQUENCIES,
   SERVICES,
-  SIZE_TIERS,
+  SERVICE_INCLUSIONS,
+  AUTO_INCLUDED_ADDONS,
+  SQFT_MIN,
+  SQFT_MAX,
+  SQFT_STEP,
+  SQFT_DEFAULT,
   computePrice,
   getServiceMeta,
   loadPricingTiers,
   type ServiceKey,
 } from "@/lib/pricing";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { Check } from "lucide-react";
 
 interface IncomingState {
   service?: ServiceKey;
   sqft?: number;
-  bedsLabel?: string;
-  sizeIndex?: number;
   frequency?: string;
   addOnIds?: string[];
 }
