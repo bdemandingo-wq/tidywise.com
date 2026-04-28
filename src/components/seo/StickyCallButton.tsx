@@ -65,6 +65,7 @@ const StickyCallButton = () => {
         >
           <a 
             href={telLink} 
+            onClick={() => trackPhoneCall("sticky_desktop")}
             className="flex items-center justify-center gap-3"
             aria-label={`Call TIDYWISE now at ${phoneNumber}`}
           >
