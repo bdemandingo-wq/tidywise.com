@@ -1,10 +1,12 @@
 import { Phone, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const StickyCallButton = () => {
   const [isVisible, setIsVisible] = useState(false);
-  
+  const location = useLocation();
+
   const phoneNumber = "(561) 571-8725";
   const telLink = "tel:+15615718725";
 
@@ -17,6 +19,10 @@ const StickyCallButton = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Hide entirely on the booking flow & confirmation pages so it doesn't cover form CTAs
+  const path = location.pathname;
+  const isBookingFlow = path === "/booking" || path.startsWith("/confirmation");
+  if (isBookingFlow) return null;
   if (!isVisible) return null;
 
   return (
