@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, ChevronDown, Phone } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackPhoneCall } from "@/lib/trackPhoneCall";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +23,40 @@ const Navbar = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+
+  // Focus trap for mobile menu when open
+  useEffect(() => {
+    if (!isOpen) return;
+    const container = mobileMenuRef.current;
+    if (!container) return;
+
+    const focusable = container.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    first?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+        hamburgerRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab" || focusable.length === 0) return;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen]);
 
   const handleBookNowClick = () => {
     if (location.pathname === '/') {
@@ -136,7 +171,7 @@ const Navbar = () => {
               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               asChild
             >
-              <a href="tel:+15615718725" className="flex items-center gap-1.5">
+              <a href="tel:+15615718725" className="flex items-center gap-1.5" onClick={() => trackPhoneCall("navbar_desktop")}>
                 <Phone className="w-4 h-4" />
                 Call Now
               </a>
@@ -148,9 +183,12 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
+            ref={hamburgerRef}
             className="md:hidden p-2"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-nav-menu"
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -158,7 +196,14 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in relative z-[60] bg-background">
+          <div
+            ref={mobileMenuRef}
+            id="mobile-nav-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+            className="md:hidden py-4 border-t border-border animate-fade-in relative z-[60] bg-background"
+          >
             <div className="flex flex-col gap-2">
               <Link
                 to="/"
@@ -232,7 +277,7 @@ const Navbar = () => {
               )}
               <div className="flex gap-2 mt-2">
                 <Button variant="outline" className="flex-1 border-primary text-primary" asChild>
-                  <a href="tel:+15615718725" className="flex items-center justify-center gap-1.5">
+                  <a href="tel:+15615718725" className="flex items-center justify-center gap-1.5" onClick={() => trackPhoneCall("navbar_mobile")}>
                     <Phone className="w-4 h-4" />
                     Call
                   </a>

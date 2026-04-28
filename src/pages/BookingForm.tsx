@@ -261,6 +261,10 @@ const BookingForm = () => {
         await supabase.functions.invoke("send-sms-notification", {
           body: {
             type: "booking",
+            // Top-level fields drive routing & consent gating in the edge function
+            bookingId,
+            customerPhone: parsed.data.phone,
+            smsConsent: parsed.data.smsConsent === true,
             data: {
               bookingId,
               customerName: parsed.data.name,

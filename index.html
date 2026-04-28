@@ -6,9 +6,8 @@
     <title>TIDYWISE</title>
     <meta name="author" content="TIDYWISE" />
 
-    <!-- Verification placeholders -->
-    <meta name="google-site-verification" content="REPLACE_WITH_GOOGLE_SEARCH_CONSOLE_CODE" />
-    <meta name="msvalidate.01" content="REPLACE_WITH_BING_WEBMASTER_CODE" />
+    <!-- Site verification handled via DNS TXT records -->
+
 
     <!-- Theme & Mobile -->
     <meta name="theme-color" content="#1A56DB" />
@@ -31,13 +30,13 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) — Ads conversion + Analytics share one dataLayer/gtag instance -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-11395004496"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-11395004496');
+      window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', 'AW-11395004496');
     </script>
 
     <!-- DNS Prefetch & Preconnect -->
@@ -97,28 +96,23 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Defer non-critical scripts -->
+    <!-- Defer GA4 load until first user interaction or 5s, then push a single config to the shared gtag instance -->
     <script>
-      var gaLoaded = false;
-      function loadGA() {
-        if (gaLoaded) return;
-        gaLoaded = true;
+      var ga4Loaded = false;
+      function loadGA4() {
+        if (ga4Loaded) return;
+        ga4Loaded = true;
         var script = document.createElement('script');
         script.src = 'https://www.googletagmanager.com/gtag/js?id=G-7GMDF04SNZ';
         script.async = true;
         document.head.appendChild(script);
-        script.onload = function() {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('js', new Date());
-          gtag('config', 'G-7GMDF04SNZ');
-        };
+        // gtag + dataLayer were initialized in <head>; just push the GA4 config.
+        window.gtag('config', 'G-7GMDF04SNZ');
       }
       ['scroll', 'click', 'touchstart', 'keydown'].forEach(function(evt) {
-        window.addEventListener(evt, loadGA, { once: true, passive: true });
+        window.addEventListener(evt, loadGA4, { once: true, passive: true });
       });
-      setTimeout(loadGA, 5000);
+      setTimeout(loadGA4, 5000);
     </script>
   </body>
 </html>

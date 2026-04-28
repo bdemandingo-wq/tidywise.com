@@ -1,10 +1,13 @@
 import { Phone, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { trackPhoneCall } from "@/lib/trackPhoneCall";
 
 const StickyCallButton = () => {
   const [isVisible, setIsVisible] = useState(false);
-  
+  const location = useLocation();
+
   const phoneNumber = "(561) 571-8725";
   const telLink = "tel:+15615718725";
 
@@ -17,6 +20,10 @@ const StickyCallButton = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Hide entirely on the booking flow & confirmation pages so it doesn't cover form CTAs
+  const path = location.pathname;
+  const isBookingFlow = path === "/booking" || path.startsWith("/confirmation");
+  if (isBookingFlow) return null;
   if (!isVisible) return null;
 
   return (
@@ -32,7 +39,7 @@ const StickyCallButton = () => {
           className="flex-1 bg-primary text-primary-foreground font-semibold"
           asChild
         >
-          <a href={telLink} className="flex items-center justify-center gap-2">
+          <a href={telLink} onClick={() => trackPhoneCall("sticky_mobile")} className="flex items-center justify-center gap-2">
             <Phone className="w-5 h-5" aria-hidden="true" />
             <span>Call Now</span>
           </a>
@@ -58,6 +65,7 @@ const StickyCallButton = () => {
         >
           <a 
             href={telLink} 
+            onClick={() => trackPhoneCall("sticky_desktop")}
             className="flex items-center justify-center gap-3"
             aria-label={`Call TIDYWISE now at ${phoneNumber}`}
           >

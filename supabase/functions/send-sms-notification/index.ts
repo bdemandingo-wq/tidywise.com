@@ -1,9 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const OPENPHONE_API_KEY = Deno.env.get("OPENPHONE_API_KEY");
 const OPENPHONE_PHONE_NUMBER_ID = "PNr7XukuaV";
 const NOTIFY_PHONE_NUMBER = "+15615718725";
 const PERSONAL_PHONE_NUMBER = "+18137356859";
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +19,9 @@ const corsHeaders = {
 interface SmsNotificationRequest {
   type: "booking" | "cleaner_application" | "contact";
   data: Record<string, unknown>;
+  customerPhone?: string;
+  smsConsent?: boolean;
+  bookingId?: string;
 }
 
 function formatBookingSms(data: Record<string, unknown>): string {
@@ -26,6 +34,10 @@ Address: ${data.address}
 Total: $${data.totalPrice}
 
 Log in to your dashboard to view details.`;
+}
+
+function formatCustomerBookingSms(data: Record<string, unknown>): string {
+  return `TIDYWISE: Thanks ${data.customerName ?? ""}! Your ${data.serviceType ?? "cleaning"} booking for ${data.preferredDate ?? ""} is received. Total: $${data.totalPrice ?? ""}. We'll confirm shortly. Reply STOP to opt out.`;
 }
 
 function formatApplicationSms(data: Record<string, unknown>): string {
@@ -51,6 +63,63 @@ Message: ${data.message}
 Log in to your dashboard to respond.`;
 }
 
+async function sendOne(opts: {
+  to: string;
+  message: string;
+  recipientType: "admin" | "personal" | "customer";
+  messageType: string;
+  bookingId?: string;
+}) {
+  const { to, message, recipientType, messageType, bookingId } = opts;
+  let success = false;
+  let providerMessageId: string | null = null;
+  let errorMessage: string | null = null;
+
+  try {
+    const res = await fetch("https://api.openphone.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Authorization": OPENPHONE_API_KEY!,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: message,
+        from: OPENPHONE_PHONE_NUMBER_ID,
+        to: [to],
+      }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      errorMessage = `HTTP ${res.status}: ${JSON.stringify(body).slice(0, 500)}`;
+      console.error(`SMS error (${recipientType} → ${to}):`, errorMessage);
+    } else {
+      success = true;
+      providerMessageId = body?.data?.id ?? body?.id ?? null;
+      console.log(`SMS sent to ${recipientType} (${to})`, providerMessageId);
+    }
+  } catch (err: any) {
+    errorMessage = err?.message ?? String(err);
+    console.error(`SMS exception (${recipientType} → ${to}):`, errorMessage);
+  }
+
+  // Log every attempt — wrapped so logging failure can't crash the send
+  try {
+    await supabaseAdmin.from("sms_send_log").insert({
+      recipient: to,
+      recipient_type: recipientType,
+      message_type: messageType,
+      success,
+      provider_message_id: providerMessageId,
+      error_message: errorMessage,
+      related_booking_id: bookingId ?? null,
+    });
+  } catch (logErr) {
+    console.error("Failed to insert sms_send_log:", logErr);
+  }
+
+  return { success, providerMessageId, errorMessage };
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -61,70 +130,69 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("OPENPHONE_API_KEY is not configured");
     }
 
-    const { type, data }: SmsNotificationRequest = await req.json();
-    console.log("Sending SMS notification for:", type);
+    const payload: SmsNotificationRequest = await req.json();
+    const { type, data, customerPhone, smsConsent, bookingId } = payload;
+    console.log("SMS notification:", type, "consent:", smsConsent, "phone:", customerPhone ? "yes" : "no");
 
-    let message: string;
+    let adminMessage: string;
+    let customerMessage: string | null = null;
+
     switch (type) {
       case "booking":
-        message = formatBookingSms(data);
+        adminMessage = formatBookingSms(data);
+        customerMessage = formatCustomerBookingSms(data);
         break;
       case "cleaner_application":
-        message = formatApplicationSms(data);
+        adminMessage = formatApplicationSms(data);
         break;
       case "contact":
-        message = formatContactSms(data);
+        adminMessage = formatContactSms(data);
         break;
       default:
         throw new Error(`Unknown notification type: ${type}`);
     }
 
-    // Send to OpenPhone admin number
-    const adminRes = await fetch("https://api.openphone.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Authorization": OPENPHONE_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content: message,
-        from: OPENPHONE_PHONE_NUMBER_ID,
-        to: [NOTIFY_PHONE_NUMBER],
-      }),
+    // Always send to admin + personal — each in its own try/catch via sendOne
+    const adminResult = await sendOne({
+      to: NOTIFY_PHONE_NUMBER,
+      message: adminMessage,
+      recipientType: "admin",
+      messageType: type,
+      bookingId,
+    });
+    const personalResult = await sendOne({
+      to: PERSONAL_PHONE_NUMBER,
+      message: adminMessage,
+      recipientType: "personal",
+      messageType: type,
+      bookingId,
     });
 
-    const adminData = await adminRes.json();
-    if (!adminRes.ok) {
-      console.error("Admin SMS error:", adminRes.status, adminData);
-    } else {
-      console.log("SMS sent to admin:", adminData);
+    let customerResult: { success: boolean } | null = null;
+    if (customerMessage && smsConsent === true && customerPhone) {
+      customerResult = await sendOne({
+        to: customerPhone,
+        message: customerMessage,
+        recipientType: "customer",
+        messageType: `${type}_customer`,
+        bookingId,
+      });
+    } else if (customerMessage) {
+      console.log("Skipping customer SMS — consent or phone missing.");
     }
 
-    // Send to personal number
-    const personalRes = await fetch("https://api.openphone.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Authorization": OPENPHONE_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content: message,
-        from: OPENPHONE_PHONE_NUMBER_ID,
-        to: [PERSONAL_PHONE_NUMBER],
+    return new Response(
+      JSON.stringify({
+        success: true,
+        admin: adminResult.success,
+        personal: personalResult.success,
+        customer: customerResult?.success ?? null,
       }),
-    });
-
-    const personalData = await personalRes.json();
-    if (!personalRes.ok) {
-      console.error("Personal SMS error:", personalRes.status, personalData);
-    } else {
-      console.log("SMS sent to personal:", personalData);
-    }
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      },
+    );
   } catch (error: any) {
     console.error("Error sending SMS notification:", error);
     return new Response(
@@ -132,7 +200,7 @@ const handler = async (req: Request): Promise<Response> => {
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      },
     );
   }
 };

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Shield, Leaf } from "lucide-react";
+import { trackPhoneCall } from "@/lib/trackPhoneCall";
 
 const Footer = () => {
   return (
@@ -18,7 +19,7 @@ const Footer = () => {
               Professional cleaning services for South Florida homes. Licensed, bonded, and insured.
             </p>
             <div className="space-y-2 text-sm">
-              <a href="tel:+15615718725" className="flex items-center gap-2 text-background/70 hover:text-background transition-colors">
+              <a href="tel:+15615718725" onClick={() => trackPhoneCall("footer")} className="flex items-center gap-2 text-background/70 hover:text-background transition-colors">
                 <Phone className="w-4 h-4" />
                 (561) 571-8725
               </a>
