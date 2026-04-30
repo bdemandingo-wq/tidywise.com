@@ -177,7 +177,7 @@ const CleanerApplication = () => {
     <>
       <SEOHead
         title="Cleaning Jobs South Florida | Apply Now | TIDYWISE Careers"
-        description="Now hiring experienced cleaners in Broward, Miami-Dade & Palm Beach County. Flexible schedule, competitive pay, steady recurring clients. Apply to TIDYWISE today."
+        description="Now hiring experienced cleaners in Broward, Miami-Dade & Palm Beach County. Flexible hours, competitive pay, steady recurring clients. Apply today."
         canonical="https://www.tidywisecleaning.com/apply"
       />
     <div className="min-h-screen bg-background">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import SEOHead from "@/components/seo/SEOHead";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -169,10 +169,9 @@ const Auth = () => {
   return (
     <>
       <SEOHead
-        title="Sign In | TIDYWISE Cleaning Services"
-        description="Sign in or create an account to manage your TIDYWISE cleaning bookings. Track appointments and manage your profile."
+        title="Sign In to Your TIDYWISE Account | South Florida Cleaning"
+        description="Sign in or create your TIDYWISE account to book South Florida house cleaning, track upcoming visits, view past invoices, and manage your service preferences."
         canonical="https://www.tidywisecleaning.com/auth"
-        noIndex={true}
       />
     <div className="min-h-screen bg-muted py-12 px-4">
       <div className="max-w-md mx-auto">
@@ -390,6 +389,69 @@ const Auth = () => {
           </CardContent>
         </Card>
       </div>
+
+      <section aria-labelledby="auth-info-heading" className="mt-12 max-w-3xl mx-auto bg-background rounded-xl border border-border p-8 space-y-6">
+        <h2 id="auth-info-heading" className="font-display text-2xl font-bold text-foreground">
+          Manage your TIDYWISE cleaning service online
+        </h2>
+        <p className="text-muted-foreground leading-relaxed">
+          Your TIDYWISE account is the easiest way to stay on top of your South Florida
+          cleaning service. Sign in above to book a new appointment, reschedule an
+          existing visit, view past invoices and receipts, save your preferred cleaner,
+          update your address or gate code, and leave a tip after a job. Everything is
+          secured by encrypted email and SMS verification — your home access details and
+          payment information are never visible to other clients or shared with third
+          parties.
+        </p>
+
+        <div>
+          <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+            What you can do once signed in
+          </h3>
+          <ul className="space-y-2 text-muted-foreground list-disc pl-5">
+            <li>Book recurring weekly, biweekly, or monthly cleaning visits with one tap</li>
+            <li>Reschedule or cancel an upcoming clean without picking up the phone</li>
+            <li>View and download your full booking and payment history</li>
+            <li>Update saved payment methods, addresses, and pet/parking notes</li>
+            <li>Leave reviews or tips for your cleaner directly from your dashboard</li>
+            <li>Track your TIDYWISE referral credit balance and rewards</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+            New to TIDYWISE?
+          </h3>
+          <p className="text-muted-foreground leading-relaxed">
+            TIDYWISE is South Florida's local house cleaning service — serving{" "}
+            <Link to="/fort-lauderdale-cleaning" className="text-primary hover:underline">Fort Lauderdale</Link>,{" "}
+            <Link to="/boca-raton-cleaning" className="text-primary hover:underline">Boca Raton</Link>,{" "}
+            <Link to="/west-palm-beach-cleaning" className="text-primary hover:underline">West Palm Beach</Link>,
+            and dozens of cities across <Link to="/service-areas" className="text-primary hover:underline">our service areas</Link>.
+            Browse our cleaning services —{" "}
+            <Link to="/standard-cleaning" className="text-primary hover:underline">Standard</Link>,{" "}
+            <Link to="/deep-cleaning" className="text-primary hover:underline">Deep</Link>,{" "}
+            <Link to="/move-in-out-cleaning" className="text-primary hover:underline">Move-In/Out</Link>,{" "}
+            <Link to="/airbnb-cleaning" className="text-primary hover:underline">Airbnb Turnover</Link>, and more —
+            then{" "}
+            <Link to="/booking" className="text-primary hover:underline">book online in 60 seconds</Link>.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+            Trusted, insured, and South-Florida-local
+          </h3>
+          <p className="text-muted-foreground leading-relaxed">
+            Every TIDYWISE cleaner is background-checked and trained on our 50-point
+            quality checklist. We're fully insured, eco-friendly products are standard,
+            and every visit comes with our re-clean guarantee. Have questions before you
+            sign up? Browse our <Link to="/faq" className="text-primary hover:underline">FAQ</Link>,
+            see what neighbors say in our <Link to="/reviews" className="text-primary hover:underline">customer reviews</Link>,
+            or check out our <Link to="/blog" className="text-primary hover:underline">cleaning guides and tips</Link>.
+          </p>
+        </div>
+      </section>
     </div>
     </>
   );

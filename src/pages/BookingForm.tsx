@@ -356,8 +356,7 @@ const BookingForm = () => {
       <SEOHead
         title="Book Cleaning Online | TIDYWISE South Florida"
         description="Book your professional house cleaning in 60 seconds. Instant quote, flexible scheduling, vetted cleaners. Serving Deerfield Beach, Boca Raton & all South Florida."
-        canonical="/booking"
-        noIndex={true}
+        canonical="/"
       />
       <main id="main-content" className="min-h-screen bg-muted pb-32 md:pb-12">
         <section className="bg-gradient-to-b from-primary/10 to-background py-12 md:py-16">

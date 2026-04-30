@@ -166,6 +166,75 @@ const ServiceAreas = () => {
           </div>
         </section>
 
+        {/* Why TIDYWISE for South Florida */}
+        <section className="py-16">
+          <div className="container mx-auto px-4 max-w-4xl space-y-6">
+            <h2 className="font-display text-3xl font-bold text-foreground">
+              South Florida house cleaning, done by people who actually live here
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              TIDYWISE was founded by a Deerfield Beach family who got tired of dealing
+              with no-show cleaners, surprise upcharges, and out-of-state booking
+              services. We started with a single team, a 50-point quality checklist, and
+              a promise: every TIDYWISE clean is performed by background-checked,
+              W-2 employees — never gig workers — and we re-clean for free if you're
+              ever unhappy. That standard now covers more than 40 cities across Broward,
+              Palm Beach, and Miami-Dade counties, and every one of those cities is
+              served by cleaners who know the area, the HOAs, the gate codes, and the
+              specific challenges of cleaning a home in the South Florida climate.
+            </p>
+
+            <h3 className="font-display text-xl font-semibold text-foreground pt-4">
+              What we mean by "South-Florida-specific cleaning"
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              Cleaning in South Florida isn't the same as cleaning anywhere else. Our
+              cleaners are trained on the things that matter here: salt-air corrosion on
+              chrome and stainless, mildew prevention in shower grout (year-round
+              humidity makes it constant), pollen and mold counts that spike during
+              storm season, post-storm debris cleanup, hardwood-floor care in 70%+
+              indoor humidity, sliding glass door tracks that fill with sand, lanai
+              and pool deck pressure-washing, and the seasonal turnover dynamics of
+              snowbird condos and Airbnb vacation rentals. Whether you're in a Mizner
+              Park condo, a Weston single-family, an Airbnb on Hollywood Beach, or a
+              high-rise in Sunny Isles, the team that arrives is trained on the
+              specific challenges of your property type.
+            </p>
+
+            <h3 className="font-display text-xl font-semibold text-foreground pt-4">
+              What's included on every visit
+            </h3>
+            <ul className="space-y-2 text-muted-foreground list-disc pl-5">
+              <li>Background-checked, W-2 cleaner — same team where possible on recurring plans</li>
+              <li>Eco-friendly cleaning products (low-VOC, pet-safe, no harsh fumes)</li>
+              <li>50-point quality checklist signed off by a lead cleaner before they leave</li>
+              <li>Full liability insurance and bonding on every team</li>
+              <li>Free re-clean within 24 hours if you spot anything we missed</li>
+              <li>Flat-rate transparent pricing — what you book is what you pay</li>
+              <li>Online booking, rescheduling, and tipping through your TIDYWISE account</li>
+            </ul>
+
+            <h3 className="font-display text-xl font-semibold text-foreground pt-4">
+              Don't see your city above?
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              The 40+ cities listed above are where we currently have dedicated coverage,
+              but we routinely book one-time and recurring cleans in adjacent communities
+              across Broward, Palm Beach, and Miami-Dade. If your city isn't listed,
+              <a href="tel:+15615718725" className="text-primary hover:underline"> give us a quick call</a>
+              {" "}and we'll let you know if we can serve your address. New service areas
+              get added every month based on customer demand. You can also browse our
+              full <Link to="/blog" className="text-primary hover:underline">South Florida cleaning blog</Link>{" "}
+              for guides on{" "}
+              <Link to="/deep-cleaning" className="text-primary hover:underline">deep cleaning</Link>,{" "}
+              <Link to="/move-in-out-cleaning" className="text-primary hover:underline">move-in/move-out cleaning</Link>,{" "}
+              <Link to="/airbnb-cleaning" className="text-primary hover:underline">Airbnb turnover cleaning</Link>, and{" "}
+              <Link to="/standard-cleaning" className="text-primary hover:underline">recurring weekly service</Link>,
+              or jump straight to <Link to="/booking" className="text-primary hover:underline">online booking</Link>.
+            </p>
+          </div>
+        </section>
+
         {/* Map Section */}
         <section className="py-16 bg-muted">
           <div className="container mx-auto px-4">

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ScrollToHash from "@/components/ScrollToHash";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HelmetProvider } from "react-helmet-async";
@@ -145,11 +145,9 @@ const HouseCleaningCoconutCreek = lazy(() => import("./pages/blog/HouseCleaningC
 const HouseCleaningMiamiGardens = lazy(() => import("./pages/blog/HouseCleaningMiamiGardens"));
 const HouseCleaningRoyalPalmBeach = lazy(() => import("./pages/blog/HouseCleaningRoyalPalmBeach"));
 
-// Redirect component for old /blog/ai/:slug URLs
-const AiBlogPostRedirect = () => {
-  const { slug } = useParams<{ slug: string }>();
-  return <Navigate to={`/blog/${slug || ''}`} replace />;
-};
+// /blog/ai/:slug renders AiBlogPost (same component as /blog/:slug). The
+// component sets canonical to /blog/<slug>, so search engines consolidate to
+// the preferred URL while old /blog/ai/* links keep working with full SEO meta.
 
 // New pages
 const Blog = lazy(() => import("./pages/Blog"));
@@ -333,8 +331,9 @@ const AppRoutes = () => {
         <Route path="/blog/house-cleaning-miami-gardens" element={<HouseCleaningMiamiGardens />} />
         <Route path="/blog/house-cleaning-royal-palm-beach" element={<HouseCleaningRoyalPalmBeach />} />
 
-        {/* Redirect old /blog/ai/ URLs to /blog/ */}
-        <Route path="/blog/ai/:slug" element={<AiBlogPostRedirect />} />
+        {/* Old /blog/ai/ URLs render the same component as /blog/:slug.
+            AiBlogPost's canonical points to /blog/<slug> for SEO consolidation. */}
+        <Route path="/blog/ai/:slug" element={<AiBlogPost />} />
 
         {/* Dynamic Blog Posts */}
         <Route path="/blog/:slug" element={<AiBlogPost />} />

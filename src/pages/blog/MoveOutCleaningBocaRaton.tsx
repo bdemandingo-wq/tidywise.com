@@ -47,7 +47,7 @@ const MoveOutCleaningBocaRaton = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="Move-Out Cleaning Boca Raton FL | Deposit Back Guaranteed | TIDYWISE"
+        pageTitle="Move-Out Cleaning Boca Raton, FL | TIDYWISE"
         pageDescription="Move-out cleaning in Boca Raton, FL from $283. Get your deposit back. Licensed & insured. Mizner Park, Boca West, Royal Palm & all Boca neighborhoods."
         canonicalUrl="https://www.tidywisecleaning.com/blog/move-out-cleaning-boca-raton"
         pageType="blog"
