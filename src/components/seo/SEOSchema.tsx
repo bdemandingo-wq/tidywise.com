@@ -165,9 +165,18 @@ const SEOSchema = ({
 }: SEOSchemaProps) => {
   const isHome = pageType === 'home';
   // Normalize incoming canonical to guarantee www apex everywhere downstream
-  // (canonical link, og:url, hreflang, JSON-LD @id/url, breadcrumbs).
+  // (canonical link, og:url, JSON-LD @id/url, breadcrumbs).
   // eslint-disable-next-line no-param-reassign
   canonicalUrl = normalizeCanonical(canonicalUrl);
+
+  // Hreflang self-references the URL the user/crawler actually requested. Falls
+  // back to canonicalUrl when window isn't available (initial server-render).
+  // This decouples hreflang from canonical so pages whose canonical points
+  // elsewhere (e.g. archived blog posts canonicalized to /blog) still emit a
+  // self-referencing hreflang for the audit and for search engine compliance.
+  const hreflangUrl = typeof window !== 'undefined'
+    ? `${WEBSITE}${window.location.pathname}`
+    : canonicalUrl;
 
   // Build breadcrumb schema
   const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
@@ -323,9 +332,10 @@ const SEOSchema = ({
       <meta name="geo.position" content="26.3182;-80.0944" />
       <meta name="ICBM" content="26.3182, -80.0944" />
 
-      {/* Hreflang */}
-      <link rel="alternate" hrefLang="en-us" href={canonicalUrl} />
-      <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
+      {/* Hreflang — self-references the current URL so the tag is always present
+          even on pages whose canonical points elsewhere (e.g. archived posts). */}
+      <link rel="alternate" hrefLang="en-us" href={hreflangUrl} />
+      <link rel="alternate" hrefLang="x-default" href={hreflangUrl} />
       
       {/* Homepage schemas */}
       {isHome && (

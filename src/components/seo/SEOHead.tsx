@@ -39,6 +39,11 @@ const SEOHead = ({
 }: SEOHeadProps) => {
   const image = ogImage || DEFAULT_OG_IMAGE;
   const canonicalUrl = normalizeCanonical(canonical);
+  // hreflang self-references the URL actually being viewed, not the canonical.
+  // Lets the tag stay self-referencing on pages whose canonical points elsewhere.
+  const hreflangUrl = typeof window !== 'undefined'
+    ? `${WEBSITE}${window.location.pathname}`
+    : canonicalUrl;
   const robotsContent = noIndex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
@@ -74,9 +79,10 @@ const SEOHead = ({
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
 
-      {/* Hreflang */}
-      <link rel="alternate" hrefLang="en-us" href={canonicalUrl} />
-      <link rel="alternate" hrefLang="x-default" href={canonicalUrl} />
+      {/* Hreflang — self-references the current URL, not the canonical, so
+          pages canonicalized elsewhere still emit a self-referencing tag. */}
+      <link rel="alternate" hrefLang="en-us" href={hreflangUrl} />
+      <link rel="alternate" hrefLang="x-default" href={hreflangUrl} />
 
       {/* Schema JSON-LD */}
       {schemas.map((schema, i) => (
