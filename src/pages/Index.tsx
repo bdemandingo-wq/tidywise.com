@@ -74,8 +74,8 @@ const Index = () => {
   return (
     <>
       <SEOSchema
-        pageTitle="House Cleaning South Florida | TidyWise Cleaning"
-        pageDescription="Top-rated house cleaning in Deerfield Beach, Boca Raton, Fort Lauderdale & all of South Florida. 4.9★ rated. Book online or call (561) 571-8725."
+        pageTitle="TIDYWISE — South Florida's Top-Rated House Cleaners"
+        pageDescription="South Florida's most-loved house cleaners. Same-cleaner guarantee, eco-friendly products, instant online booking. 4.9★ from 127+ neighbors. Book today."
         canonicalUrl="https://www.tidywisecleaning.com/"
         pageType="home"
         faqItems={homepageFaqs}

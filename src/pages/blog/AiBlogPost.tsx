@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { ArrowLeft, Calendar, Clock, Sparkles } from "lucide-react";
 import DOMPurify from "dompurify";
 import Navbar from "@/components/Navbar";
@@ -22,6 +22,7 @@ interface BlogPostData {
 
 const AiBlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const [post, setPost] = useState<BlogPostData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -172,9 +173,9 @@ const AiBlogPost = () => {
   return (
     <>
       <SEOSchema
-        pageTitle={`${post.title} | TIDYWISE`}
-        pageDescription={post.excerpt}
-        canonicalUrl={`https://www.tidywisecleaning.com/blog/${slug}`}
+        pageTitle={post.title.length > 60 ? post.title.slice(0, 57).trimEnd() + "…" : post.title}
+        pageDescription={post.excerpt.length > 160 ? post.excerpt.slice(0, 157).trimEnd() + "…" : post.excerpt}
+        canonicalUrl={`https://www.tidywisecleaning.com${location.pathname}`}
         pageType="blog"
         county="South Florida"
       />
