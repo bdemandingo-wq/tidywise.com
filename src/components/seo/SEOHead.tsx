@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface SEOHeadProps {
@@ -10,7 +11,6 @@ interface SEOHeadProps {
 }
 
 const WEBSITE = "https://www.tidywisecleaning.com";
-const BUSINESS_NAME = "TIDYWISE Cleaning Services";
 const DEFAULT_OG_IMAGE = `${WEBSITE}/og-image.webp`;
 
 /**
@@ -54,35 +54,44 @@ const SEOHead = ({
       : [schemaJson]
     : [];
 
+  // Update the static description, canonical, OG, Twitter, and hreflang tags
+  // shipped in index.html in place. This keeps the tags present in the static
+  // HTML for non-JS audit crawlers AND ensures per-route values for JS crawlers
+  // without producing duplicate tags via Helmet injection.
+  useEffect(() => {
+    const setMeta = (selector: string, value: string) => {
+      const tag = document.querySelector<HTMLMetaElement>(selector);
+      if (tag && value) tag.content = value;
+    };
+    const setLinkHref = (selector: string, value: string) => {
+      const tag = document.querySelector<HTMLLinkElement>(selector);
+      if (tag && value) tag.href = value;
+    };
+
+    setMeta('meta[name="description"]', description);
+    setLinkHref('link[rel="canonical"]', canonicalUrl);
+
+    setMeta('meta[property="og:title"]', title);
+    setMeta('meta[property="og:description"]', description);
+    setMeta('meta[property="og:url"]', canonicalUrl);
+    setMeta('meta[property="og:image"]', image);
+
+    setMeta('meta[name="twitter:title"]', title);
+    setMeta('meta[name="twitter:description"]', description);
+    setMeta('meta[name="twitter:image"]', image);
+
+    setLinkHref('link[rel="alternate"][hreflang="en-us"]', hreflangUrl);
+    setLinkHref('link[rel="alternate"][hreflang="x-default"]', hreflangUrl);
+  }, [title, description, canonicalUrl, hreflangUrl, image]);
+
   return (
     <Helmet>
       <title>{title}</title>
-      <meta name="description" content={description} />
-      <link rel="canonical" href={canonicalUrl} />
       <meta name="robots" content={robotsContent} />
 
-      {/* Open Graph */}
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
-      <meta property="og:url" content={canonicalUrl} />
-      <meta property="og:type" content="website" />
-      <meta property="og:image" content={image} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content="TIDYWISE professional cleaning service in South Florida" />
-      <meta property="og:site_name" content={BUSINESS_NAME} />
-      <meta property="og:locale" content="en_US" />
-
-      {/* Twitter Card */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={image} />
-
-      {/* Hreflang — self-references the current URL, not the canonical, so
-          pages canonicalized elsewhere still emit a self-referencing tag. */}
-      <link rel="alternate" hrefLang="en-us" href={hreflangUrl} />
-      <link rel="alternate" hrefLang="x-default" href={hreflangUrl} />
+      {/* description, canonical, OG/Twitter, and hreflang tags are managed via
+          useEffect above on the static tags shipped in index.html — keeps the
+          static HTML covered for non-JS crawlers AND avoids duplicate tags. */}
 
       {/* Schema JSON-LD */}
       {schemas.map((schema, i) => (

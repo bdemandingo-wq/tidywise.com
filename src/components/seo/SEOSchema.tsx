@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 interface SEOSchemaProps {
@@ -178,6 +179,38 @@ const SEOSchema = ({
     ? `${WEBSITE}${window.location.pathname}`
     : canonicalUrl;
 
+  const ogImageUrl = `${WEBSITE}/og-image.webp`;
+
+  // Update the static description, canonical, OG, Twitter, and hreflang tags
+  // shipped in index.html in place. This keeps the tags present in the static
+  // HTML for non-JS audit crawlers AND ensures per-route values for JS crawlers
+  // without producing duplicate tags via Helmet injection.
+  useEffect(() => {
+    const setMeta = (selector: string, value: string) => {
+      const tag = document.querySelector<HTMLMetaElement>(selector);
+      if (tag && value) tag.content = value;
+    };
+    const setLinkHref = (selector: string, value: string) => {
+      const tag = document.querySelector<HTMLLinkElement>(selector);
+      if (tag && value) tag.href = value;
+    };
+
+    setMeta('meta[name="description"]', pageDescription);
+    setLinkHref('link[rel="canonical"]', canonicalUrl);
+
+    setMeta('meta[property="og:title"]', pageTitle);
+    setMeta('meta[property="og:description"]', pageDescription);
+    setMeta('meta[property="og:url"]', canonicalUrl);
+    setMeta('meta[property="og:image"]', ogImageUrl);
+
+    setMeta('meta[name="twitter:title"]', pageTitle);
+    setMeta('meta[name="twitter:description"]', pageDescription);
+    setMeta('meta[name="twitter:image"]', ogImageUrl);
+
+    setLinkHref('link[rel="alternate"][hreflang="en-us"]', hreflangUrl);
+    setLinkHref('link[rel="alternate"][hreflang="x-default"]', hreflangUrl);
+  }, [pageTitle, pageDescription, canonicalUrl, hreflangUrl, ogImageUrl]);
+
   // Build breadcrumb schema
   const breadcrumbSchema = breadcrumbs && breadcrumbs.length > 0 ? {
     "@context": "https://schema.org",
@@ -304,38 +337,21 @@ const SEOSchema = ({
   return (
     <Helmet>
       <title>{pageTitle}</title>
-      <meta name="description" content={pageDescription} />
-      <link rel="canonical" href={canonicalUrl} />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      
-      {/* Open Graph */}
-      <meta property="og:title" content={pageTitle} />
-      <meta property="og:description" content={pageDescription} />
-      <meta property="og:url" content={canonicalUrl} />
+
+      {/* og:type is per-page (article vs website) — keep it dynamic via Helmet. */}
       <meta property="og:type" content={(pageType === 'blog' || pageType === 'article') ? 'article' : 'website'} />
-      <meta property="og:image" content={`${WEBSITE}/og-image.webp`} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content="TIDYWISE professional cleaning service in South Florida" />
-      <meta property="og:site_name" content={BUSINESS_NAME} />
-      <meta property="og:locale" content="en_US" />
-      
-      {/* Twitter Card */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={pageTitle} />
-      <meta name="twitter:description" content={pageDescription} />
-      <meta name="twitter:image" content={`${WEBSITE}/og-image.webp`} />
-      
-      {/* Geo Tags */}
+
+      {/* Geo Tags — same on every page, fine to inject via Helmet. */}
       <meta name="geo.region" content="US-FL" />
       <meta name="geo.placename" content="Deerfield Beach" />
       <meta name="geo.position" content="26.3182;-80.0944" />
       <meta name="ICBM" content="26.3182, -80.0944" />
 
-      {/* Hreflang — self-references the current URL so the tag is always present
-          even on pages whose canonical points elsewhere (e.g. archived posts). */}
-      <link rel="alternate" hrefLang="en-us" href={hreflangUrl} />
-      <link rel="alternate" hrefLang="x-default" href={hreflangUrl} />
+      {/* description, canonical, OG title/description/url/image, Twitter, and
+          hreflang tags are managed via useEffect above on the static tags
+          shipped in index.html — keeps the static HTML covered for non-JS
+          crawlers AND avoids duplicate tags. */}
       
       {/* Homepage schemas */}
       {isHome && (
