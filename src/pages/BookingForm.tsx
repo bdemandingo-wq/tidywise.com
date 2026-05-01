@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SEOHead from "@/components/seo/SEOHead";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -355,8 +355,8 @@ const BookingForm = () => {
     <>
       <SEOHead
         title="Book Cleaning Online | TIDYWISE South Florida"
-        description="Book your professional house cleaning in 60 seconds. Instant quote, flexible scheduling, vetted cleaners. Serving Deerfield Beach, Boca Raton & all South Florida."
-        canonical="/"
+        description="Book a TIDYWISE house cleaning in 60 seconds. Flat-rate quote, vetted cleaners, free re-clean guarantee. Serving Broward, Palm Beach & Miami-Dade."
+        canonical="/booking"
       />
       <main id="main-content" className="min-h-screen bg-muted pb-32 md:pb-12">
         <section className="bg-gradient-to-b from-primary/10 to-background py-12 md:py-16">
@@ -813,6 +813,59 @@ const BookingForm = () => {
             </CardContent>
           </Card>
         </div>
+
+        <section aria-labelledby="booking-related-heading" className="max-w-4xl mx-auto px-4 pt-12 pb-8 space-y-8">
+          <div>
+            <h2 id="booking-related-heading" className="font-display text-2xl font-bold text-foreground mb-4">
+              Not sure which service to book?
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Pick the cleaning that matches what your home needs today —{" "}
+              <Link to="/standard-cleaning" className="text-primary hover:underline">Standard recurring cleaning</Link>{" "}
+              for weekly, biweekly, or monthly maintenance,{" "}
+              <Link to="/deep-cleaning" className="text-primary hover:underline">Deep cleaning</Link> for a
+              first-time top-to-bottom reset,{" "}
+              <Link to="/move-in-out-cleaning" className="text-primary hover:underline">Move-in / move-out cleaning</Link>{" "}
+              for security-deposit-back results,{" "}
+              <Link to="/airbnb-cleaning" className="text-primary hover:underline">Airbnb turnover cleaning</Link>{" "}
+              for short-term rentals,{" "}
+              <Link to="/post-construction-cleaning" className="text-primary hover:underline">Post-construction cleanup</Link>,{" "}
+              <Link to="/carpet-cleaning" className="text-primary hover:underline">Carpet cleaning</Link>, or{" "}
+              <Link to="/upholstery-cleaning" className="text-primary hover:underline">Upholstery cleaning</Link>.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-4">
+              Booking from a specific city?
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              We serve more than 40 South Florida cities — see our full{" "}
+              <Link to="/service-areas" className="text-primary hover:underline">service areas</Link>{" "}
+              list, or jump to your county:{" "}
+              <Link to="/broward-county-cleaning" className="text-primary hover:underline">Broward</Link>,{" "}
+              <Link to="/palm-beach-county-cleaning" className="text-primary hover:underline">Palm Beach</Link>, or{" "}
+              <Link to="/miami-dade-cleaning" className="text-primary hover:underline">Miami-Dade</Link>. Top
+              city pages include{" "}
+              <Link to="/fort-lauderdale-cleaning" className="text-primary hover:underline">Fort Lauderdale</Link>,{" "}
+              <Link to="/boca-raton-cleaning" className="text-primary hover:underline">Boca Raton</Link>, and{" "}
+              <Link to="/west-palm-beach-cleaning" className="text-primary hover:underline">West Palm Beach</Link>.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-4">
+              Have questions before you book?
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Browse our <Link to="/faq" className="text-primary hover:underline">FAQ</Link> for pricing,
+              cancellation, and re-clean policy details, see what neighbors say in our{" "}
+              <Link to="/reviews" className="text-primary hover:underline">customer reviews</Link>, or read
+              our <Link to="/blog" className="text-primary hover:underline">South Florida cleaning guides</Link>{" "}
+              for tips on humidity, salt-air corrosion, post-storm cleanup, and more.
+            </p>
+          </div>
+        </section>
       </main>
     </>
   );
