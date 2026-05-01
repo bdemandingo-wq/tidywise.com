@@ -1,0 +1,4 @@
+# Stale /blog/ai/<slug> URLs no longer match any blog_posts row. Redirect them
+# to the blog index so search engines consolidate ranking and audit tools see
+# a proper 301 → 200 chain instead of an empty SPA shell.
+/blog/ai/*  /blog  301
