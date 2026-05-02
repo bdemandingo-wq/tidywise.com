@@ -36,9 +36,16 @@ const normalizeCanonical = (input: string): string => {
   return `${WEBSITE}${cleanPath}`;
 };
 
+// Top-level business schema. Uses @type: LocalBusiness so Google's review
+// snippet parser recognizes aggregateRating and review on this node — the
+// CleaningService subtype does technically inherit from LocalBusiness but
+// Search Console flags ratings/reviews when @type is the more specific
+// CleaningService string. The "additionalType" link below preserves the
+// cleaning-specific signal without confusing the parser.
 const cleaningServiceSchema = {
   "@context": "https://schema.org",
-  "@type": "CleaningService",
+  "@type": "LocalBusiness",
+  "additionalType": "https://schema.org/CleaningService",
   "@id": `${WEBSITE}/#business`,
   "name": BUSINESS_NAME,
   "alternateName": ["Tidywise", "TidyWise Cleaning", "TIDYWISE House Cleaning"],
@@ -321,7 +328,10 @@ const SEOSchema = ({
       { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "17:00" },
       { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "15:00" }
     ],
-    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "reviewCount": "127", "bestRating": "5" },
+    // Per-city LocalBusiness intentionally has no aggregateRating or review.
+    // The 4.9/127 figures are global, not city-scoped, so attaching them per
+    // page would constitute self-serving reviews and trip Search Console.
+    // Ratings/reviews are carried by the canonical homepage schema only.
     "hasOfferCatalog": {
       "@type": "OfferCatalog",
       "name": `Cleaning Services in ${resolvedCity}`,
@@ -375,7 +385,8 @@ const SEOSchema = ({
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "CleaningService",
+            "@type": "LocalBusiness",
+            "additionalType": "https://schema.org/CleaningService",
             "@id": `${WEBSITE}/#business`,
             "name": BUSINESS_NAME,
             "url": WEBSITE,
