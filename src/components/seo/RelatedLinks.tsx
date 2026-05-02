@@ -1,4 +1,10 @@
 import { Link } from "react-router-dom";
+import {
+  blogPathToCitySlug,
+  citiesBySlug,
+  cityNameToSlug,
+  cityRoute,
+} from "@/data/cityLinkMap";
 
 interface RelatedLinksProps {
   currentPage: string;
@@ -67,10 +73,49 @@ const blogPosts = [
 ];
 
 const RelatedLinks = ({ currentPage, pageType, county, cityName }: RelatedLinksProps) => {
+  // Resolve a city slug for both pageType=city (from cityName prop) and
+  // pageType=blog (from currentPage path). Falls back to undefined for
+  // service / county / topical-blog pages — those keep the generic UI.
+  const resolvedSlug =
+    pageType === "city" && cityName
+      ? cityNameToSlug(cityName)
+      : pageType === "blog"
+      ? blogPathToCitySlug[currentPage]
+      : undefined;
+  const resolvedCity = resolvedSlug ? citiesBySlug[resolvedSlug] : undefined;
+
   const filteredServices = services.filter(s => s.link !== currentPage);
   const filteredCities = topCities.filter(c => c.link !== currentPage);
-  const filteredBlogs = blogPosts.filter(b => b.link !== currentPage).slice(0, 3);
   const filteredCounties = counties.filter(c => c.link !== currentPage);
+
+  // Blog column: when on a city page show that city's blog guides; on a
+  // city blog post show 3 thematically related cities' blog posts; else
+  // fall back to the generic featured list.
+  const cityBlogGuides =
+    pageType === "city" && resolvedCity ? resolvedCity.blogPosts : [];
+  const blogColumnTitle =
+    pageType === "city" && resolvedCity && cityBlogGuides.length > 0
+      ? `Cleaning Guides for ${resolvedCity.name}`
+      : "From Our Blog";
+  const filteredBlogs =
+    cityBlogGuides.length > 0
+      ? cityBlogGuides.map((b) => ({ name: b.anchor, link: b.path }))
+      : blogPosts.filter(b => b.link !== currentPage).slice(0, 3);
+
+  // Cities column: on a city blog post, replace the static top-cities list
+  // with the matching city + nearby neighbors using descriptive anchors.
+  const blogServiceArea =
+    pageType === "blog" && resolvedCity
+      ? [
+          { name: `Professional Cleaning in ${resolvedCity.name}`, link: cityRoute(resolvedCity.slug) },
+          ...resolvedCity.neighbors
+            .map((n) => citiesBySlug[n])
+            .filter((c): c is NonNullable<typeof c> => Boolean(c))
+            .slice(0, 4)
+            .map((c) => ({ name: `Cleaning Services in ${c.name}`, link: cityRoute(c.slug) })),
+        ]
+      : null;
+  const citiesColumnTitle = blogServiceArea ? "Service Areas We Cover" : "Service Areas";
 
   return (
     <section className="py-12 bg-muted/50">
@@ -99,23 +144,35 @@ const RelatedLinks = ({ currentPage, pageType, county, cityName }: RelatedLinksP
           {/* Cities/Areas Column */}
           <div>
             <h3 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wider">
-              Service Areas
+              {citiesColumnTitle}
             </h3>
             <ul className="space-y-2">
-              {filteredCounties.map(c => (
-                <li key={c.link}>
-                  <Link to={c.link} className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium">
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
-              {filteredCities.slice(0, 4).map(city => (
-                <li key={city.link}>
-                  <Link to={city.link} className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                    {city.name} cleaning service
-                  </Link>
-                </li>
-              ))}
+              {blogServiceArea ? (
+                blogServiceArea.map((c) => (
+                  <li key={c.link}>
+                    <Link to={c.link} className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                      {c.name}
+                    </Link>
+                  </li>
+                ))
+              ) : (
+                <>
+                  {filteredCounties.map(c => (
+                    <li key={c.link}>
+                      <Link to={c.link} className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium">
+                        {c.name}
+                      </Link>
+                    </li>
+                  ))}
+                  {filteredCities.slice(0, 4).map(city => (
+                    <li key={city.link}>
+                      <Link to={city.link} className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                        {city.name} cleaning service
+                      </Link>
+                    </li>
+                  ))}
+                </>
+              )}
               <li>
                 <Link to="/service-areas" className="text-primary hover:underline text-sm font-medium">
                   View all 40+ cities →
@@ -127,7 +184,7 @@ const RelatedLinks = ({ currentPage, pageType, county, cityName }: RelatedLinksP
           {/* Blog Column */}
           <div>
             <h3 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wider">
-              From Our Blog
+              {blogColumnTitle}
             </h3>
             <ul className="space-y-2">
               {filteredBlogs.map(post => (

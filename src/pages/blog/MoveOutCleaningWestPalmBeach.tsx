@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const MoveOutCleaningWestPalmBeach = () => {
   const faqSchema = {
@@ -210,6 +211,7 @@ const MoveOutCleaningWestPalmBeach = () => {
           </section>
         </article>
 
+        <RelatedLinks currentPage="/blog/move-out-cleaning-west-palm-beach" pageType="blog" />
         <Footer />
       </main>
     </>

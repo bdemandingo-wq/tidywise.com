@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const HouseCleaningHollywood = () => {
   const faqSchema = {
@@ -199,6 +200,7 @@ const HouseCleaningHollywood = () => {
           </section>
         </article>
 
+        <RelatedLinks currentPage="/blog/house-cleaning-hollywood-florida" pageType="blog" />
         <Footer />
       </main>
     </>

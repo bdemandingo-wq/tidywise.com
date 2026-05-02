@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SEOSchema from "@/components/seo/SEOSchema";
+import RelatedLinks from "@/components/seo/RelatedLinks";
 
 const DeepCleaningBocaRaton = () => {
   const faqSchema = {
@@ -205,6 +206,7 @@ const DeepCleaningBocaRaton = () => {
           </section>
         </article>
 
+        <RelatedLinks currentPage="/blog/deep-cleaning-service-boca-raton" pageType="blog" />
         <Footer />
       </main>
     </>
