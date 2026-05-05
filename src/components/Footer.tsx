@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Shield, Leaf } from "lucide-react";
 import { trackPhoneCall } from "@/lib/trackPhoneCall";
+import { CITY_CLEANING_GUIDES } from "@/data/cityCleaningGuides";
 
 const Footer = () => {
   return (
@@ -88,6 +89,29 @@ const Footer = () => {
             </ul>
           </div>
         </div>
+
+        {/* Cleaning Guides by City — every page links to every blog city
+            so Google can crawl them. Compact list, no cards. */}
+        <nav
+          aria-label="Cleaning guides by city"
+          className="border-t border-background/20 pt-6 mb-6"
+        >
+          <h3 className="text-background/80 text-xs font-semibold uppercase tracking-wider mb-3">
+            Cleaning Guides by City
+          </h3>
+          <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+            {CITY_CLEANING_GUIDES.map((city) => (
+              <li key={city.path}>
+                <Link
+                  to={city.path}
+                  className="text-background/70 hover:text-background hover:underline transition-colors"
+                >
+                  House Cleaning {city.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         {/* Trust signals */}
         <div className="border-t border-background/20 py-6 mb-6">

@@ -18,6 +18,7 @@ const Contact = lazy(() => import("@/components/Contact"));
 const BlogPreview = lazy(() => import("@/components/BlogPreview"));
 const AIChatbot = lazy(() => import("@/components/AIChatbot"));
 const ServiceAreaLinks = lazy(() => import("@/components/seo/ServiceAreaLinks"));
+const CityCleaningGuides = lazy(() => import("@/components/seo/CityCleaningGuides"));
 const StickyCallButton = lazy(() => import("@/components/seo/StickyCallButton"));
 const GoogleMapEmbed = lazy(() => import("@/components/seo/GoogleMapEmbed"));
 
@@ -89,6 +90,7 @@ const Index = () => {
         <PricingCalculator />
         
         <LazySection minHeight={400}><WhyChooseUs /></LazySection>
+        <LazySection minHeight={500}><CityCleaningGuides /></LazySection>
         <LazySection minHeight={400}><Testimonials /></LazySection>
         <LazySection minHeight={400}><HomeFAQ /></LazySection>
         <LazySection minHeight={200}><ContactOptions /></LazySection>
