@@ -30,7 +30,7 @@ const HouseCleaningJupiter = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Jupiter FL | From $108 | TIDYWISE"
-        pageDescription="House cleaning in Jupiter, FL from $108. Licensed & insured. Abacoa, Jonathan's Landing, Admirals Cove, Jupiter Island & all communities. Waterfront home specialists."
+        pageDescription="Premium house cleaning in Jupiter, FL from $108. Licensed & insured. Abacoa, Jonathan's Landing, Admirals Cove & all communities. Waterfront home experts."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-jupiter"
         pageType="blog"
         blogMeta={{ datePublished: "2026-04-13", dateModified: "2026-04-13", category: "Local Guides" }}

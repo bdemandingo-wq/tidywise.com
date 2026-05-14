@@ -30,7 +30,7 @@ const HouseCleaningDeerfield = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Deerfield Beach FL | From $108 | TIDYWISE"
-        pageDescription="House cleaning in Deerfield Beach, FL from $108. TIDYWISE is based in Deerfield Beach. Licensed & insured. Lighthouse Point, Deer Creek, The Cove & all neighborhoods."
+        pageDescription="Local house cleaning in Deerfield Beach, FL from $108. TIDYWISE is based here. Lighthouse Point, Deer Creek & all neighborhoods. Instant online quotes."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-deerfield-beach"
         pageType="blog"
         blogMeta={{ datePublished: "2026-04-13", dateModified: "2026-04-13", category: "Local Guides" }}

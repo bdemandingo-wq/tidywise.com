@@ -30,7 +30,7 @@ const HouseCleaningAventura = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Aventura FL | From $108 | TIDYWISE"
-        pageDescription="House cleaning in Aventura, FL from $108. Licensed & insured. Williams Island, Turnberry Isle, Harbor Centre & all Aventura luxury buildings. Same-day available."
+        pageDescription="Professional house cleaning in Aventura, FL from $108. Licensed & insured. Serving Williams Island, Turnberry Isle & all luxury condos. Book online in 60 seconds."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-aventura"
         pageType="blog"
         blogMeta={{ datePublished: "2026-04-13", dateModified: "2026-04-13", category: "Local Guides" }}
