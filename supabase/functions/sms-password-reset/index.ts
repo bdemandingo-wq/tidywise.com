@@ -150,9 +150,7 @@ serve(async (req) => {
 
       console.log(`OTP sent via SMS to user phone (user.id=${user.id})`);
 
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return genericSendResponse();
     }
 
     if (action === "verify") {
