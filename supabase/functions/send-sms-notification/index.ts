@@ -145,6 +145,26 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Per-IP rate limit: this endpoint is reachable from the public booking,
+  // cleaner-application, and contact forms. 15 sends/hour/IP is generous for
+  // real users but throttles abuse of the OpenPhone integration.
+  try {
+    const { data: allowed, error: rlError } = await supabaseAdmin.rpc("check_rate_limit", {
+      _bucket: "send-sms-notification",
+      _identifier: getClientIp(req),
+      _max: 15,
+      _window: "1 hour",
+    });
+    if (!rlError && allowed === false) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+  } catch (rlErr) {
+    console.error("SMS rate-limit check failed (allowing):", rlErr);
+  }
+
   try {
     if (!OPENPHONE_API_KEY) {
       throw new Error("OPENPHONE_API_KEY is not configured");
