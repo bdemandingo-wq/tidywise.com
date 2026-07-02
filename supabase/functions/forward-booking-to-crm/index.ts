@@ -1,7 +1,15 @@
 // Forwards a newly-created TidyWise booking to the external CRM ingest endpoint.
 // The shared secret (EXTERNAL_BOOKING_INGEST_KEY) stays server-side and is never
 // exposed to the browser. Failures are non-fatal to the booking flow.
+//
+// Hardening:
+//   - Per-IP rate limit (10/hour) via public.check_rate_limit.
+//   - Instead of trusting raw request-body fields, we look up the just-inserted
+//     booking row by id server-side (service role) and forward THOSE values.
+//     Junk can only reach the CRM if it first passed the real booking flow's
+//     validation and landed a row in public.bookings.
 
+import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const CRM_INGEST_URL =
@@ -15,6 +23,12 @@ function normalizeFrequency(input: unknown): string {
   if (v.includes("week")) return "weekly";
   if (v.includes("month")) return "monthly";
   return "one_time";
+}
+
+function getClientIp(req: Request): string {
+  const fwd = req.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0].trim();
+  return req.headers.get("x-real-ip") ?? "unknown";
 }
 
 Deno.serve(async (req) => {
@@ -36,6 +50,28 @@ Deno.serve(async (req) => {
     );
   }
 
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  // ---- Per-IP rate limit: 10/hour ----
+  const ip = getClientIp(req);
+  const { data: allowed, error: rlErr } = await supabase.rpc("check_rate_limit", {
+    _bucket: "forward-booking-to-crm",
+    _identifier: ip,
+    _max: 10,
+    _window: "01:00:00",
+  });
+  if (rlErr) {
+    console.error("Rate limit check failed:", rlErr);
+  } else if (allowed === false) {
+    return new Response(
+      JSON.stringify({ error: "Too many requests. Please try again later." }),
+      { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
   let body: any;
   try {
     body = await req.json();
@@ -46,20 +82,60 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Map TidyWise booking fields -> CRM ingest payload
+  // Require a booking id and load the real row server-side. Only values that
+  // already passed the booking flow's validation get forwarded to the CRM.
+  const bookingId = String(body?.bookingId ?? body?.id ?? "").trim();
+  if (!bookingId) {
+    return new Response(
+      JSON.stringify({ error: "bookingId is required" }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const { data: booking, error: fetchErr } = await supabase
+    .from("bookings")
+    .select("*")
+    .eq("id", bookingId)
+    .maybeSingle();
+
+  if (fetchErr) {
+    console.error("Booking lookup failed:", fetchErr);
+    return new Response(
+      JSON.stringify({ error: "Booking lookup failed" }),
+      { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+  if (!booking) {
+    return new Response(
+      JSON.stringify({ error: "Booking not found" }),
+      { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  // Build scheduled_at from the stored preferred_date + time_slot.
+  let scheduledAt: string | null = null;
+  try {
+    const time = booking.time_slot ? `${booking.time_slot}:00` : "00:00:00";
+    const d = new Date(`${booking.preferred_date}T${time}`);
+    scheduledAt = Number.isNaN(d.getTime()) ? null : d.toISOString();
+  } catch {
+    scheduledAt = null;
+  }
+
+  // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
-    name: body.name,
-    email: body.email,
-    phone: body.phone ?? null,
-    address: body.address ?? null,
-    scheduled_at: body.scheduled_at,
-    service: body.service ?? null,
-    total_amount: Number.isFinite(+body.total_amount) ? +body.total_amount : 0,
-    frequency: normalizeFrequency(body.frequency),
-    bathrooms: body.bathrooms ?? null,
-    square_footage: body.square_footage ?? null,
-    extras: Array.isArray(body.extras) ? body.extras : [],
-    notes: body.notes ?? null,
+    name: booking.customer_name,
+    email: booking.customer_email,
+    phone: booking.customer_phone ?? null,
+    address: booking.address ?? null,
+    scheduled_at: scheduledAt,
+    service: booking.service_type ?? null,
+    total_amount: Number.isFinite(+booking.total_price) ? +booking.total_price : 0,
+    frequency: normalizeFrequency(booking.frequency),
+    bathrooms: booking.baths ?? null,
+    square_footage: booking.sqft != null ? String(booking.sqft) : null,
+    extras: Array.isArray(booking.add_ons) ? booking.add_ons : [],
+    notes: booking.special_instructions ?? null,
   };
 
   try {
