@@ -371,20 +371,7 @@ const BookingForm = () => {
       // Forward booking to external CRM calendar (non-fatal).
       try {
         await supabase.functions.invoke("forward-booking-to-crm", {
-          body: {
-            name: parsed.data.name,
-            email: parsed.data.email,
-            phone: parsed.data.phone,
-            address: parsed.data.address,
-            scheduled_at: new Date(`${format(preferredDate, "yyyy-MM-dd")}T${preferredTime}:00`).toISOString(),
-            service: serviceLabel,
-            total_amount: isCustomQuote ? 0 : breakdown.total,
-            frequency: freqLabel,
-            bathrooms: parsed.data.baths,
-            square_footage: sqft.toString(),
-            extras: addOnLabels,
-            notes: parsed.data.specialInstructions || null,
-          },
+          body: { bookingId },
         });
       } catch (crmErr) {
         console.error("[BookingForm] forward-booking-to-crm failed:", crmErr);
