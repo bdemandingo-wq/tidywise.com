@@ -73,12 +73,10 @@ serve(async (req) => {
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
       if (userError) throw new Error("Failed to look up user");
 
-      const user = userData.users.find((u) => u.email === email);
+      const user = userData.users.find((u) => u.email?.toLowerCase() === emailNorm);
       if (!user) {
-        // Don't reveal if email exists or not
-        return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        // Don't reveal whether the email exists.
+        return genericSendResponse();
       }
 
       // CRITICAL: the OTP must go to THE USER, not to admin. Previously the
