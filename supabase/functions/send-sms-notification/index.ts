@@ -16,6 +16,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Best-effort client IP from proxy headers.
+function getClientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
 interface SmsNotificationRequest {
   type: "booking" | "cleaner_application" | "contact";
   data: Record<string, unknown>;
@@ -136,6 +143,26 @@ async function sendOne(opts: {
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Per-IP rate limit: this endpoint is reachable from the public booking,
+  // cleaner-application, and contact forms. 15 sends/hour/IP is generous for
+  // real users but throttles abuse of the OpenPhone integration.
+  try {
+    const { data: allowed, error: rlError } = await supabaseAdmin.rpc("check_rate_limit", {
+      _bucket: "send-sms-notification",
+      _identifier: getClientIp(req),
+      _max: 15,
+      _window: "1 hour",
+    });
+    if (!rlError && allowed === false) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+  } catch (rlErr) {
+    console.error("SMS rate-limit check failed (allowing):", rlErr);
   }
 
   try {
