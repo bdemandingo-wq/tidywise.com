@@ -54,6 +54,29 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Per-IP rate limit: 20 messages/hour to prevent AI credit drain.
+  try {
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      const { data: allowed, error: rlError } = await admin.rpc("check_rate_limit", {
+        _bucket: "chat",
+        _identifier: getClientIp(req),
+        _max: 20,
+        _window: "1 hour",
+      });
+      if (!rlError && allowed === false) {
+        return new Response(
+          JSON.stringify({ error: "Too many messages. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+  } catch (rlErr) {
+    console.error("Chat rate-limit check failed (allowing):", rlErr);
+  }
+
   try {
     const rawData = await req.json();
     
