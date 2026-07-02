@@ -11,6 +11,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Best-effort client IP from proxy headers.
+function getClientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
+// Identical response returned regardless of whether the account (or a phone
+// on file) exists, so this endpoint can't be used to enumerate accounts.
+function genericSendResponse() {
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: "If an account with that email exists, a reset code has been sent.",
+    }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+  );
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
