@@ -478,6 +478,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_events: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: string
+          identifier: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: string
+          identifier: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: string
+          identifier?: string
+        }
+        Relationships: []
+      }
       review_submission_log: {
         Row: {
           created_at: string
@@ -780,6 +801,15 @@ export type Database = {
       }
     }
     Functions: {
+      check_rate_limit: {
+        Args: {
+          _bucket: string
+          _identifier: string
+          _max: number
+          _window: string
+        }
+        Returns: boolean
+      }
       get_booking_by_idempotency_key: {
         Args: { _booking_id: string; _idempotency_key: string }
         Returns: {
