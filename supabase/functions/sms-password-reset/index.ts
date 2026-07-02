@@ -43,7 +43,33 @@ serve(async (req) => {
     const { action, email, otp, newPassword } = await req.json();
 
     if (action === "send") {
-      // Find user by email
+      const emailNorm = String(email ?? "").trim().toLowerCase();
+      if (!emailNorm) return genericSendResponse();
+
+      // Strict rate limiting: 3 attempts/hour per IP AND per email. On any
+      // limit hit we return the SAME generic response and send nothing, so
+      // this endpoint can't be abused for SMS pumping or enumeration.
+      const clientIp = getClientIp(req);
+      const [ipRl, emailRl] = await Promise.all([
+        supabase.rpc("check_rate_limit", {
+          _bucket: "sms-password-reset:ip",
+          _identifier: clientIp,
+          _max: 3,
+          _window: "1 hour",
+        }),
+        supabase.rpc("check_rate_limit", {
+          _bucket: "sms-password-reset:email",
+          _identifier: emailNorm,
+          _max: 3,
+          _window: "1 hour",
+        }),
+      ]);
+      if (ipRl.data === false || emailRl.data === false) {
+        console.warn("Password reset rate limit hit", { ip: clientIp });
+        return genericSendResponse();
+      }
+
+      // Find user by email — verify the account exists BEFORE sending anything.
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
       if (userError) throw new Error("Failed to look up user");
 
