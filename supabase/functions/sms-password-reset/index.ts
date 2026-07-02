@@ -96,16 +96,11 @@ serve(async (req) => {
         userPhone = (profile as any)?.phone ?? null;
       }
       if (!userPhone) {
-        return new Response(
-          JSON.stringify({
-            error:
-              "No phone number on file for that account. Please contact support to reset your password.",
-          }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
+        // No phone on file: return the same generic response instead of a
+        // distinct error, so callers can't tell this account apart from a
+        // non-existent one.
+        console.warn("Password reset requested for account with no phone on file", user.id);
+        return genericSendResponse();
       }
 
       // Normalize to E.164 — OpenPhone rejects ambiguous formats.
