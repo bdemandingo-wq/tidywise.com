@@ -247,6 +247,11 @@ Deno.serve(async (req) => {
   // naive string parser if geocoding is unavailable.
   const loc = (await geocodeAddress(booking.address)) ?? parseAddress(booking.address);
 
+  // Derive has_pets from the free-text pet_info column.
+  const petInfo = String(booking.pet_info ?? "").trim().toLowerCase();
+  const hasPets =
+    !!petInfo && !["no", "none", "no pets", "n/a", "na"].includes(petInfo);
+
   // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
     // Hardcoded TIDYWISE org ID so the CRM attributes bookings to this site.
@@ -257,6 +262,7 @@ Deno.serve(async (req) => {
     // Send both the full string and the parsed components so the CRM's
     // separate city/state/zip columns populate in the scheduler.
     address: loc.street ?? booking.address ?? null,
+    apt_suite: null,
     city: loc.city,
     state: loc.state,
     zip_code: loc.zip,
@@ -264,11 +270,17 @@ Deno.serve(async (req) => {
     service: normalizeService(booking.service_type),
     total_amount: Number.isFinite(+booking.total_price) ? +booking.total_price : 0,
     frequency: normalizeFrequency(booking.frequency),
+    bedrooms: booking.beds ?? null,
     bathrooms: booking.baths ?? null,
     square_footage: booking.sqft != null ? String(booking.sqft) : null,
     extras: Array.isArray(booking.add_ons) ? booking.add_ons : [],
     notes: booking.special_instructions ?? null,
+    duration: null,
+    has_pets: hasPets,
   };
+
+  // Log the exact payload leaving the sender site (visible in function logs).
+  console.log("Sending booking to CRM:", payload);
 
   try {
     const res = await fetch(CRM_INGEST_URL, {
@@ -286,6 +298,8 @@ Deno.serve(async (req) => {
     } catch {
       data = text;
     }
+    // Log the CRM's response so we can verify what it received/returned.
+    console.log("CRM response:", data);
     return new Response(JSON.stringify({ ok: res.ok, status: res.status, crm: data }), {
       status: res.ok ? 200 : 502,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
