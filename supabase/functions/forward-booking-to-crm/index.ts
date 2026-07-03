@@ -252,11 +252,19 @@ Deno.serve(async (req) => {
   const hasPets =
     !!petInfo && !["no", "none", "no pets", "n/a", "na"].includes(petInfo);
 
+  // Split the stored full name into first/last for CRMs that expect them.
+  const fullName = String(booking.customer_name ?? "").trim();
+  const nameParts = fullName.split(/\s+/).filter(Boolean);
+  const firstName = nameParts[0] ?? null;
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : null;
+
   // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
     // Hardcoded TIDYWISE org ID so the CRM attributes bookings to this site.
     organization_id: "e95b92d0-7099-408e-a773-e4407b34f8b4",
     name: booking.customer_name,
+    first_name: firstName,
+    last_name: lastName,
     email: booking.customer_email,
     phone: booking.customer_phone ?? null,
     // Send both the full string and the parsed components so the CRM's
