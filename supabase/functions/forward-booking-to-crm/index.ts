@@ -261,7 +261,7 @@ Deno.serve(async (req) => {
     state: loc.state,
     zip_code: loc.zip,
     scheduled_at: scheduledAt,
-    service: booking.service_type ?? null,
+    service: normalizeService(booking.service_type),
     total_amount: Number.isFinite(+booking.total_price) ? +booking.total_price : 0,
     frequency: normalizeFrequency(booking.frequency),
     bathrooms: booking.baths ?? null,
