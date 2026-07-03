@@ -221,7 +221,9 @@ Deno.serve(async (req) => {
   }
 
   // Split the single stored address into the discrete fields the CRM reads.
-  const loc = parseAddress(booking.address);
+  // Prefer Google geocoding (handles comma-less free text); fall back to the
+  // naive string parser if geocoding is unavailable.
+  const loc = (await geocodeAddress(booking.address)) ?? parseAddress(booking.address);
 
   // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
