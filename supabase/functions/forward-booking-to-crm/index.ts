@@ -65,6 +65,64 @@ function parseAddress(raw: unknown): { street: string | null; city: string | nul
   return { street, city, state, zip };
 }
 
+// Google Maps geocoding via the Lovable connector gateway. Turns the single
+// stored free-text address into structured street/city/state/zip so the CRM's
+// separate columns populate reliably — even for addresses typed without commas
+// (e.g. "65 sw 12th ave deerfield beach"). Falls back to the naive string
+// parser below if geocoding is unavailable or returns nothing.
+const MAPS_GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+
+async function geocodeAddress(
+  raw: unknown,
+): Promise<{ street: string | null; city: string | null; state: string | null; zip: string | null } | null> {
+  const full = String(raw ?? "").trim();
+  if (!full) return null;
+
+  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+  const mapsKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+  if (!lovableKey || !mapsKey) return null;
+
+  try {
+    const res = await fetch(
+      `${MAPS_GATEWAY_URL}/maps/api/geocode/json?address=${encodeURIComponent(full)}&region=us`,
+      {
+        headers: {
+          Authorization: `Bearer ${lovableKey}`,
+          "X-Connection-Api-Key": mapsKey,
+        },
+      },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const result = data?.results?.[0];
+    if (!result) return null;
+
+    const comps: Array<{ long_name: string; short_name: string; types: string[] }> =
+      result.address_components ?? [];
+    const get = (type: string, short = false) => {
+      const c = comps.find((x) => x.types.includes(type));
+      return c ? (short ? c.short_name : c.long_name) : null;
+    };
+
+    const streetNumber = get("street_number");
+    const route = get("route");
+    const street = [streetNumber, route].filter(Boolean).join(" ") || null;
+    const city =
+      get("locality") ||
+      get("postal_town") ||
+      get("sublocality") ||
+      get("administrative_area_level_3") ||
+      null;
+    const state = get("administrative_area_level_1", true);
+    const zip = get("postal_code");
+
+    if (!city && !state && !zip) return null;
+    return { street, city, state, zip };
+  } catch (_e) {
+    return null;
+  }
+}
+
 function getClientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
