@@ -25,6 +25,46 @@ function normalizeFrequency(input: unknown): string {
   return "one_time";
 }
 
+// Best-effort parse of a single free-text US address string into
+// { street, city, state, zip }. The CRM's ingest endpoint reads city / state /
+// zip_code as SEPARATE fields — if we only send the combined `address` string,
+// those columns land blank in the scheduler. Google-autocompleted addresses
+// look like "65 SW 12th Ave, Deerfield Beach, FL 33441, USA".
+function parseAddress(raw: unknown): { street: string | null; city: string | null; state: string | null; zip: string | null } {
+  const full = String(raw ?? "").trim();
+  if (!full) return { street: null, city: null, state: null, zip: null };
+
+  // Drop a trailing country token like "USA" / "United States".
+  const parts = full
+    .split(",")
+    .map((p) => p.trim())
+    .filter((p) => p && !/^(usa|united states)$/i.test(p));
+
+  let street: string | null = null;
+  let city: string | null = null;
+  let state: string | null = null;
+  let zip: string | null = null;
+
+  // Pull a "FL 33441" or "FL" or "33441" out of the last segment.
+  const last = parts[parts.length - 1] ?? "";
+  const stateZip = last.match(/^([A-Za-z]{2})?\s*(\d{5}(?:-\d{4})?)?$/);
+  const hasStateZip = !!last && !!stateZip && (!!stateZip[1] || !!stateZip[2]);
+
+  if (parts.length >= 3 && hasStateZip) {
+    state = stateZip![1]?.toUpperCase() ?? null;
+    zip = stateZip![2] ?? null;
+    city = parts[parts.length - 2] ?? null;
+    street = parts.slice(0, parts.length - 2).join(", ") || null;
+  } else if (parts.length === 2) {
+    street = parts[0] ?? null;
+    city = parts[1] ?? null;
+  } else {
+    street = full || null;
+  }
+
+  return { street, city, state, zip };
+}
+
 function getClientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
