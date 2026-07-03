@@ -124,6 +124,8 @@ Deno.serve(async (req) => {
 
   // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
+    // Hardcoded TIDYWISE org ID so the CRM attributes bookings to this site.
+    organization_id: "e95b92d0-7099-408e-a773-e4407b34f8b4",
     name: booking.customer_name,
     email: booking.customer_email,
     phone: booking.customer_phone ?? null,
