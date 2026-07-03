@@ -162,6 +162,9 @@ Deno.serve(async (req) => {
     scheduledAt = null;
   }
 
+  // Split the single stored address into the discrete fields the CRM reads.
+  const loc = parseAddress(booking.address);
+
   // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
     // Hardcoded TIDYWISE org ID so the CRM attributes bookings to this site.
@@ -169,7 +172,12 @@ Deno.serve(async (req) => {
     name: booking.customer_name,
     email: booking.customer_email,
     phone: booking.customer_phone ?? null,
-    address: booking.address ?? null,
+    // Send both the full string and the parsed components so the CRM's
+    // separate city/state/zip columns populate in the scheduler.
+    address: loc.street ?? booking.address ?? null,
+    city: loc.city,
+    state: loc.state,
+    zip_code: loc.zip,
     scheduled_at: scheduledAt,
     service: booking.service_type ?? null,
     total_amount: Number.isFinite(+booking.total_price) ? +booking.total_price : 0,
