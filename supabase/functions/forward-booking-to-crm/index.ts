@@ -25,6 +25,28 @@ function normalizeFrequency(input: unknown): string {
   return "one_time";
 }
 
+// Map any TidyWise service label/variant -> the canonical service name the CRM
+// expects. The CRM matches `service` against its own services list, so legacy
+// or reworded labels (e.g. "Standard Clean", "Deep Clean (First Cleaning)",
+// "Move In/Move Out Clean") must be normalized to the exact canonical names.
+// Canonical set: Standard Cleaning, Deep Cleaning, Move In/Out,
+// Post-Construction, Carpet Cleaning, Upholstery Cleaning.
+function normalizeService(input: unknown): string | null {
+  const raw = String(input ?? "").trim();
+  if (!raw) return null;
+  const v = raw.toLowerCase();
+
+  if (v.includes("post") && v.includes("construction")) return "Post-Construction";
+  if (v.includes("move")) return "Move In/Out";
+  if (v.includes("carpet")) return "Carpet Cleaning";
+  if (v.includes("upholstery")) return "Upholstery Cleaning";
+  if (v.includes("deep")) return "Deep Cleaning";
+  if (v.includes("standard")) return "Standard Cleaning";
+
+  // Unknown label: forward as-is so the CRM can still attempt a match/log it.
+  return raw;
+}
+
 // Best-effort parse of a single free-text US address string into
 // { street, city, state, zip }. The CRM's ingest endpoint reads city / state /
 // zip_code as SEPARATE fields — if we only send the combined `address` string,
