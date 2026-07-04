@@ -94,12 +94,11 @@ serve(async (req) => {
         });
       }
 
-      // Check OTP
+      // Fetch most recent active OTP for this user (regardless of match)
       const { data: otpData, error: otpError } = await supabase
         .from("password_reset_otps")
-        .select("*")
+        .select("id, otp_code, failed_attempts")
         .eq("user_id", user.id)
-        .eq("otp_code", otp)
         .eq("used", false)
         .gte("expires_at", new Date().toISOString())
         .order("created_at", { ascending: false })
@@ -108,6 +107,32 @@ serve(async (req) => {
 
       if (otpError || !otpData) {
         return new Response(JSON.stringify({ error: "Invalid or expired code" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Lock out this code after too many failed guesses
+      if (otpData.failed_attempts >= 5) {
+        await supabase
+          .from("password_reset_otps")
+          .update({ used: true })
+          .eq("id", otpData.id);
+
+        return new Response(
+          JSON.stringify({ error: "Too many attempts. Please request a new code." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Check submitted code against the active OTP
+      if (otpData.otp_code !== otp) {
+        await supabase
+          .from("password_reset_otps")
+          .update({ failed_attempts: otpData.failed_attempts + 1 })
+          .eq("id", otpData.id);
+
+        return new Response(JSON.stringify({ error: "Invalid code" }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
