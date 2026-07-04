@@ -30,7 +30,7 @@ const HouseCleaningDoral = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Doral FL | From $108 | TIDYWISE"
-        pageDescription="House cleaning in Doral, FL from $108. Bilingual Spanish-speaking team. Licensed & insured. Downtown Doral, Landmark at Doral & all communities. Same-day available."
+        pageDescription="Bilingual house cleaning in Doral, FL from $108. Hablamos español. Licensed & insured. Downtown Doral, Landmark & all communities. Book now."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-doral"
         pageType="blog"
         blogMeta={{ datePublished: "2026-04-13", dateModified: "2026-04-13", category: "Local Guides" }}
@@ -142,7 +142,7 @@ const HouseCleaningDoral = () => {
 
             <div className="mt-12 p-6 bg-primary text-primary-foreground rounded-xl text-center">
               <h2 className="font-display text-2xl font-bold mb-3">Book Doral Cleaning Today</h2>
-              <p className="text-primary-foreground/80 mb-5">Instant quote. Same-day availability. Hablamos español.</p>
+              <p className="text-primary-foreground/90 mb-5">Instant quote. Same-day availability. Hablamos español.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="secondary" asChild><Link to="/#booking">Get Instant Quote</Link></Button>
                 <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>

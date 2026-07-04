@@ -30,7 +30,7 @@ const HouseCleaningDelrayBeach = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Delray Beach FL | From $108 | TIDYWISE"
-        pageDescription="House cleaning in Delray Beach, FL from $108. Licensed & insured. Mizner Country Club, Lake Ida, downtown Delray & all neighborhoods. Seasonal service available."
+        pageDescription="Top-rated house cleaning in Delray Beach, FL from $108. Licensed & insured. Mizner Country Club, Lake Ida & all areas. Seasonal cleaning available."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-delray-beach"
         pageType="blog"
         blogMeta={{ datePublished: "2026-04-13", dateModified: "2026-04-13", category: "Local Guides" }}
@@ -150,7 +150,7 @@ const HouseCleaningDelrayBeach = () => {
 
             <div className="mt-12 p-6 bg-primary text-primary-foreground rounded-xl text-center">
               <h2 className="font-display text-2xl font-bold mb-3">Book Delray Beach Cleaning Today</h2>
-              <p className="text-primary-foreground/80 mb-5">Instant quote. Same-day availability. Satisfaction guaranteed.</p>
+              <p className="text-primary-foreground/90 mb-5">Instant quote. Same-day availability. Satisfaction guaranteed.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="secondary" asChild><Link to="/#booking">Get Instant Quote</Link></Button>
                 <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>

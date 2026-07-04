@@ -9,18 +9,43 @@ const trustPills = [
   { icon: Lock, label: "Satisfaction Guaranteed" },
 ];
 
+// Above-the-fold hero image. Loaded as an <img> with fetchpriority
+// "high" so the browser treats it as the LCP element and prioritizes
+// it over later resources (the prior CSS-background version got
+// queued behind every other request). srcset adds a responsive
+// version for narrower viewports, keeping bandwidth down on mobile.
+//
+// TODO: Replace with a locally-served AVIF/WebP. Hotlinking Unsplash
+// hurts Core Web Vitals (CDN latency + third-party origin) and exposes
+// us to their TOS / availability. Download the photo and place it in
+// /src/assets, then update the imports below.
+const HERO_IMAGE = "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=75";
+const HERO_IMAGE_SMALL = "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=960&q=70";
+
 const Hero = () => {
   return (
     <section
       id="home"
       aria-labelledby="hero-heading"
-      className="relative min-h-screen flex items-center pt-16"
-      style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=75')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
+      className="relative min-h-screen flex items-center pt-16 overflow-hidden"
     >
+      {/* Hero image — replaces the CSS background-image so we can use
+          fetchpriority + explicit dimensions. The <img> covers the
+          section absolutely; aria-hidden because the visible H1 is
+          the real heading. */}
+      <img
+        src={HERO_IMAGE}
+        srcSet={`${HERO_IMAGE_SMALL} 960w, ${HERO_IMAGE} 1920w`}
+        sizes="100vw"
+        alt=""
+        aria-hidden="true"
+        width={1920}
+        height={1080}
+        // @ts-expect-error — fetchPriority is a 2024 attribute not yet in React's types.
+        fetchpriority="high"
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
@@ -40,7 +65,7 @@ const Hero = () => {
               Your Home Deserves Better Than Average.
             </h1>
 
-            <p className="text-lg md:text-xl text-white/80 max-w-xl leading-relaxed">
+            <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed">
               TIDYWISE delivers professional home cleaning across Fort Lauderdale, Boca Raton, West Palm Beach, Miami & 40+ South Florida cities — with transparent pricing, vetted cleaners, and a satisfaction guarantee.
             </p>
 
@@ -113,7 +138,7 @@ const Hero = () => {
         style={{ transform: "translateX(-50%)" }}
         aria-hidden="true"
       >
-        <a href="#social-proof" className="flex flex-col items-center gap-2 text-white/60 hover:text-white transition-colors">
+        <a href="#social-proof" className="flex flex-col items-center gap-2 text-white/80 hover:text-white transition-colors">
           <span className="text-sm font-medium">See pricing & services</span>
           <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2 animate-bounce">
             <div className="w-1 h-2 bg-white/50 rounded-full" />

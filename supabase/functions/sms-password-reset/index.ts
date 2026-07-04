@@ -11,6 +11,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Best-effort client IP from proxy headers.
+function getClientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
+// Identical response returned regardless of whether the account (or a phone
+// on file) exists, so this endpoint can't be used to enumerate accounts.
+function genericSendResponse() {
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: "If an account with that email exists, a reset code has been sent.",
+    }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+  );
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -24,17 +43,70 @@ serve(async (req) => {
     const { action, email, otp, newPassword } = await req.json();
 
     if (action === "send") {
-      // Find user by email
+      const emailNorm = String(email ?? "").trim().toLowerCase();
+      if (!emailNorm) return genericSendResponse();
+
+      // Strict rate limiting: 3 attempts/hour per IP AND per email. On any
+      // limit hit we return the SAME generic response and send nothing, so
+      // this endpoint can't be abused for SMS pumping or enumeration.
+      const clientIp = getClientIp(req);
+      const [ipRl, emailRl] = await Promise.all([
+        supabase.rpc("check_rate_limit", {
+          _bucket: "sms-password-reset:ip",
+          _identifier: clientIp,
+          _max: 3,
+          _window: "1 hour",
+        }),
+        supabase.rpc("check_rate_limit", {
+          _bucket: "sms-password-reset:email",
+          _identifier: emailNorm,
+          _max: 3,
+          _window: "1 hour",
+        }),
+      ]);
+      if (ipRl.data === false || emailRl.data === false) {
+        console.warn("Password reset rate limit hit", { ip: clientIp });
+        return genericSendResponse();
+      }
+
+      // Find user by email — verify the account exists BEFORE sending anything.
       const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
       if (userError) throw new Error("Failed to look up user");
 
-      const user = userData.users.find((u) => u.email === email);
+      const user = userData.users.find((u) => u.email?.toLowerCase() === emailNorm);
       if (!user) {
-        // Don't reveal if email exists or not
-        return new Response(JSON.stringify({ success: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        // Don't reveal whether the email exists.
+        return genericSendResponse();
       }
+
+      // CRITICAL: the OTP must go to THE USER, not to admin. Previously the
+      // SMS recipient was hardcoded to ADMIN_PHONE_NUMBER which meant every
+      // password reset SMS landed on the same admin device — the requesting
+      // user never received their own code. Resolve the user's phone via
+      // Supabase auth.users.phone first (set when account was created with
+      // phone OTP) and fall back to the profiles/customers table for users
+      // who signed up via email only.
+      let userPhone = (user as any).phone as string | null | undefined;
+      if (!userPhone) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("phone")
+          .eq("id", user.id)
+          .maybeSingle();
+        userPhone = (profile as any)?.phone ?? null;
+      }
+      if (!userPhone) {
+        // No phone on file: return the same generic response instead of a
+        // distinct error, so callers can't tell this account apart from a
+        // non-existent one.
+        console.warn("Password reset requested for account with no phone on file", user.id);
+        return genericSendResponse();
+      }
+
+      // Normalize to E.164 — OpenPhone rejects ambiguous formats.
+      const normalizedPhone = userPhone.startsWith("+")
+        ? userPhone.replace(/[^\d+]/g, "")
+        : `+1${userPhone.replace(/\D/g, "")}`;
 
       // Generate 6-digit OTP
       const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -66,7 +138,7 @@ serve(async (req) => {
         body: JSON.stringify({
           content: `Your TIDYWISE password reset code is: ${otpCode}\n\nThis code expires in 10 minutes.`,
           from: OPENPHONE_PHONE_NUMBER_ID,
-          to: [ADMIN_PHONE_NUMBER],
+          to: [normalizedPhone],
         }),
       });
 
@@ -76,11 +148,9 @@ serve(async (req) => {
         throw new Error("Failed to send SMS");
       }
 
-      console.log("OTP sent via SMS to admin phone");
+      console.log(`OTP sent via SMS to user phone (user.id=${user.id})`);
 
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return genericSendResponse();
     }
 
     if (action === "verify") {

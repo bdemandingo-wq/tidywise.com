@@ -75,12 +75,40 @@ const workAreaLabels: Record<string, string> = {
   "miami-dade": "Miami Dade County",
 };
 
+function getClientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
 const handler = async (req: Request): Promise<Response> => {
   console.log("Received cleaner application notification request");
 
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: getCorsHeaders(req) });
+  }
+
+  // Per-IP rate limit: reachable from the public cleaner-application form.
+  // 5 submissions/hour/IP throttles email abuse without blocking real applicants.
+  if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      const { data: allowed, error: rlError } = await admin.rpc("check_rate_limit", {
+        _bucket: "send-cleaner-application-notification",
+        _identifier: getClientIp(req),
+        _max: 5,
+        _window: "1 hour",
+      });
+      if (!rlError && allowed === false) {
+        return new Response(
+          JSON.stringify({ error: "Too many requests. Please try again later." }),
+          { status: 429, headers: { "Content-Type": "application/json", ...getCorsHeaders(req) } }
+        );
+      }
+    } catch (rlErr) {
+      console.error("Application rate-limit check failed (allowing):", rlErr);
+    }
   }
 
   try {

@@ -30,7 +30,7 @@ const HouseCleaningWellington = () => {
     <>
       <SEOSchema
         pageTitle="House Cleaning Wellington FL | From $108 | TIDYWISE"
-        pageDescription="House cleaning in Wellington, FL from $108. Licensed & insured. Palm Beach Polo, Versailles, Olympia, equestrian properties & all communities. Polo season scheduling available."
+        pageDescription="House cleaning in Wellington, FL from $108. Licensed & insured. Equestrian estates, Palm Beach Polo & all communities. Polo season scheduling."
         canonicalUrl="https://www.tidywisecleaning.com/blog/house-cleaning-wellington"
         pageType="blog"
         blogMeta={{ datePublished: "2026-04-13", dateModified: "2026-04-13", category: "Local Guides" }}
@@ -144,7 +144,7 @@ const HouseCleaningWellington = () => {
 
             <div className="mt-12 p-6 bg-primary text-primary-foreground rounded-xl text-center">
               <h2 className="font-display text-2xl font-bold mb-3">Book Wellington Cleaning Today</h2>
-              <p className="text-primary-foreground/80 mb-5">Instant quote. Seasonal scheduling. Satisfaction guaranteed.</p>
+              <p className="text-primary-foreground/90 mb-5">Instant quote. Seasonal scheduling. Satisfaction guaranteed.</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="secondary" asChild><Link to="/#booking">Get Instant Quote</Link></Button>
                 <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>

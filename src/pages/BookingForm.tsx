@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Sentry } from "@/lib/sentry";
 import SEOHead from "@/components/seo/SEOHead";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
@@ -48,6 +49,20 @@ interface IncomingState {
   addOnIds?: string[];
   addOnQuantities?: AddOnQuantities;
 }
+
+// Selectable arrival windows. Value is 24h "HH:mm"; label is customer-friendly.
+const TIME_SLOTS: { value: string; label: string }[] = [
+  { value: "08:00", label: "8:00 AM" },
+  { value: "09:00", label: "9:00 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "12:00", label: "12:00 PM" },
+  { value: "13:00", label: "1:00 PM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "17:00", label: "5:00 PM" },
+];
 
 // Zod schema mirroring DB constraints
 const bookingSchema = z.object({
@@ -101,19 +116,41 @@ const BookingForm = () => {
     smsConsent: false,
   });
   const [preferredDate, setPreferredDate] = useState<Date | undefined>();
+  const [preferredTime, setPreferredTime] = useState<string>("");
   const [errors, setErrors] = useState<BookingErrors>({});
   const [dateError, setDateError] = useState<string | null>(null);
+  const [timeError, setTimeError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Idempotency key generated once per mount; ensures retries don't double-book.
   const idempotencyKey = useRef<string>(crypto.randomUUID());
 
-  // Load pricing tiers + blocked dates on mount
+  // Load pricing tiers + blocked dates on mount. Both fetches need surfaced
+  // failures: tiers→[] silently shows $0 pricing, blocked_dates→empty Set
+  // means users can book on dates we've explicitly blocked off.
   useEffect(() => {
-    loadPricingTiers().then(setTiers);
+    loadPricingTiers()
+      .then(setTiers)
+      .catch((err) => {
+        console.error("[BookingForm] Failed to load pricing tiers:", err);
+        toast({
+          title: "Couldn't load pricing",
+          description: "Please refresh the page. If this keeps happening, call us at (561) 571-8725.",
+          variant: "destructive",
+        });
+      });
     supabase
       .from("booking_blocked_dates")
       .select("blocked_date")
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("[BookingForm] Failed to load blocked dates:", error);
+          toast({
+            title: "Couldn't load schedule",
+            description: "Please refresh — the calendar may show unavailable dates as available.",
+            variant: "destructive",
+          });
+          return;
+        }
         if (data) setBlockedDates(new Set(data.map((d) => d.blocked_date)));
       });
   }, []);
@@ -126,13 +163,27 @@ const BookingForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Date constraints — Eastern time aware (server enforces too)
+  // Date constraints — Eastern time aware (server enforces too).
+  // Anchor "today" to Eastern time directly so a user booking from another
+  // timezone (PT/MT/HI customer) doesn't see a window shifted by hours
+  // around midnight or DST transitions. The server validates the final
+  // value via a trigger so this is purely client UX.
   const { minDate, maxDate } = useMemo(() => {
-    const now = new Date();
-    const min = new Date(now);
+    // Build today's Y/M/D in America/New_York then construct local Dates
+    // with those components — the calendar component cares about Date
+    // calendar-day comparisons, not the absolute instant.
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
+    const get = (t: string) => Number(parts.find((p) => p.type === t)?.value ?? "0");
+    const todayET = new Date(get("year"), get("month") - 1, get("day"));
+    const min = new Date(todayET);
     min.setDate(min.getDate() + 2);
     min.setHours(0, 0, 0, 0);
-    const max = new Date(now);
+    const max = new Date(todayET);
     max.setDate(max.getDate() + 90);
     max.setHours(23, 59, 59, 999);
     return { minDate: min, maxDate: max };
@@ -216,6 +267,13 @@ const BookingForm = () => {
     }
     setDateError(null);
 
+    // Validate time
+    if (!preferredTime) {
+      setTimeError("Please select a preferred time");
+      return;
+    }
+    setTimeError(null);
+
     // Validate form
     const parsed = bookingSchema.safeParse(formData);
     if (!parsed.success) {
@@ -272,6 +330,8 @@ const BookingForm = () => {
           ? parsed.data.petInfo || "Yes"
           : null,
         status: "pending" as const,
+        sms_consent: parsed.data.smsConsent === true,
+        time_slot: preferredTime,
         idempotency_key: idempotencyKey.current,
       };
 
@@ -286,6 +346,7 @@ const BookingForm = () => {
           return;
         }
         console.error("Database error:", dbError);
+        Sentry.captureException(dbError, { tags: { area: "booking-submit" } });
         toast({
           title: "Couldn't save your booking",
           description: dbError.message.includes("Bookings must be") || dbError.message.includes("unavailable")
@@ -307,12 +368,26 @@ const BookingForm = () => {
         });
       }
 
-      // SMS notification (admin + personal + customer if consent)
+      // Forward booking to external CRM calendar (non-fatal).
       try {
-        await supabase.functions.invoke("send-sms-notification", {
+        await supabase.functions.invoke("forward-booking-to-crm", {
+          body: { bookingId },
+        });
+      } catch (crmErr) {
+        console.error("[BookingForm] forward-booking-to-crm failed:", crmErr);
+      }
+
+
+
+      // SMS notification (admin + personal + customer if consent).
+      // Non-fatal to the booking flow but admin needs visibility — previously
+      // failures only hit console.error, so a dead OpenPhone integration
+      // would silently stop sending us booking alerts and we wouldn't notice
+      // until a customer complained nobody contacted them.
+      try {
+        const { error: smsErr } = await supabase.functions.invoke("send-sms-notification", {
           body: {
             type: "booking",
-            // Top-level fields drive routing & consent gating in the edge function
             bookingId,
             customerPhone: parsed.data.phone,
             smsConsent: parsed.data.smsConsent === true,
@@ -328,13 +403,22 @@ const BookingForm = () => {
               baths: parsed.data.baths,
               sqft,
               totalPrice: isCustomQuote ? "Custom Quote" : breakdown.total.toString(),
-              preferredDate: format(preferredDate, "EEEE, MMMM d, yyyy"),
+              preferredDate: `${format(preferredDate, "EEEE, MMMM d, yyyy")} at ${TIME_SLOTS.find((s) => s.value === preferredTime)?.label ?? preferredTime}`,
               smsConsent: parsed.data.smsConsent === true,
             },
           },
         });
+        if (smsErr) {
+          console.error("[BookingForm] send-sms-notification returned error:", smsErr);
+          Sentry.captureException(smsErr instanceof Error ? smsErr : new Error(String(smsErr)), {
+            tags: { area: "booking-sms-notification" },
+          });
+        }
       } catch (smsError) {
-        console.error("SMS notification error:", smsError);
+        console.error("[BookingForm] send-sms-notification threw:", smsError);
+        Sentry.captureException(smsError instanceof Error ? smsError : new Error(String(smsError)), {
+          tags: { area: "booking-sms-notification" },
+        });
         // Non-fatal — booking still succeeded
       }
 
@@ -342,6 +426,9 @@ const BookingForm = () => {
       navigate(`/confirmation/${bookingId}?k=${encodeURIComponent(idempotencyKey.current)}`, { replace: true });
     } catch (error) {
       console.error("Booking error:", error);
+      Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
+        tags: { area: "booking-submit" },
+      });
       toast({
         title: "Something went wrong",
         description: "Please try again or call us at (561) 571-8725.",
@@ -396,6 +483,19 @@ const BookingForm = () => {
                 <h2 className="font-display text-2xl font-bold text-foreground mb-2">Almost Done!</h2>
                 <p className="text-muted-foreground">Lock in your price — takes under 2 minutes.</p>
               </div>
+
+              {/* If tiers failed to load, never let the user submit a $0
+                  booking. The pricing-load toast already warned them; this
+                  banner reinforces and the disabled submit lower down does
+                  the actual blocking. */}
+              {tiers.length === 0 && !isCustomService && (
+                <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm">
+                  <p className="font-semibold text-destructive mb-1">Pricing unavailable</p>
+                  <p className="text-foreground/80">
+                    Please refresh the page. If this keeps happening, call us at (561) 571-8725 and we'll book you over the phone.
+                  </p>
+                </div>
+              )}
 
               {/* Live Booking Summary */}
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6 space-y-3">
@@ -647,6 +747,31 @@ const BookingForm = () => {
                     </Popover>
                     {dateError && <p id="bf-date-error" className="text-sm text-destructive">{dateError}</p>}
                     <p className="text-xs text-muted-foreground">Bookings open 2–90 days out. Some dates may be unavailable.</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bf-time">Preferred Arrival Time *</Label>
+                    <Select
+                      value={preferredTime}
+                      onValueChange={(v) => { setPreferredTime(v); setTimeError(null); }}
+                    >
+                      <SelectTrigger
+                        id="bf-time"
+                        className="w-full"
+                        aria-invalid={!!timeError}
+                        aria-describedby={timeError ? "bf-time-error" : undefined}
+                      >
+                        <Clock className="mr-2 h-4 w-4 text-primary" />
+                        <SelectValue placeholder="Select a time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_SLOTS.map((slot) => (
+                          <SelectItem key={slot.value} value={slot.value}>{slot.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {timeError && <p id="bf-time-error" className="text-sm text-destructive">{timeError}</p>}
+                    <p className="text-xs text-muted-foreground">We'll arrive within a short window of your selected time.</p>
                   </div>
                 </fieldset>
 

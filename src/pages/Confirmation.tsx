@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { Sentry } from "@/lib/sentry";
 import SEOHead from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -41,13 +42,37 @@ const Confirmation = () => {
         .eq("id", bookingId)
         .maybeSingle();
 
-      // Fallback for unauthenticated customers: lookup via idempotency key RPC
+      // Fallback for unauthenticated customers: lookup via idempotency key RPC.
+      // Retry up to 3 times with backoff because the booking row might still be
+      // committing when the redirect lands (BookingForm uses a client-side UUID
+      // and navigates immediately on insert success — replication lag or a
+      // transient network blip on the RPC would otherwise render "Booking not
+      // found" for a real, valid booking).
       if ((!data || error) && key) {
-        const { data: rpcData } = await supabase.rpc("get_booking_by_idempotency_key", {
-          _booking_id: bookingId,
-          _idempotency_key: key,
-        });
-        if (rpcData && rpcData.length > 0) data = rpcData[0] as Booking;
+        const attempts = [0, 500, 1500]; // ms backoff before each try
+        for (const delay of attempts) {
+          if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+          const { data: rpcData, error: rpcErr } = await supabase.rpc(
+            "get_booking_by_idempotency_key",
+            { _booking_id: bookingId, _idempotency_key: key }
+          );
+          if (rpcErr) {
+            console.warn("[Confirmation] idempotency RPC retry:", rpcErr);
+            // Only flag to Sentry on the LAST retry — earlier ones are
+            // expected race-window misses that resolve naturally.
+            if (delay === attempts[attempts.length - 1]) {
+              Sentry.captureException(
+                rpcErr instanceof Error ? rpcErr : new Error(String(rpcErr)),
+                { tags: { area: "confirmation-idempotency-retry-exhausted" } },
+              );
+            }
+            continue;
+          }
+          if (rpcData && rpcData.length > 0) {
+            data = rpcData[0] as Booking;
+            break;
+          }
+        }
       }
       setBooking((data as Booking) ?? null);
       setLoading(false);
@@ -82,7 +107,10 @@ const Confirmation = () => {
   }
 
   const addOns = booking.add_ons ?? [];
-  const hasPets = booking.pet_info && booking.pet_info !== "null";
+  // Dropped the `!== "null"` string-literal guard — pet_info is
+  // either a real string or SQL null. The defensive check was masking
+  // any real future bug that produced the literal string "null".
+  const hasPets = !!booking.pet_info;
 
   return (
     <>
@@ -100,7 +128,7 @@ const Confirmation = () => {
                 <CheckCircle className="w-12 h-12 text-green-600" aria-hidden="true" />
               </div>
               <h1 className="text-3xl font-bold text-foreground mb-2">Booking Confirmed!</h1>
-              <p className="text-muted-foreground">Thanks {booking.customer_name.split(" ")[0]} — we'll text you shortly.</p>
+              <p className="text-muted-foreground">Thanks {booking.customer_name?.trim()?.split(/\s+/)[0] || "for booking"} — we'll text you shortly.</p>
             </div>
 
             <div className="bg-muted rounded-lg p-6 mb-6 space-y-3">
@@ -126,7 +154,11 @@ const Confirmation = () => {
                 <div className="flex justify-between">
                   <span className="font-semibold text-foreground">Total Price</span>
                   <span className="text-2xl font-bold text-primary">
-                    {booking.total_price > 0 ? `$${Number(booking.total_price).toFixed(2)}` : "Custom Quote"}
+                    {(() => {
+                      const n = Number(booking.total_price);
+                      if (!Number.isFinite(n) || n <= 0) return "Custom Quote";
+                      return `$${n.toFixed(2)}`;
+                    })()}
                   </span>
                 </div>
               </div>

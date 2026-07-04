@@ -16,6 +16,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Best-effort client IP from proxy headers.
+function getClientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}
+
 interface SmsNotificationRequest {
   type: "booking" | "cleaner_application" | "contact";
   data: Record<string, unknown>;
@@ -88,9 +95,22 @@ async function sendOne(opts: {
         to: [to],
       }),
     });
-    const body = await res.json().catch(() => ({}));
+    // Capture raw text first so we can log it if JSON parsing fails — when
+    // OpenPhone returns an HTML error page the silent catch(() => ({}))
+    // would otherwise hide the root cause of integration failures.
+    const rawBody = await res.text().catch(() => "");
+    let body: any = {};
+    try {
+      body = rawBody ? JSON.parse(rawBody) : {};
+    } catch (parseErr) {
+      console.warn(
+        `SMS response not JSON (${recipientType} → ${to}):`,
+        rawBody.slice(0, 500),
+        parseErr
+      );
+    }
     if (!res.ok) {
-      errorMessage = `HTTP ${res.status}: ${JSON.stringify(body).slice(0, 500)}`;
+      errorMessage = `HTTP ${res.status}: ${(rawBody || JSON.stringify(body)).slice(0, 500)}`;
       console.error(`SMS error (${recipientType} → ${to}):`, errorMessage);
     } else {
       success = true;
@@ -125,22 +145,94 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Per-IP rate limit: this endpoint is reachable from the public booking,
+  // cleaner-application, and contact forms. 15 sends/hour/IP is generous for
+  // real users but throttles abuse of the OpenPhone integration.
+  try {
+    const { data: allowed, error: rlError } = await supabaseAdmin.rpc("check_rate_limit", {
+      _bucket: "send-sms-notification",
+      _identifier: getClientIp(req),
+      _max: 15,
+      _window: "1 hour",
+    });
+    if (!rlError && allowed === false) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } },
+      );
+    }
+  } catch (rlErr) {
+    console.error("SMS rate-limit check failed (allowing):", rlErr);
+  }
+
   try {
     if (!OPENPHONE_API_KEY) {
       throw new Error("OPENPHONE_API_KEY is not configured");
     }
 
     const payload: SmsNotificationRequest = await req.json();
-    const { type, data, customerPhone, smsConsent, bookingId } = payload;
-    console.log("SMS notification:", type, "consent:", smsConsent, "phone:", customerPhone ? "yes" : "no");
+    const { type, data, bookingId } = payload;
+    console.log("SMS notification:", type, "bookingId:", bookingId ? "yes" : "no");
 
     let adminMessage: string;
     let customerMessage: string | null = null;
+    let trustedCustomerPhone: string | null = null;
+    let trustedSmsConsent = false;
 
     switch (type) {
       case "booking":
-        adminMessage = formatBookingSms(data);
-        customerMessage = formatCustomerBookingSms(data);
+        // Anti-spam: verify that the booking row actually exists, and
+        // read customerPhone + smsConsent FROM THE ROW — never from the
+        // request body. Previously the function trusted the body, so
+        // any anonymous caller could POST {type:'booking', smsConsent:
+        // true, customerPhone:'+1...'} and TidyWise would SMS that
+        // number from your OpenPhone account.
+        if (!bookingId) {
+          throw new Error("booking notifications require a bookingId");
+        }
+        {
+          // The booking row is inserted by the (anonymous) client right
+          // before this function is invoked. Occasionally the read here
+          // races the write and returns null. Retry a few times before
+          // giving up so the customer SMS can still use verified values.
+          let row: Record<string, unknown> | null = null;
+          for (let attempt = 0; attempt < 4; attempt++) {
+            const { data: bookingRow } = await supabaseAdmin
+              .from("bookings")
+              .select("customer_phone, sms_consent, customer_name, service_type, frequency, preferred_date, address, total_price")
+              .eq("id", bookingId)
+              .maybeSingle();
+            if (bookingRow) {
+              row = bookingRow as Record<string, unknown>;
+              break;
+            }
+            await new Promise((r) => setTimeout(r, 750));
+          }
+
+          // Admin/personal copy uses the request body — it never depends
+          // on the DB read, so the team is always notified.
+          adminMessage = formatBookingSms(data);
+
+          if (row) {
+            // Verified values for the customer-facing SMS.
+            customerMessage = formatCustomerBookingSms({
+              customerName: row.customer_name,
+              serviceType: row.service_type,
+              preferredDate: row.preferred_date,
+              totalPrice: row.total_price,
+            });
+            trustedCustomerPhone = (row.customer_phone as string | null) ?? null;
+            trustedSmsConsent = row.sms_consent === true;
+          } else {
+            // Could not verify the booking row in time. Still send the
+            // admin/personal alerts (above); just skip the customer SMS
+            // since we cannot confirm consent/phone from the DB.
+            console.warn(
+              "booking row not found after retries; sending admin/personal SMS only:",
+              bookingId,
+            );
+          }
+        }
         break;
       case "cleaner_application":
         adminMessage = formatApplicationSms(data);
@@ -169,16 +261,16 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     let customerResult: { success: boolean } | null = null;
-    if (customerMessage && smsConsent === true && customerPhone) {
+    if (customerMessage && trustedSmsConsent && trustedCustomerPhone) {
       customerResult = await sendOne({
-        to: customerPhone,
+        to: trustedCustomerPhone,
         message: customerMessage,
         recipientType: "customer",
         messageType: `${type}_customer`,
         bookingId,
       });
     } else if (customerMessage) {
-      console.log("Skipping customer SMS — consent or phone missing.");
+      console.log("Skipping customer SMS — consent or phone missing on booking row.");
     }
 
     return new Response(

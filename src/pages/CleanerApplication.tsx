@@ -73,11 +73,38 @@ const CleanerApplication = () => {
     }
   };
 
+  // Cap the upload: at most 5 files, each ≤ 10 MB. Without this an
+  // applicant could accidentally pick their whole photo library, kicking
+  // off dozens of multi-MB uploads sequentially with no feedback beyond
+  // a spinner — long submission times, storage cost burn, drop-off
+  // mid-upload. 5×10MB is plenty for ID + work-area photos.
+  const MAX_FILES = 5;
+  const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setUploadedFiles((prev) => [...prev, ...newFiles]);
+    if (!e.target.files) return;
+    const incoming = Array.from(e.target.files);
+    const oversize = incoming.filter((f) => f.size > MAX_FILE_BYTES);
+    if (oversize.length > 0) {
+      toast({
+        title: "File too large",
+        description: `${oversize[0].name} is over 10 MB. Please choose a smaller image.`,
+        variant: "destructive",
+      });
+      return;
     }
+    setUploadedFiles((prev) => {
+      const next = [...prev, ...incoming];
+      if (next.length > MAX_FILES) {
+        toast({
+          title: `Up to ${MAX_FILES} files`,
+          description: `Keeping the first ${MAX_FILES}.`,
+        });
+      }
+      return next.slice(0, MAX_FILES);
+    });
+    // Reset the input so re-picking the same file works.
+    e.target.value = "";
   };
 
   const removeFile = (index: number) => {
@@ -88,7 +115,13 @@ const CleanerApplication = () => {
     const filenames: string[] = [];
     
     for (const file of uploadedFiles) {
-      const fileExt = file.name.split(".").pop();
+      // file.name.split(".").pop() returns undefined for extension-less
+      // filenames ("resume", "scan") and the upload key would become
+      // "<uuid>.undefined" — works but signals "broken" in storage. Derive
+      // from MIME first, fall back to "bin".
+      const mimeExt = file.type.split("/")[1];
+      const nameExt = file.name.includes(".") ? file.name.split(".").pop() : undefined;
+      const fileExt = (nameExt || mimeExt || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
       
       const { error } = await supabase.storage

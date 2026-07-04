@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SEOHead from "@/components/seo/SEOHead";
+import { Sentry } from "@/lib/sentry";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,7 @@ const CustomerPortal = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -52,8 +54,18 @@ const CustomerPortal = () => {
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Error fetching bookings:", error);
+        // Previously this only console.errored and left bookings=[] so the
+        // user saw "No bookings yet" indefinitely with no path to recover.
+        // Surface it so they can retry.
+        console.error("[CustomerPortal] Failed to load bookings:", error);
+        Sentry.captureException(
+          error instanceof Error ? error : new Error(String(error)),
+          { tags: { area: "customer-portal-load-bookings" } },
+        );
+        setFetchError(error.message || "Failed to load bookings.");
+        setBookings([]);
       } else {
+        setFetchError(null);
         setBookings(data || []);
       }
       setLoading(false);
@@ -136,7 +148,18 @@ const CustomerPortal = () => {
           </p>
         </div>
 
-        {bookings.length === 0 ? (
+        {fetchError ? (
+          <Card className="text-center py-12 border-destructive/40">
+            <CardContent>
+              <Calendar className="h-12 w-12 mx-auto text-destructive mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">Couldn't load your bookings</h3>
+              <p className="text-muted-foreground mb-6">
+                Something went wrong on our end. Please refresh — if the issue persists, call us at (561) 571-8725.
+              </p>
+              <Button onClick={() => window.location.reload()}>Refresh</Button>
+            </CardContent>
+          </Card>
+        ) : bookings.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
               <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
