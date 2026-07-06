@@ -25,126 +25,6 @@ function normalizeFrequency(input: unknown): string {
   return "one_time";
 }
 
-// Map any TidyWise service label/variant -> the canonical service name the CRM
-// expects. The CRM matches `service` against its own services list, so legacy
-// or reworded labels (e.g. "Standard Clean", "Deep Clean (First Cleaning)",
-// "Move In/Move Out Clean") must be normalized to the exact canonical names.
-// Canonical set: Standard Cleaning, Deep Cleaning, Move In/Out,
-// Post-Construction, Carpet Cleaning, Upholstery Cleaning.
-function normalizeService(input: unknown): string | null {
-  const raw = String(input ?? "").trim();
-  if (!raw) return null;
-  const v = raw.toLowerCase();
-
-  if (v.includes("post") && v.includes("construction")) return "Post-Construction";
-  if (v.includes("move")) return "Move In/Out";
-  if (v.includes("carpet")) return "Carpet Cleaning";
-  if (v.includes("upholstery")) return "Upholstery Cleaning";
-  if (v.includes("deep")) return "Deep Cleaning";
-  if (v.includes("standard")) return "Standard Cleaning";
-
-  // Unknown label: forward as-is so the CRM can still attempt a match/log it.
-  return raw;
-}
-
-// Best-effort parse of a single free-text US address string into
-// { street, city, state, zip }. The CRM's ingest endpoint reads city / state /
-// zip_code as SEPARATE fields — if we only send the combined `address` string,
-// those columns land blank in the scheduler. Google-autocompleted addresses
-// look like "65 SW 12th Ave, Deerfield Beach, FL 33441, USA".
-function parseAddress(raw: unknown): { street: string | null; city: string | null; state: string | null; zip: string | null } {
-  const full = String(raw ?? "").trim();
-  if (!full) return { street: null, city: null, state: null, zip: null };
-
-  // Drop a trailing country token like "USA" / "United States".
-  const parts = full
-    .split(",")
-    .map((p) => p.trim())
-    .filter((p) => p && !/^(usa|united states)$/i.test(p));
-
-  let street: string | null = null;
-  let city: string | null = null;
-  let state: string | null = null;
-  let zip: string | null = null;
-
-  // Pull a "FL 33441" or "FL" or "33441" out of the last segment.
-  const last = parts[parts.length - 1] ?? "";
-  const stateZip = last.match(/^([A-Za-z]{2})?\s*(\d{5}(?:-\d{4})?)?$/);
-  const hasStateZip = !!last && !!stateZip && (!!stateZip[1] || !!stateZip[2]);
-
-  if (parts.length >= 3 && hasStateZip) {
-    state = stateZip![1]?.toUpperCase() ?? null;
-    zip = stateZip![2] ?? null;
-    city = parts[parts.length - 2] ?? null;
-    street = parts.slice(0, parts.length - 2).join(", ") || null;
-  } else if (parts.length === 2) {
-    street = parts[0] ?? null;
-    city = parts[1] ?? null;
-  } else {
-    street = full || null;
-  }
-
-  return { street, city, state, zip };
-}
-
-// Google Maps geocoding via the Lovable connector gateway. Turns the single
-// stored free-text address into structured street/city/state/zip so the CRM's
-// separate columns populate reliably — even for addresses typed without commas
-// (e.g. "65 sw 12th ave deerfield beach"). Falls back to the naive string
-// parser below if geocoding is unavailable or returns nothing.
-const MAPS_GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
-
-async function geocodeAddress(
-  raw: unknown,
-): Promise<{ street: string | null; city: string | null; state: string | null; zip: string | null } | null> {
-  const full = String(raw ?? "").trim();
-  if (!full) return null;
-
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
-  const mapsKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
-  if (!lovableKey || !mapsKey) return null;
-
-  try {
-    const res = await fetch(
-      `${MAPS_GATEWAY_URL}/maps/api/geocode/json?address=${encodeURIComponent(full)}&region=us`,
-      {
-        headers: {
-          Authorization: `Bearer ${lovableKey}`,
-          "X-Connection-Api-Key": mapsKey,
-        },
-      },
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    const result = data?.results?.[0];
-    if (!result) return null;
-
-    const comps: Array<{ long_name: string; short_name: string; types: string[] }> =
-      result.address_components ?? [];
-    const get = (type: string, short = false) => {
-      const c = comps.find((x) => x.types.includes(type));
-      return c ? (short ? c.short_name : c.long_name) : null;
-    };
-
-    const streetNumber = get("street_number");
-    const route = get("route");
-    const street = [streetNumber, route].filter(Boolean).join(" ") || null;
-    const city =
-      get("locality") ||
-      get("postal_town") ||
-      get("sublocality") ||
-      get("administrative_area_level_3") ||
-      null;
-    const state = get("administrative_area_level_1", true);
-    const zip = get("postal_code");
-
-    if (!city && !state && !zip) return null;
-    return { street, city, state, zip };
-  } catch (_e) {
-    return null;
-  }
-}
-
 function getClientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
@@ -242,53 +122,21 @@ Deno.serve(async (req) => {
     scheduledAt = null;
   }
 
-  // Split the single stored address into the discrete fields the CRM reads.
-  // Prefer Google geocoding (handles comma-less free text); fall back to the
-  // naive string parser if geocoding is unavailable.
-  const loc = (await geocodeAddress(booking.address)) ?? parseAddress(booking.address);
-
-  // Derive has_pets from the free-text pet_info column.
-  const petInfo = String(booking.pet_info ?? "").trim().toLowerCase();
-  const hasPets =
-    !!petInfo && !["no", "none", "no pets", "n/a", "na"].includes(petInfo);
-
-  // Split the stored full name into first/last for CRMs that expect them.
-  const fullName = String(booking.customer_name ?? "").trim();
-  const nameParts = fullName.split(/\s+/).filter(Boolean);
-  const firstName = nameParts[0] ?? null;
-  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : null;
-
   // Map trusted TidyWise booking row -> CRM ingest payload
   const payload = {
-    // Hardcoded TIDYWISE org ID so the CRM attributes bookings to this site.
-    organization_id: "e95b92d0-7099-408e-a773-e4407b34f8b4",
     name: booking.customer_name,
-    first_name: firstName,
-    last_name: lastName,
     email: booking.customer_email,
     phone: booking.customer_phone ?? null,
-    // Send both the full string and the parsed components so the CRM's
-    // separate city/state/zip columns populate in the scheduler.
-    address: loc.street ?? booking.address ?? null,
-    apt_suite: null,
-    city: loc.city,
-    state: loc.state,
-    zip_code: loc.zip,
+    address: booking.address ?? null,
     scheduled_at: scheduledAt,
-    service: normalizeService(booking.service_type),
+    service: booking.service_type ?? null,
     total_amount: Number.isFinite(+booking.total_price) ? +booking.total_price : 0,
     frequency: normalizeFrequency(booking.frequency),
-    bedrooms: booking.beds ?? null,
     bathrooms: booking.baths ?? null,
     square_footage: booking.sqft != null ? String(booking.sqft) : null,
     extras: Array.isArray(booking.add_ons) ? booking.add_ons : [],
     notes: booking.special_instructions ?? null,
-    duration: null,
-    has_pets: hasPets,
   };
-
-  // Log the exact payload leaving the sender site (visible in function logs).
-  console.log("Sending booking to CRM:", payload);
 
   try {
     const res = await fetch(CRM_INGEST_URL, {
@@ -306,8 +154,6 @@ Deno.serve(async (req) => {
     } catch {
       data = text;
     }
-    // Log the CRM's response so we can verify what it received/returned.
-    console.log("CRM response:", data);
     return new Response(JSON.stringify({ ok: res.ok, status: res.status, crm: data }), {
       status: res.ok ? 200 : 502,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
