@@ -62,8 +62,11 @@ const Hero = () => {
             </div>
 
             <h1 id="hero-heading" className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              Your Home Deserves Better Than Average.
+              Trusted House Cleaning in Deerfield Beach & South Florida
             </h1>
+            <p className="font-display text-2xl md:text-3xl lg:text-4xl font-semibold text-white/95 leading-tight">
+              Your Home Deserves Better Than Average.
+            </p>
 
             <p className="text-lg md:text-xl text-white/90 max-w-xl leading-relaxed">
               TIDYWISE delivers professional home cleaning across Fort Lauderdale, Boca Raton, West Palm Beach, Miami & 40+ South Florida cities — with transparent pricing, vetted cleaners, and a satisfaction guarantee.
