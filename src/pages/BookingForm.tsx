@@ -925,6 +925,9 @@ const BookingForm = () => {
                 {errors.smsConsent && <p className="text-sm text-destructive">{errors.smsConsent}</p>}
 
                 <div className="space-y-3 pt-2">
+                  <p className="text-lg md:text-xl font-bold text-primary text-center leading-snug">
+                    We don't charge your card until after your cleaning is complete.
+                  </p>
                   <Button type="submit" size="lg" className="w-full text-lg font-semibold" disabled={isSubmitting}>
                     {isSubmitting ? "Sending your booking..." : "Confirm My Booking"}
                   </Button>
