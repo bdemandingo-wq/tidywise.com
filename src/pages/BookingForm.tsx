@@ -16,6 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ArrowLeft, User, Mail, Phone, Home, MapPin, MessageSquare, CalendarIcon, AlertTriangle, Shield, Star, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import CardOnFileSection, { type CardOnFileApi } from "@/components/booking/CardOnFileSection";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
