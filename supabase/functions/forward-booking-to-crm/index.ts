@@ -297,15 +297,16 @@ Deno.serve(async (req) => {
     );
   }
 
-  // Build scheduled_at from the stored preferred_date + time_slot.
+  // Wall-clock Eastern + explicit DST-correct offset, so the CRM's timestamptz
+  // stores the instant the customer actually picked.
   let scheduledAt: string | null = null;
   try {
-    const time = booking.time_slot ? `${booking.time_slot}:00` : "00:00:00";
-    const d = new Date(`${booking.preferred_date}T${time}`);
-    scheduledAt = Number.isNaN(d.getTime()) ? null : d.toISOString();
-  } catch {
+    scheduledAt = buildScheduledAt(booking.preferred_date, booking.time_slot);
+  } catch (e) {
+    console.error("scheduled_at build failed:", e);
     scheduledAt = null;
   }
+
 
   // Split the single stored address into the discrete fields the CRM reads.
   // Geocoding first (handles comma-less free text), naive parser as fallback.
