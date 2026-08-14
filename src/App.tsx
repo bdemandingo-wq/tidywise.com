@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 // Lazy load non-critical routes
 const BookingForm = lazy(() => import("./pages/BookingForm"));
 const Confirmation = lazy(() => import("./pages/Confirmation"));
+const CardSaved = lazy(() => import("./pages/CardSaved"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Admin = lazy(() => import("./pages/Admin"));
 const CustomerPortal = lazy(() => import("./pages/CustomerPortal"));
