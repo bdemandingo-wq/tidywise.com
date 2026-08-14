@@ -101,6 +101,10 @@ Deno.serve(async (req) => {
 
   const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
 
+  // The CRM's get-customer-card requires this metadata field on the Stripe
+  // customer. Secret-backed so it can change without a code edit.
+  const orgId = Deno.env.get("CRM_ORGANIZATION_ID") ?? "";
+
   try {
     // ---- Find or create the Stripe customer for this email ----
     let customerId: string | null = booking.stripe_customer_id ?? null;
@@ -116,9 +120,24 @@ Deno.serve(async (req) => {
         email: booking.customer_email ?? undefined,
         name: booking.customer_name ?? undefined,
         phone: booking.customer_phone ?? undefined,
-        metadata: { booking_id: booking.id },
+        metadata: orgId
+          ? { booking_id: booking.id, organization_id: orgId }
+          : { booking_id: booking.id },
       });
       customerId = created.id;
+    } else if (orgId) {
+      // Matched an existing customer — make sure it carries the org id.
+      try {
+        const current = await stripe.customers.retrieve(customerId);
+        const meta = (current as any)?.metadata ?? {};
+        if (meta.organization_id !== orgId) {
+          await stripe.customers.update(customerId, {
+            metadata: { ...meta, booking_id: booking.id, organization_id: orgId },
+          });
+        }
+      } catch (err) {
+        console.error("Customer metadata backfill failed:", customerId, err);
+      }
     }
 
     // ---- Setup-mode Checkout Session: saves the card, charges nothing ----

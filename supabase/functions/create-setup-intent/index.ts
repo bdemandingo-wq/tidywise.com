@@ -62,22 +62,46 @@ Deno.serve(async (req) => {
   const phone = String(body?.phone ?? "").trim().slice(0, 40);
   if (!EMAIL_RE.test(email)) return json({ error: "A valid email is required" }, 400);
 
+  // The CRM's get-customer-card only recognises a saved card when the Stripe
+  // customer carries this metadata field. Stored as a secret so it can change
+  // without a code edit.
+  const orgId = Deno.env.get("CRM_ORGANIZATION_ID") ?? "";
+
   try {
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" });
 
-    const existing = await stripe.customers.list({ email, limit: 1 });
+    // Match on email; backfill organization_id on every matching customer so
+    // pre-existing records start being recognised by the CRM.
+    const existing = await stripe.customers.list({ email, limit: 10 });
+    if (orgId) {
+      for (const c of existing.data) {
+        if (c.metadata?.organization_id !== orgId) {
+          try {
+            await stripe.customers.update(c.id, {
+              metadata: { ...(c.metadata ?? {}), organization_id: orgId },
+            });
+          } catch (err) {
+            console.error("Customer metadata backfill failed:", c.id, err);
+          }
+        }
+      }
+    }
+
     const customer = existing.data[0] ??
       (await stripe.customers.create({
         email,
         name: name || undefined,
         phone: phone || undefined,
+        metadata: orgId ? { organization_id: orgId } : undefined,
       }));
 
     const setupIntent = await stripe.setupIntents.create({
       customer: customer.id,
       usage: "off_session",
       payment_method_types: ["card"],
-      metadata: { source: "booking_form_inline" },
+      metadata: orgId
+        ? { source: "booking_form_inline", organization_id: orgId }
+        : { source: "booking_form_inline" },
     });
 
     return json({
