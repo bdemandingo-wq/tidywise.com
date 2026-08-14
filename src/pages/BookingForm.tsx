@@ -291,9 +291,35 @@ const BookingForm = () => {
       return;
     }
 
+    // ---- Inline card-on-file (Stripe SetupIntent — nothing is charged) ----
+    // Required to book. A decline returns early WITHOUT touching the form
+    // state, so everything the customer typed is preserved for a retry.
+    let cardResult: { customerId: string; paymentMethodId: string } | null = null;
+    if (cardAvailable) {
+      if (!cardApiRef.current) {
+        toast({
+          title: "Card form still loading",
+          description: "Give it a second and tap Confirm again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setIsSubmitting(true);
+      const res = await cardApiRef.current.confirm();
+      if (!res.ok) {
+        setCardError(res.message);
+        toast({ title: "Card was declined", description: res.message, variant: "destructive" });
+        setIsSubmitting(false);
+        return;
+      }
+      setCardError(null);
+      cardResult = { customerId: res.customerId, paymentMethodId: res.paymentMethodId };
+    }
+
     setIsSubmitting(true);
 
     try {
+
       const serviceLabel = meta?.label ?? service;
       const freqLabel = FREQUENCIES.find((f) => f.key === frequency)?.label ?? frequency;
       const addOnLabels = addOnIds
