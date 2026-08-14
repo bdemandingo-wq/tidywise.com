@@ -35,3 +35,9 @@ verify_jwt = false
 
 [functions.forward-booking-to-crm]
 verify_jwt = false
+
+[functions.create-card-setup-session]
+verify_jwt = false
+
+[functions.stripe-setup-webhook]
+verify_jwt = false
