@@ -342,7 +342,12 @@ export function computePrice(
   const allowFreqDiscount = supportsFrequency(opts.service);
   const freq = FREQUENCIES.find((f) => f.key === opts.frequency) ?? FREQUENCIES[0];
   const discount = allowFreqDiscount ? freq.baseDiscount : 0;
-  const baseAfterDiscount = basePrice * (1 - discount);
+  // Apply the per-service floor to the discounted BASE, before add-ons, so a
+  // discount can never sell the clean itself below its minimum.
+  const baseAfterDiscount = Math.max(
+    getServiceFloor(opts.service),
+    basePrice * (1 - discount),
+  );
 
   // Auto-included add-ons are baked into the base price → skip them in the sum.
   const autoIncluded = new Set(AUTO_INCLUDED_ADDONS[opts.service] ?? []);
