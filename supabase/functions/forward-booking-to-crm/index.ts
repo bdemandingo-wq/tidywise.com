@@ -144,6 +144,9 @@ Deno.serve(async (req) => {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": ingestKey,
+        "x-ingest-key": ingestKey,
+        "apikey": ingestKey,
+        "Authorization": `Bearer ${ingestKey}`,
       },
       body: JSON.stringify(payload),
     });
@@ -155,13 +158,14 @@ Deno.serve(async (req) => {
       data = text;
     }
     return new Response(JSON.stringify({ ok: res.ok, status: res.status, crm: data }), {
-      status: res.ok ? 200 : 502,
+      // Always 200: CRM forwarding is non-fatal to the booking flow.
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: "Failed to reach CRM", details: String(err) }),
-      { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      JSON.stringify({ ok: false, error: "Failed to reach CRM", details: String(err) }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
