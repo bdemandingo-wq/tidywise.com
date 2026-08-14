@@ -337,7 +337,15 @@ Deno.serve(async (req) => {
     service: normalizeService(booking.service_type),
     total_amount: Number.isFinite(+booking.total_price) ? +booking.total_price : 0,
     frequency: normalizeFrequency(booking.frequency),
-    bedrooms: booking.beds ?? null,
+    // `beds` on this site holds a square-footage label ("2,000 sq ft"), not a
+    // bedroom count. Only forward a genuine numeric count; otherwise null.
+    // Square footage travels in square_footage below.
+    bedrooms: (() => {
+      const n = Number(String(booking.beds ?? "").replace(/[^0-9.]/g, ""));
+      return /sq|ft/i.test(String(booking.beds ?? "")) || !Number.isFinite(n) || n <= 0
+        ? null
+        : n;
+    })(),
     bathrooms: booking.baths ?? null,
     square_footage: booking.sqft != null ? String(booking.sqft) : null,
     extras: Array.isArray(booking.add_ons) ? booking.add_ons : [],
