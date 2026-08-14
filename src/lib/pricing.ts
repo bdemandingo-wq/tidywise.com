@@ -365,10 +365,15 @@ export function computePrice(
   total = Math.max(PRICE_FLOOR, Math.min(PRICE_CAP, total));
   total = Math.round(total);
 
-  // Display range: ±10% around total
-  const low = Math.round(total * 0.9);
+  // Display range: +10% upper anchor. The lower bound is clamped so it can
+  // never advertise less than what the booking actually charges.
+  const low = Math.max(
+    Math.round(total * 0.9),
+    getServiceFloor(opts.service),
+    total,
+  );
   const high = Math.round(total * 1.1);
-  const range = `$${low}–$${high}`;
+  const range = low >= high ? `$${low}` : `$${low}–$${high}`;
 
   return {
     basePrice,
