@@ -334,7 +334,7 @@ const UpholsteryCarpetPricing = () => {
             </h2>
             <p className="text-primary-foreground mb-8 max-w-xl mx-auto">
               Trusted by 140+ five-star clients across Boca Raton, Fort Lauderdale, Broward
-              and Miami-Dade. No credit card required — just tell us what you need cleaned.
+              and Miami-Dade. Nothing is charged until your cleaning is complete.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" asChild>

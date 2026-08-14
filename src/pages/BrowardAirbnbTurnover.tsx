@@ -243,7 +243,7 @@ const BrowardAirbnbTurnover = () => {
             </h2>
             <p className="text-primary-foreground mb-8 max-w-xl mx-auto">
               Trusted by 140+ five-star clients. Keep your listing guest-ready with reliable,
-              photo-confirmed turnovers across Broward County. No credit card required to book.
+              photo-confirmed turnovers across Broward County. You're not charged until the turnover is done.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" asChild>

@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.stripe-setup-webhook]
 verify_jwt = false
+
+[functions.create-setup-intent]
+verify_jwt = false

@@ -16,6 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ArrowLeft, User, Mail, Phone, Home, MapPin, MessageSquare, CalendarIcon, AlertTriangle, Shield, Star, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import CardOnFileSection, { type CardOnFileApi } from "@/components/booking/CardOnFileSection";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import {
@@ -121,6 +123,12 @@ const BookingForm = () => {
   const [dateError, setDateError] = useState<string | null>(null);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Inline Stripe card-on-file. `cardAvailable` flips to false only if the
+  // secure card form can't load — then we fall back to the emailed/SMS link.
+  const cardApiRef = useRef<CardOnFileApi | null>(null);
+  const [cardAvailable, setCardAvailable] = useState(true);
+  const [cardError, setCardError] = useState<string | null>(null);
+
   // Idempotency key generated once per mount; ensures retries don't double-book.
   const idempotencyKey = useRef<string>(crypto.randomUUID());
 
@@ -291,9 +299,37 @@ const BookingForm = () => {
       return;
     }
 
+    // ---- Inline card-on-file (Stripe SetupIntent — nothing is charged) ----
+    // Required to book. A decline returns early WITHOUT touching the form
+    // state, so everything the customer typed is preserved for a retry.
+    let cardResult: { customerId: string; paymentMethodId: string } | null = null;
+    if (cardAvailable) {
+      if (!cardApiRef.current) {
+        toast({
+          title: "Card form still loading",
+          description: "Give it a second and tap Confirm again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setIsSubmitting(true);
+      const res = await cardApiRef.current.confirm();
+      if (res.ok !== true) {
+        const msg = "message" in res ? res.message : "Your card could not be saved.";
+        setCardError(msg);
+        toast({ title: "Card was declined", description: msg, variant: "destructive" });
+        setIsSubmitting(false);
+        return;
+      }
+
+      setCardError(null);
+      cardResult = { customerId: res.customerId, paymentMethodId: res.paymentMethodId };
+    }
+
     setIsSubmitting(true);
 
     try {
+
       const serviceLabel = meta?.label ?? service;
       const freqLabel = FREQUENCIES.find((f) => f.key === frequency)?.label ?? frequency;
       const addOnLabels = addOnIds
@@ -333,6 +369,11 @@ const BookingForm = () => {
         sms_consent: parsed.data.smsConsent === true,
         time_slot: preferredTime,
         idempotency_key: idempotencyKey.current,
+        stripe_customer_id: cardResult?.customerId ?? null,
+        stripe_payment_method_id: cardResult?.paymentMethodId ?? null,
+        card_on_file_status: cardResult ? "saved" : "pending",
+        card_saved_at: cardResult ? new Date().toISOString() : null,
+
       };
 
       const { error: dbError } = await supabase
@@ -377,15 +418,18 @@ const BookingForm = () => {
         console.error("[BookingForm] forward-booking-to-crm failed:", crmErr);
       }
 
-      // Card-on-file setup link (Stripe setup mode — nothing is charged).
-      // Strictly non-fatal: a Stripe outage must never block a booking.
-      try {
-        await supabase.functions.invoke("create-card-setup-session", {
-          body: { bookingId },
-        });
-      } catch (cardErr) {
-        console.error("[BookingForm] create-card-setup-session failed:", cardErr);
+      // FALLBACK ONLY: if the card wasn't captured inline (Stripe Elements
+      // unavailable), send the hosted card-setup link by SMS + email.
+      if (!cardResult) {
+        try {
+          await supabase.functions.invoke("create-card-setup-session", {
+            body: { bookingId },
+          });
+        } catch (cardErr) {
+          console.error("[BookingForm] create-card-setup-session failed:", cardErr);
+        }
       }
+
 
 
 
@@ -940,15 +984,26 @@ const BookingForm = () => {
                   <p className="text-lg md:text-xl font-bold text-primary text-center leading-snug">
                     We don't charge your card until after your cleaning is complete.
                   </p>
+
+                  <CardOnFileSection
+                    email={formData.email}
+                    name={formData.name}
+                    phone={formData.phone}
+                    apiRef={cardApiRef}
+                    onAvailabilityChange={setCardAvailable}
+                  />
+                  {cardError && <p className="text-sm text-destructive">{cardError}</p>}
+
                   <Button type="submit" size="lg" className="w-full text-lg font-semibold" disabled={isSubmitting}>
                     {isSubmitting ? "Sending your booking..." : "Confirm My Booking"}
                   </Button>
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No credit card now</span>
+                    <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No charge today</span>
                     <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-primary" /> Confirmed in 15 min</span>
                     <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-secondary text-secondary" /> Free re-clean guarantee</span>
                   </div>
                 </div>
+
               </form>
             </CardContent>
           </Card>

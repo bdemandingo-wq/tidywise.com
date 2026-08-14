@@ -187,7 +187,7 @@ const DeepCleaningBocaRaton = () => {
               Book Your Boca Raton Deep Clean
             </h2>
             <p className="text-muted-foreground mb-6">
-              Get your exact price online in seconds. No credit card required to book.
+              Get your exact price online in seconds. You're not charged until the cleaning is done.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
