@@ -89,6 +89,20 @@ export const isUnitAddOn = (a: AddOnDef): boolean => a.unit !== "flat";
 export const PRICE_FLOOR = 99;
 export const PRICE_CAP = 5000;
 
+/**
+ * Per-service minimum for the BASE portion of a job (after any frequency
+ * discount, BEFORE add-ons). Services not listed fall back to PRICE_FLOOR.
+ */
+export const SERVICE_PRICE_FLOOR: Partial<Record<ServiceKey, number>> = {
+  standard: 150,
+  deep: 200,
+  moveinout: 250,
+  postconstruction: 400,
+};
+
+export const getServiceFloor = (service: ServiceKey): number =>
+  SERVICE_PRICE_FLOOR[service] ?? PRICE_FLOOR;
+
 /** Raw sqft slider config — used by Hero & Calculator. */
 export const SQFT_MIN = 500;
 export const SQFT_MAX = 10000;
@@ -328,7 +342,12 @@ export function computePrice(
   const allowFreqDiscount = supportsFrequency(opts.service);
   const freq = FREQUENCIES.find((f) => f.key === opts.frequency) ?? FREQUENCIES[0];
   const discount = allowFreqDiscount ? freq.baseDiscount : 0;
-  const baseAfterDiscount = basePrice * (1 - discount);
+  // Apply the per-service floor to the discounted BASE, before add-ons, so a
+  // discount can never sell the clean itself below its minimum.
+  const baseAfterDiscount = Math.max(
+    getServiceFloor(opts.service),
+    basePrice * (1 - discount),
+  );
 
   // Auto-included add-ons are baked into the base price → skip them in the sum.
   const autoIncluded = new Set(AUTO_INCLUDED_ADDONS[opts.service] ?? []);
@@ -346,10 +365,15 @@ export function computePrice(
   total = Math.max(PRICE_FLOOR, Math.min(PRICE_CAP, total));
   total = Math.round(total);
 
-  // Display range: ±10% around total
-  const low = Math.round(total * 0.9);
+  // Display range: +10% upper anchor. The lower bound is clamped so it can
+  // never advertise less than what the booking actually charges.
+  const low = Math.max(
+    Math.round(total * 0.9),
+    getServiceFloor(opts.service),
+    total,
+  );
   const high = Math.round(total * 1.1);
-  const range = `$${low}–$${high}`;
+  const range = low >= high ? `$${low}` : `$${low}–$${high}`;
 
   return {
     basePrice,
