@@ -136,6 +136,9 @@ export type Database = {
           address: string
           baths: string
           beds: string
+          card_on_file_status: string
+          card_saved_at: string | null
+          card_setup_link_sent_at: string | null
           created_at: string
           customer_email: string
           customer_id: string | null
@@ -152,6 +155,9 @@ export type Database = {
           special_instructions: string | null
           sqft: number
           status: Database["public"]["Enums"]["booking_status"]
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          stripe_setup_session_id: string | null
           time_slot: string | null
           total_price: number
           updated_at: string
@@ -161,6 +167,9 @@ export type Database = {
           address: string
           baths: string
           beds: string
+          card_on_file_status?: string
+          card_saved_at?: string | null
+          card_setup_link_sent_at?: string | null
           created_at?: string
           customer_email: string
           customer_id?: string | null
@@ -177,6 +186,9 @@ export type Database = {
           special_instructions?: string | null
           sqft: number
           status?: Database["public"]["Enums"]["booking_status"]
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          stripe_setup_session_id?: string | null
           time_slot?: string | null
           total_price: number
           updated_at?: string
@@ -186,6 +198,9 @@ export type Database = {
           address?: string
           baths?: string
           beds?: string
+          card_on_file_status?: string
+          card_saved_at?: string | null
+          card_setup_link_sent_at?: string | null
           created_at?: string
           customer_email?: string
           customer_id?: string | null
@@ -202,6 +217,9 @@ export type Database = {
           special_instructions?: string | null
           sqft?: number
           status?: Database["public"]["Enums"]["booking_status"]
+          stripe_customer_id?: string | null
+          stripe_payment_method_id?: string | null
+          stripe_setup_session_id?: string | null
           time_slot?: string | null
           total_price?: number
           updated_at?: string
@@ -817,6 +835,9 @@ export type Database = {
           address: string
           baths: string
           beds: string
+          card_on_file_status: string
+          card_saved_at: string | null
+          card_setup_link_sent_at: string | null
           created_at: string
           customer_email: string
           customer_id: string | null
@@ -833,6 +854,9 @@ export type Database = {
           special_instructions: string | null
           sqft: number
           status: Database["public"]["Enums"]["booking_status"]
+          stripe_customer_id: string | null
+          stripe_payment_method_id: string | null
+          stripe_setup_session_id: string | null
           time_slot: string | null
           total_price: number
           updated_at: string
