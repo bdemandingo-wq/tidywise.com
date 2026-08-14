@@ -188,6 +188,7 @@ const AppRoutes = () => {
         <Route path="/confirmation/:bookingId" element={<Confirmation />} />
         {/* Legacy: /confirmation without an id redirects home */}
         <Route path="/confirmation" element={<Navigate to="/" replace />} />
+        <Route path="/card-saved" element={<CardSaved />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/my-bookings" element={<CustomerPortal />} />
