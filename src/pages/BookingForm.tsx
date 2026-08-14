@@ -377,6 +377,18 @@ const BookingForm = () => {
         console.error("[BookingForm] forward-booking-to-crm failed:", crmErr);
       }
 
+      // Card-on-file setup link (Stripe setup mode — nothing is charged).
+      // Strictly non-fatal: a Stripe outage must never block a booking.
+      try {
+        await supabase.functions.invoke("create-card-setup-session", {
+          body: { bookingId },
+        });
+      } catch (cardErr) {
+        console.error("[BookingForm] create-card-setup-session failed:", cardErr);
+      }
+
+
+
 
 
       // SMS notification (admin + personal + customer if consent).

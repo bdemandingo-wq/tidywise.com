@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 // Lazy load non-critical routes
 const BookingForm = lazy(() => import("./pages/BookingForm"));
 const Confirmation = lazy(() => import("./pages/Confirmation"));
+const CardSaved = lazy(() => import("./pages/CardSaved"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Admin = lazy(() => import("./pages/Admin"));
 const CustomerPortal = lazy(() => import("./pages/CustomerPortal"));
@@ -187,6 +188,7 @@ const AppRoutes = () => {
         <Route path="/confirmation/:bookingId" element={<Confirmation />} />
         {/* Legacy: /confirmation without an id redirects home */}
         <Route path="/confirmation" element={<Navigate to="/" replace />} />
+        <Route path="/card-saved" element={<CardSaved />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/my-bookings" element={<CustomerPortal />} />
