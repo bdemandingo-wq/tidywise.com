@@ -140,7 +140,7 @@ const MoveOutCleaningWestPalmBeach = () => {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-muted-foreground">Carpet cleaning and wall washing available as add-ons. No credit card needed to book.</p>
+            <p className="text-xs text-muted-foreground">Carpet cleaning and wall washing available as add-ons. You're not charged until the cleaning is complete.</p>
           </section>
 
           {/* WPB-specific tips */}
