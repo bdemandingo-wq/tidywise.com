@@ -121,6 +121,12 @@ const BookingForm = () => {
   const [dateError, setDateError] = useState<string | null>(null);
   const [timeError, setTimeError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Inline Stripe card-on-file. `cardAvailable` flips to false only if the
+  // secure card form can't load — then we fall back to the emailed/SMS link.
+  const cardApiRef = useRef<CardOnFileApi | null>(null);
+  const [cardAvailable, setCardAvailable] = useState(true);
+  const [cardError, setCardError] = useState<string | null>(null);
+
   // Idempotency key generated once per mount; ensures retries don't double-book.
   const idempotencyKey = useRef<string>(crypto.randomUUID());
 
