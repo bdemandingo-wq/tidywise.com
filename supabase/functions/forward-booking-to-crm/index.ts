@@ -127,6 +127,25 @@ async function geocodeAddress(
   }
 }
 
+// The CRM's square footage field is a fixed list of label strings, not a
+// number. Bucket up to the first tier whose max covers the value.
+const SQFT_TIERS = [750, 1000, 1250, 1500, 1800, 2100, 2400, 2700, 3000, 3300,
+  3600, 4000, 4400, 4800, 5200, 5600, 6000];
+
+function sqftLabel(input: unknown): string | null {
+  const n = Number(input);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const tier = SQFT_TIERS.find((t) => n <= t) ?? SQFT_TIERS[SQFT_TIERS.length - 1];
+  return `Up to ${tier} sf`;
+}
+
+// "4+" has no CRM equivalent and renders blank there — send "4".
+function normalizeBaths(input: unknown): string | null {
+  const raw = String(input ?? "").trim();
+  if (!raw) return null;
+  return raw === "4+" ? "4" : raw;
+}
+
 function getClientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
@@ -346,8 +365,8 @@ Deno.serve(async (req) => {
         ? null
         : n;
     })(),
-    bathrooms: booking.baths ?? null,
-    square_footage: booking.sqft != null ? String(booking.sqft) : null,
+    bathrooms: normalizeBaths(booking.baths),
+    square_footage: sqftLabel(booking.sqft),
     extras: Array.isArray(booking.add_ons) ? booking.add_ons : [],
     notes: booking.special_instructions ?? null,
     // The whole point of this integration: the card travels with the booking so
