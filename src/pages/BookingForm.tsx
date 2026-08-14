@@ -369,6 +369,11 @@ const BookingForm = () => {
         sms_consent: parsed.data.smsConsent === true,
         time_slot: preferredTime,
         idempotency_key: idempotencyKey.current,
+        stripe_customer_id: cardResult?.customerId ?? null,
+        stripe_payment_method_id: cardResult?.paymentMethodId ?? null,
+        card_on_file_status: cardResult ? "saved" : "pending",
+        card_saved_at: cardResult ? new Date().toISOString() : null,
+
       };
 
       const { error: dbError } = await supabase
