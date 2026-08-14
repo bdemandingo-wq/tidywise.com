@@ -984,15 +984,26 @@ const BookingForm = () => {
                   <p className="text-lg md:text-xl font-bold text-primary text-center leading-snug">
                     We don't charge your card until after your cleaning is complete.
                   </p>
+
+                  <CardOnFileSection
+                    email={formData.email}
+                    name={formData.name}
+                    phone={formData.phone}
+                    apiRef={cardApiRef}
+                    onAvailabilityChange={setCardAvailable}
+                  />
+                  {cardError && <p className="text-sm text-destructive">{cardError}</p>}
+
                   <Button type="submit" size="lg" className="w-full text-lg font-semibold" disabled={isSubmitting}>
                     {isSubmitting ? "Sending your booking..." : "Confirm My Booking"}
                   </Button>
                   <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No credit card now</span>
+                    <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> No charge today</span>
                     <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-primary" /> Confirmed in 15 min</span>
                     <span className="flex items-center gap-1"><Star className="w-3 h-3 fill-secondary text-secondary" /> Free re-clean guarantee</span>
                   </div>
                 </div>
+
               </form>
             </CardContent>
           </Card>
