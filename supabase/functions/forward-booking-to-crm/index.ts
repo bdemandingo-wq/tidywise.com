@@ -25,21 +25,22 @@ function normalizeFrequency(input: unknown): string {
   return "one_time";
 }
 
-// Map any TidyWise service label/variant -> the canonical service name the CRM
-// expects. The CRM matches `service` against its own services list, so legacy or
-// reworded labels ("Deep Clean (First Cleaning)", "Move In/Move Out Clean") must
-// be normalized. Unknown labels are forwarded as-is so the CRM can still try.
+// Map any TidyWise service label/variant -> the EXACT service name in the CRM's
+// services list. The CRM matches on exact name, so anything else silently misses.
+// Carpet / Upholstery have no CRM equivalent yet -> null (better an empty field
+// than an unmatched string the CRM will drop anyway).
 function normalizeService(input: unknown): string | null {
   const raw = String(input ?? "").trim();
   if (!raw) return null;
   const v = raw.toLowerCase();
-  if (v.includes("post") && v.includes("construction")) return "Post-Construction";
-  if (v.includes("move")) return "Move In/Out";
-  if (v.includes("carpet")) return "Carpet Cleaning";
-  if (v.includes("upholstery")) return "Upholstery Cleaning";
-  if (v.includes("deep")) return "Deep Cleaning";
-  if (v.includes("standard")) return "Standard Cleaning";
-  return raw;
+  if (v.includes("post") && v.includes("construction")) return "Post Construction Clean";
+  if (v.includes("move")) return "Move In/Out Clean";
+  if (v.includes("airbnb") || v.includes("turnover")) return "Airbnb Turnover";
+  if (v.includes("carpet")) return null;
+  if (v.includes("upholstery")) return null;
+  if (v.includes("deep")) return "Deep Clean";
+  if (v.includes("standard")) return "Standard Clean";
+  return null;
 }
 
 // Best-effort parse of a free-text US address into street/city/state/zip. The
