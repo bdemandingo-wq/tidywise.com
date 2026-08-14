@@ -314,12 +314,14 @@ const BookingForm = () => {
       }
       setIsSubmitting(true);
       const res = await cardApiRef.current.confirm();
-      if (!res.ok) {
-        setCardError(res.message);
-        toast({ title: "Card was declined", description: res.message, variant: "destructive" });
+      if (res.ok !== true) {
+        const msg = "message" in res ? res.message : "Your card could not be saved.";
+        setCardError(msg);
+        toast({ title: "Card was declined", description: msg, variant: "destructive" });
         setIsSubmitting(false);
         return;
       }
+
       setCardError(null);
       cardResult = { customerId: res.customerId, paymentMethodId: res.paymentMethodId };
     }
