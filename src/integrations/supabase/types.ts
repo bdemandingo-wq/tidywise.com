@@ -140,6 +140,9 @@ export type Database = {
           card_saved_at: string | null
           card_setup_link_sent_at: string | null
           created_at: string
+          crm_error: string | null
+          crm_sync_status: string | null
+          crm_synced_at: string | null
           customer_email: string
           customer_id: string | null
           customer_name: string
@@ -171,6 +174,9 @@ export type Database = {
           card_saved_at?: string | null
           card_setup_link_sent_at?: string | null
           created_at?: string
+          crm_error?: string | null
+          crm_sync_status?: string | null
+          crm_synced_at?: string | null
           customer_email: string
           customer_id?: string | null
           customer_name: string
@@ -202,6 +208,9 @@ export type Database = {
           card_saved_at?: string | null
           card_setup_link_sent_at?: string | null
           created_at?: string
+          crm_error?: string | null
+          crm_sync_status?: string | null
+          crm_synced_at?: string | null
           customer_email?: string
           customer_id?: string | null
           customer_name?: string
@@ -839,6 +848,9 @@ export type Database = {
           card_saved_at: string | null
           card_setup_link_sent_at: string | null
           created_at: string
+          crm_error: string | null
+          crm_sync_status: string | null
+          crm_synced_at: string | null
           customer_email: string
           customer_id: string | null
           customer_name: string
