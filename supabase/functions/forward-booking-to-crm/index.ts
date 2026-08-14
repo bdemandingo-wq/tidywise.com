@@ -132,6 +132,90 @@ function getClientIp(req: Request): string {
   return req.headers.get("x-real-ip") ?? "unknown";
 }
 
+// ---------------------------------------------------------------------------
+// Scheduling: bookings are stored as wall-clock America/New_York values
+// (preferred_date is a plain date string, time_slot is HH:mm). The CRM stores
+// scheduled_at in a timestamptz, so we must hand it an explicit offset that
+// reflects the DST state of that specific date — never a hardcoded -04:00.
+// ---------------------------------------------------------------------------
+const BOOKING_TZ = "America/New_York";
+
+const LEGACY_SLOT_TIMES: Record<string, string> = {
+  morning: "09:00",
+  afternoon: "13:00",
+};
+
+/** Normalize stored time_slot to HH:mm. Legacy words map to sensible hours. */
+function normalizeTimeSlot(input: unknown): string {
+  const raw = String(input ?? "").trim().toLowerCase();
+  if (!raw) return "09:00";
+  if (LEGACY_SLOT_TIMES[raw]) return LEGACY_SLOT_TIMES[raw];
+  const m = raw.match(/^(\d{1,2}):(\d{2})$/);
+  if (m) {
+    const h = Number(m[1]);
+    const min = Number(m[2]);
+    if (h >= 0 && h <= 23 && min >= 0 && min <= 59) {
+      return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+    }
+  }
+  return "09:00";
+}
+
+/** Parse the stored preferred_date (ISO or "Wednesday, August 20, 2026") to YYYY-MM-DD. */
+function normalizeDate(input: unknown): string | null {
+  const raw = String(input ?? "").trim();
+  if (!raw) return null;
+  const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  const parsed = new Date(`${raw} 12:00:00 UTC`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString().slice(0, 10);
+}
+
+/**
+ * Offset of America/New_York (e.g. "-04:00" or "-05:00") at the given local
+ * wall-clock date/time, derived from the IANA database rather than guessed.
+ */
+function easternOffset(dateStr: string, timeStr: string): string {
+  // Start from the naive instant treated as UTC, then let Intl tell us what the
+  // real offset is around that moment. One refinement pass handles the case
+  // where the initial guess sits on the other side of a DST boundary.
+  let guess = new Date(`${dateStr}T${timeStr}:00Z`);
+  let offsetMinutes = tzOffsetMinutes(guess);
+  guess = new Date(guess.getTime() - offsetMinutes * 60_000);
+  offsetMinutes = tzOffsetMinutes(guess);
+  const sign = offsetMinutes < 0 ? "-" : "+";
+  const abs = Math.abs(offsetMinutes);
+  return `${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+}
+
+/** Offset in minutes of BOOKING_TZ at a real instant (negative west of UTC). */
+function tzOffsetMinutes(instant: Date): number {
+  const name = new Intl.DateTimeFormat("en-US", {
+    timeZone: BOOKING_TZ,
+    timeZoneName: "longOffset",
+  })
+    .formatToParts(instant)
+    .find((p) => p.type === "timeZoneName")?.value ?? "GMT+0";
+  const m = name.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+  if (!m) return 0;
+  const mins = Number(m[2]) * 60 + Number(m[3] ?? 0);
+  return m[1] === "-" ? -mins : mins;
+}
+
+/**
+ * Build the CRM's scheduled_at: local wall-clock time with an explicit,
+ * DST-correct Eastern offset, e.g. "2026-08-20T14:00:00-04:00".
+ */
+function buildScheduledAt(preferredDate: unknown, timeSlot: unknown): string | null {
+  const date = normalizeDate(preferredDate);
+  if (!date) return null;
+  const time = normalizeTimeSlot(timeSlot);
+  return `${date}T${time}:00${easternOffset(date, time)}`;
+}
+
+
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -213,15 +297,16 @@ Deno.serve(async (req) => {
     );
   }
 
-  // Build scheduled_at from the stored preferred_date + time_slot.
+  // Wall-clock Eastern + explicit DST-correct offset, so the CRM's timestamptz
+  // stores the instant the customer actually picked.
   let scheduledAt: string | null = null;
   try {
-    const time = booking.time_slot ? `${booking.time_slot}:00` : "00:00:00";
-    const d = new Date(`${booking.preferred_date}T${time}`);
-    scheduledAt = Number.isNaN(d.getTime()) ? null : d.toISOString();
-  } catch {
+    scheduledAt = buildScheduledAt(booking.preferred_date, booking.time_slot);
+  } catch (e) {
+    console.error("scheduled_at build failed:", e);
     scheduledAt = null;
   }
+
 
   // Split the single stored address into the discrete fields the CRM reads.
   // Geocoding first (handles comma-less free text), naive parser as fallback.
