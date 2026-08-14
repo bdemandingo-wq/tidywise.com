@@ -14,8 +14,9 @@ const CardSaved = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-16">
       <SEOHead
-        pageTitle="Card on File | TIDYWISE"
-        pageDescription="Your TIDYWISE cleaning is confirmed. We don't charge your card until after your cleaning is complete."
+        title="Card on File | TIDYWISE"
+        description="Your TIDYWISE cleaning is confirmed. We don't charge your card until after your cleaning is complete."
+        canonical="/card-saved"
         noIndex
       />
       <main className="w-full max-w-lg text-center space-y-6">
