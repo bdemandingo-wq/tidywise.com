@@ -67,6 +67,16 @@ const TIME_SLOTS: { value: string; label: string }[] = [
 ];
 
 // Zod schema mirroring DB constraints
+const BEDROOM_OPTIONS = [
+  { value: "0", label: "Studio" },
+  { value: "1", label: "1 Bedroom" },
+  { value: "2", label: "2 Bedrooms" },
+  { value: "3", label: "3 Bedrooms" },
+  { value: "4", label: "4 Bedrooms" },
+  { value: "5", label: "5 Bedrooms" },
+  { value: "6", label: "6+ Bedrooms" },
+];
+
 const bookingSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name too long"),
   email: z.string().trim().email("Invalid email address").max(255, "Email too long"),
@@ -77,6 +87,7 @@ const bookingSchema = z.object({
     .max(20, "Phone too long")
     .regex(/^[\d\s()+\-.]+$/, "Phone contains invalid characters"),
   address: z.string().trim().min(5, "Address required").max(300, "Address too long"),
+  beds: z.string().min(1, "Select bedroom count"),
   baths: z.string().min(1, "Select bathroom count"),
   specialInstructions: z.string().trim().max(2000, "Instructions too long").optional(),
   hasPets: z.boolean(),
@@ -111,6 +122,7 @@ const BookingForm = () => {
     email: user?.email ?? "",
     phone: "",
     address: "",
+    beds: "",
     baths: "",
     specialInstructions: "",
     hasPets: false,
@@ -353,7 +365,7 @@ const BookingForm = () => {
         customer_email: parsed.data.email,
         customer_phone: parsed.data.phone,
         address: parsed.data.address,
-        beds: `${sqft.toLocaleString()} sq ft`,
+        beds: parsed.data.beds,
         baths: parsed.data.baths,
         sqft,
         service_type: serviceLabel,
@@ -455,7 +467,7 @@ const BookingForm = () => {
               address: parsed.data.address,
               serviceType: serviceLabel,
               frequency: freqLabel,
-              beds: `${sqft.toLocaleString()} sq ft`,
+              beds: parsed.data.beds,
               baths: parsed.data.baths,
               sqft,
               totalPrice: isCustomQuote ? "Custom Quote" : breakdown.total.toString(),
@@ -909,6 +921,20 @@ const BookingForm = () => {
                       />
                     </div>
                     {errors.address && <p id="bf-address-error" className="text-sm text-destructive">{errors.address}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="bf-beds">Bedrooms *</Label>
+                    <Select value={formData.beds} onValueChange={(v) => handleField("beds", v)}>
+                      <SelectTrigger id="bf-beds" aria-invalid={!!errors.beds}>
+                        <SelectValue placeholder="Select number of bedrooms" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BEDROOM_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {errors.beds && <p className="text-sm text-destructive">{errors.beds}</p>}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="bf-baths">Bathrooms *</Label>
