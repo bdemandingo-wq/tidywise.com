@@ -205,7 +205,7 @@ const Auth = () => {
               <p className="text-muted-foreground">
                 {isForgotPassword
                   ? resetStep === "email"
-                    ? "Enter your email to receive a code via SMS"
+                    ? "We'll text a reset code to the phone number on your account."
                     : "Enter the code and your new password"
                   : isLogin ? "Sign in to manage bookings" : "Create your account"}
               </p>
